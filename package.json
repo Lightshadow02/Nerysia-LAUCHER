@@ -1,13 +1,13 @@
 {
-  "name": "helioslauncher",
-  "version": "2.2.1",
-  "productName": "Helios Launcher",
-  "description": "Modded Minecraft Launcher",
-  "author": "Daniel Scalzi (https://github.com/dscalzi/)",
-  "license": "UNLICENSED",
-  "homepage": "https://github.com/dscalzi/HeliosLauncher",
+  "name": "nerysialauncher",
+  "version": "1.0.0",
+  "productName": "Nerysia - Laucher",
+  "description": "Modded Nerysia Launcher",
+  "author": "Lightshadow02 (https://github.com/Lightshadow02/)",
+  "license": "MIT",
+  "homepage": "https://github.com/Lightshadow02/Nerysia-LAUCHER",
   "bugs": {
-    "url": "https://github.com/dscalzi/HeliosLauncher/issues"
+    "url": "https://github.com/Lightshadow02/Nerysia-LAUCHER/issues"
   },
   "private": true,
   "main": "index.js",
@@ -40,12 +40,12 @@
     "toml": "^3.0.0"
   },
   "devDependencies": {
-    "electron": "^33.2.1",
+    "electron": "^39.0.0",
     "electron-builder": "^25.1.8",
     "eslint": "^8.57.1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dscalzi/HeliosLauncher.git"
+    "url": "git+https://github.com/Lightshadow02/Nerysia-LAUCHER.git"
   }
 }

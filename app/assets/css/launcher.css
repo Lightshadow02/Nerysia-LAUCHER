@@ -2858,7 +2858,6 @@ input:checked + .toggleSwitchSlider:before {
     height: 70px;
     width: auto;
     position: relative;
-    border: 2px solid white;
     box-sizing: border-box;
     border-radius: 50%;
 }
@@ -3052,24 +3051,24 @@ input:checked + .toggleSwitchSlider:before {
 /* Divider bar between the external and internal icons. */
 .mediaDivider {
     height: 1px;
-    width: 14px;
+    width: 24px;
     background: rgb(255, 255, 255);
-    margin: 10px 0px;
+    margin: 20px 0px;
 }
 
 /* Social media icon shared styles. */
 .mediaSVG {
     fill: #ffffff;
-    height: 12px;
+    height: 24px;
     transition: 0.25s ease;
     cursor: pointer;
-    height: 12px;
-    width: 25px;
+    height: 24px;
+    width: 50px;
 }
 .mediaSVG:hover,
 .mediaURL:focus .mediaSVG,
 .mediaSVG:active {
-    height: 20px;
+    height: 18px;
 }
 
 /* Social media URL shared styles. */
@@ -3094,12 +3093,12 @@ input:checked + .toggleSwitchSlider:before {
 /* Settings icon colors. */
 #settingsSVG {
     stroke: #ffffff;
-    height: 15px;
+    height: 32px;
 }
 .mediaButton:hover #settingsSVG,
 .mediaButton:focus #settingsSVG,
 .mediaButton:active #settingsSVG {
-    height: 23px;
+    height: 22px;
 }
 
 /* Settings tooltip styles. */
