@@ -2,39 +2,32 @@ name: Build & Release (Win/macOS/Linux)
 
 on:
   push:
-    tags:
-      - "v*"
+    tags: ["v*"]
+
+permissions:
+  contents: write
 
 jobs:
   build:
     strategy:
+      fail-fast: false                     # <— ne pas annuler les autres OS
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.os == 'macos-latest' }}  # <— tolérer un fail mac
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "npm"
-
-      - name: Install deps
-        run: npm ci
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: "npm" }
+      - run: npm ci
 
       - name: Build & publish to GitHub Releases
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # pas de signature Apple => désactive l'auto-détection sur macOS
-          CSC_IDENTITY_AUTO_DISCOVERY: ${{ matrix.os == 'macos-latest' && 'false' || '' }}
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"   # <— ne tente pas de signer macOS
         run: npm run dist -- -p always
 
-      - name: Upload build artifacts (backup)
-        if: always()
+      - if: always()
         uses: actions/upload-artifact@v4
-        with:
-          name: dist-${{ matrix.os }}
-          path: dist/**
+        with: { name: dist-${{ matrix.os }}, path: dist/** }
