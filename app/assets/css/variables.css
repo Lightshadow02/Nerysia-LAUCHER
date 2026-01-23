@@ -1,0 +1,35 @@
+:root {
+    --font-primary: 'Avenir Book', sans-serif;
+    --font-medium: 'Avenir Medium', sans-serif;
+    --font-header: 'Ringbearer', sans-serif;
+
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #848484;
+    --color-text-dim: rgba(255, 255, 255, 0.75);
+
+    --color-bg-overlay: rgba(0, 0, 0, 0.50);
+    --color-bg-panel: rgba(0, 0, 0, 0.25);
+
+    --color-accent-green: #23aa23;
+    --color-accent-red: #c32625;
+    --color-accent-blue: #05a6f0;
+    --color-accent-yellow: #fed045;
+
+    --border-color: rgba(126, 126, 126, 0.57);
+    --border-color-light: #ffffff;
+
+    --color-button-hover: rgba(54, 54, 54, 0.25);
+    --color-button-active: rgba(156, 156, 156, 0.43);
+}
+
+body.theme-light {
+    --color-text-primary: #000000;
+    --color-text-secondary: #333333;
+    --color-text-dim: rgba(0, 0, 0, 0.75);
+
+    --color-bg-overlay: rgba(255, 255, 255, 0.50);
+    --color-bg-panel: rgba(255, 255, 255, 0.25);
+
+    --border-color: rgba(0, 0, 0, 0.57);
+    --border-color-light: #000000;
+}

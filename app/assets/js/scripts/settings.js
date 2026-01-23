@@ -1486,6 +1486,35 @@ function prepareAboutTab(){
 }
 
 /**
+ * UI Tab
+ */
+
+function prepareUITab() {
+    const selectedTheme = getTheme()
+    document.getElementById('settingsThemeSelected').innerHTML = Lang.queryJS(`settings.theme${selectedTheme.charAt(0).toUpperCase() + selectedTheme.slice(1)}`)
+
+    const themeOptions = document.getElementById('settingsThemeOptions').children
+    for (let opt of themeOptions) {
+        if (opt.getAttribute('value') === selectedTheme) {
+            opt.setAttribute('selected', '')
+        } else {
+            opt.removeAttribute('selected')
+        }
+
+        opt.onclick = function() {
+            const val = this.getAttribute('value')
+            setTheme(val)
+            document.getElementById('settingsThemeSelected').innerHTML = this.innerHTML
+            for (let sibling of this.parentElement.children) {
+                sibling.removeAttribute('selected')
+            }
+            this.setAttribute('selected', '')
+            closeSettingsSelect(this.parentElement.previousElementSibling)
+        }
+    }
+}
+
+/**
  * Update Tab
  */
 
@@ -1576,6 +1605,7 @@ async function prepareSettings(first = false) {
     await initSettingsValues()
     prepareAccountsTab()
     await prepareJavaTab()
+    prepareUITab()
     prepareAboutTab()
 }
 
