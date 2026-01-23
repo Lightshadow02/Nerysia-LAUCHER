@@ -11,6 +11,7 @@
                     <button class="settingsNavItem" rSc="settingsTabMods"><%- lang('settings.navMods') %></button>
                     <button class="settingsNavItem" rSc="settingsTabJava"><%- lang('settings.navJava') %></button>
                     <button class="settingsNavItem" rSc="settingsTabLauncher"><%- lang('settings.navLauncher') %></button>
+                    <button class="settingsNavItem" rSc="settingsTabUI"><%- lang('settings.navUI') %></button>
                     <div class="settingsNavSpacer"></div>
                     <button class="settingsNavItem" rSc="settingsTabAbout"><%- lang('settings.navAbout') %></button>
                     <button class="settingsNavItem" rSc="settingsTabUpdate" id="settingsNavUpdate"><%- lang('settings.navUpdates') %></button>
@@ -304,6 +305,26 @@
                     </div>
                 </div>
                 <div class="settingsFileSelDesc"><%- lang('settings.dataDirectoryDesc') %></div>
+            </div>
+        </div>
+        <div id="settingsTabUI" class="settingsTab" style="display: none;">
+            <div class="settingsTabHeader">
+                <span class="settingsTabHeaderText"><%- lang('settings.tabUIHeaderText') %></span>
+                <span class="settingsTabHeaderDesc"><%- lang('settings.tabUIHeaderDesc') %></span>
+            </div>
+            <div class="settingsFieldContainer">
+                <div class="settingsFieldLeft">
+                    <span class="settingsFieldTitle"><%- lang('settings.themeTitle') %></span>
+                </div>
+                <div class="settingsFieldRight">
+                    <div class="settingsSelectContainer">
+                        <div class="settingsSelectSelected" id="settingsThemeSelected">Dark</div>
+                        <div class="settingsSelectOptions" id="settingsThemeOptions" hidden>
+                            <div value="dark" selected><%- lang('settings.themeDark') %></div>
+                            <div value="light"><%- lang('settings.themeLight') %></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="settingsTabAbout" class="settingsTab" style="display: none;">

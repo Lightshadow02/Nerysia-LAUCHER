@@ -1,0 +1,49 @@
+/*******************************************************************************
+ *                                                                             *
+ * Fonts                                                                       *
+ *                                                                             *
+ ******************************************************************************/
+
+@font-face {
+    font-family: 'Avenir Book';
+    src: url('../fonts/Avenir-Book.ttf');
+}
+
+@font-face {
+    font-family: 'Avenir Medium';
+    src: url('../fonts/Avenir-Medium.ttf');
+}
+
+@font-face {
+    font-family: 'Ringbearer';
+    src: url('../fonts/Ringbearer.ttf');
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Element Styles                                                              *
+ *                                                                             *
+ ******************************************************************************/
+
+/* Reset body, html, and div presets. */
+body, html, div {
+    margin: 0px;
+    padding: 0px;
+}
+
+/* Reset p presets. */
+p {
+    -webkit-margin-before: 0em;
+    -webkit-margin-after: 0em;
+}
+
+/* Set default font and color. */
+body, button {
+    font-family: var(--font-primary);
+    color: var(--color-text-primary);
+}
+
+/*body {
+    background: url('./../images/backgrounds/0.jpg') no-repeat center center fixed;
+    background-size: cover;
+}*/
