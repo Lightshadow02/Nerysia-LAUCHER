@@ -1,9 +1,13 @@
 {
   "name": "nerysia-launcher",
   "version": "1.0.2",
-  "productName": "Nerysia - Laucher",
+  "productName": "Nerysia Launcher",
   "description": "Modded Nerysia Launcher",
-  "author": "Lightshadow02 (https://github.com/Lightshadow02/)",
+  "author": {
+    "name": "Lightshadow02",
+    "email": "loureirohugo70@gmail.com",
+    "url": "https://github.com/Lightshadow02/"
+  },
   "license": "MIT",
   "homepage": "https://github.com/Lightshadow02/Nerysia-LAUCHER",
   "bugs": {
@@ -47,18 +51,5 @@
     "electron": "^39.0.0",
     "electron-builder": "^25.1.8",
     "eslint": "^8.57.1"
-  },
-  "build": {
-    "appId": "fr.nerysia.launcher",
-    "publish": [{ "provider": "github" }],
-    "win": {
-      "target": "nsis",
-      "icon": "build/icon.ico"
-    },
-    "linux": {
-      "target": ["AppImage", "deb"],
-      "icon": "build/icons"
-    },
-    "mac": { "category": "public.app-category.games" }
   }
 }
