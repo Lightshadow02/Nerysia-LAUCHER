@@ -1,50 +1,40 @@
-appId: 'nerysialauncher'
+appId: 'fr.nerysia.launcher'
 productName: 'Nerysia Launcher'
 artifactName: '${productName}-setup-${version}.${ext}'
 
-copyright: 'Copyright © 2018-2025 Nerysia'
+copyright: 'Copyright © 2026 Nerysia'
 
 asar: true
 compression: 'maximum'
 
 files:
-  - '!{dist,.gitignore,.vscode,docs,dev-app-update.yml,.nvmrc,.eslintrc.json}'
-
-extraResources:
-  - 'libraries'
+  - '!{dist,.gitignore,.vscode,docs,dev-app-update.yml,.nvmrc,.eslintrc.json,tools,.github,.claude}'
 
 # Windows Configuration
-win: 
-  target: 
+win:
+  target:
     - target: 'nsis'
       arch: 'x64'
 
-# Windows Installer Configuration
 nsis:
   oneClick: false
   perMachine: false
   allowElevation: true
   allowToChangeInstallationDirectory: true
 
-# macOS Configuration
-mac:
-  target:
-    - target: 'dmg'
-      arch:
-        - 'x64'
-        - 'arm64'
-  artifactName: '${productName}-setup-${version}-${arch}.${ext}'
-  category: 'public.app-category.games'
-
 # Linux Configuration
-linux: 
+linux:
   target: 'AppImage'
-  maintainer: 'Daniel Scalzi'
-  vendor: 'Daniel Scalzi'
-  synopsis: 'Modded Minecraft Launcher'
-  description: 'Custom launcher which allows users to join modded servers. All mods, configurations, and updates are handled automatically.'
+  maintainer: 'Hugo Loureiro <loureirohugo70@gmail.com>'
+  vendor: 'Nerysia'
+  synopsis: 'Launcher Minecraft Nerysia (Cobblemon)'
+  description: 'Launcher officiel du serveur Nerysia. Mods, configurations et mises à jour sont téléchargés automatiquement.'
   category: 'Game'
 
+publish:
+  provider: github
+  owner: Lightshadow02
+  repo: Nerysia-LAUCHER
 
 directories:
   buildResources: 'build'

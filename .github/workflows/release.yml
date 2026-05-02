@@ -1,4 +1,4 @@
-name: Build & Release (Win/macOS/Linux)
+name: Build & Release
 
 on:
   push:
@@ -10,24 +10,22 @@ permissions:
 jobs:
   build:
     strategy:
-      fail-fast: false                     # <— ne pas annuler les autres OS
+      fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        os: [windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.os == 'macos-latest' }}  # <— tolérer un fail mac
 
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: "npm" }
+        with:
+          node-version: 20
+          cache: npm
+
       - run: npm ci
 
-      - name: Build & publish to GitHub Releases
+      - name: Build & publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CSC_IDENTITY_AUTO_DISCOVERY: "false"   # <— ne tente pas de signer macOS
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
         run: npm run dist -- -p always
-
-      - if: always()
-        uses: actions/upload-artifact@v4
-        with: { name: dist-${{ matrix.os }}, path: dist/** }
