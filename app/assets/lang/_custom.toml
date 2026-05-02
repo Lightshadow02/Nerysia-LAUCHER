@@ -4,15 +4,15 @@
 title = "Nerysia Launcher"
 
 [ejs.landing]
-mediaGitHubURL = "https://nerysia.fr"
+mediaGitHubURL = "https://www.nerysia.fr"
 mediaXURL = "#"
 mediaInstagramURL = "#"
 mediaYouTubeURL = "#"
 mediaDiscordURL = "https://discord.gg/dtvMfS69hU"
 
 [ejs.settings]
-sourceGithubLink = "https://github.com/dscalZi/HeliosLauncher"
-supportLink = "https://github.com/dscalZi/HeliosLauncher/issues"
+sourceGithubLink = "https://github.com/Lightshadow02/Nerysia-LAUCHER"
+supportLink = "https://github.com/Lightshadow02/Nerysia-LAUCHER/issues"
 
 [ejs.welcome]
 welcomeHeader = "Welcome to Nerysia"

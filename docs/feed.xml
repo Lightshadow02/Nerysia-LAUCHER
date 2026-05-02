@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:slash="http://purl.org/rss/1.0/modules/slash/">
+  <channel>
+    <title>Nerysia News</title>
+    <link>https://apk.nerysia.fr</link>
+    <description>Actualités du serveur Nerysia</description>
+    <language>fr-FR</language>
+
+    <!-- ============================================ -->
+    <!-- ARTICLE 1 — Le plus récent en premier        -->
+    <!-- ============================================ -->
+    <item>
+      <title>Bienvenue sur Nerysia !</title>
+      <link>https://apk.nerysia.fr</link>
+      <pubDate>Fri, 02 May 2026 12:00:00 +0200</pubDate>
+      <dc:creator>Lightshadow02</dc:creator>
+      <slash:comments>0</slash:comments>
+      <content:encoded><![CDATA[
+        <h2>🎉 Le serveur Nerysia est en ligne !</h2>
+        <p>Bienvenue sur le serveur <strong>Nerysia</strong>, un serveur Minecraft Fabric 1.21.1 avec <strong>Cobblemon</strong> !</p>
+        <p>Pour rejoindre le serveur :</p>
+        <ol>
+          <li>Connectez-vous avec votre compte Microsoft dans le launcher</li>
+          <li>Cliquez sur <strong>Jouer</strong></li>
+          <li>Le launcher télécharge et installe tout automatiquement</li>
+        </ol>
+        <p>Bonne aventure à tous ! 🐉</p>
+      ]]></content:encoded>
+    </item>
+
+    <!-- ============================================ -->
+    <!-- ARTICLE 2                                    -->
+    <!-- ============================================ -->
+    <item>
+      <title>Modpack v1.0.0 — Liste des mods</title>
+      <link>https://apk.nerysia.fr</link>
+      <pubDate>Fri, 02 May 2026 10:00:00 +0200</pubDate>
+      <dc:creator>Lightshadow02</dc:creator>
+      <slash:comments>0</slash:comments>
+      <content:encoded><![CDATA[
+        <h2>📦 Mods inclus dans le modpack</h2>
+        <p>Voici la liste des mods installés automatiquement par le launcher :</p>
+        <h3>Mods obligatoires</h3>
+        <ul>
+          <li><strong>Cobblemon 1.6.1</strong> — Attrapez des Pokémon dans Minecraft</li>
+          <li><strong>Fabric API 0.116.7</strong> — API de base pour Fabric</li>
+          <li><strong>Sodium 0.6.13</strong> — Optimisation graphique</li>
+        </ul>
+        <h3>Mods optionnels (désactivés par défaut)</h3>
+        <ul>
+          <li><strong>Iris Shaders 1.8.8</strong> — Support des shaders (activer dans Paramètres)</li>
+        </ul>
+      ]]></content:encoded>
+    </item>
+
+  </channel>
+</rss>

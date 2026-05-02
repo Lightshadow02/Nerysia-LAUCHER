@@ -149,8 +149,10 @@ ipcMain.on(MSFT_OPCODE.OPEN_LOGIN, (ipcEvent, ...arguments_) => {
             let queryMap = {}
 
             queries.forEach(query => {
-                const [name, value] = query.split('=')
-                queryMap[name] = decodeURI(value)
+                const idx = query.indexOf('=')
+                const name = idx === -1 ? query : query.substring(0, idx)
+                const value = idx === -1 ? '' : query.substring(idx + 1)
+                queryMap[name] = decodeURIComponent(value)
             })
 
             ipcEvent.reply(MSFT_OPCODE.REPLY_LOGIN, MSFT_REPLY_TYPE.SUCCESS, queryMap, msftAuthViewSuccess)
@@ -241,7 +243,7 @@ function createWindow() {
     remoteMain.enable(win.webContents)
 
     const data = {
-        bkid: Math.floor((Math.random() * fs.readdirSync(path.join(__dirname, 'app', 'assets', 'images', 'backgrounds')).length)),
+        bkid: pickBackground(),
         lang: (str, placeHolders) => LangLoader.queryEJS(str, placeHolders)
     }
     Object.entries(data).forEach(([key, val]) => ejse.data(key, val))
@@ -323,6 +325,15 @@ function createMenu() {
 
     }
 
+}
+
+function pickBackground() {
+    const hour = new Date().getHours()
+    const theme = (hour >= 7 && hour < 19) ? 'clair' : 'sombre'
+    const dir = path.join(__dirname, 'app', 'assets', 'images', 'backgrounds', theme)
+    const files = fs.readdirSync(dir).filter(f => /\.(jpe?g|png)$/i.test(f))
+    if (files.length === 0) return ''
+    return `${theme}/${files[Math.floor(Math.random() * files.length)]}`
 }
 
 function getPlatformIcon(filename){
