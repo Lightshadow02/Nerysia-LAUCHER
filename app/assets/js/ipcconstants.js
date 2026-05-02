@@ -1,6 +1,8 @@
 // NOTE FOR THIRD-PARTY
 // REPLACE THIS CLIENT ID WITH YOUR APPLICATION ID.
 // SEE https://github.com/dscalzi/HeliosLauncher/blob/master/docs/MicrosoftAuth.md
+// TEMPORAIRE — Client ID Helios partagé, en attendant whitelist Microsoft du Client ID Nerysia.
+// À remplacer par '4979ff0d-390e-4a51-878c-efcbf4626cab' (cf docs/AUTH_AZURE.md) dès que Microsoft valide.
 exports.AZURE_CLIENT_ID = '1ce6e35a-126f-48fd-97fb-54d143ac6d45'
 // SEE NOTE ABOVE.
 
