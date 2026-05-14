@@ -7,7 +7,7 @@
             "name": "Nerysia (Minecraft 1.21.1)",
             "description": "Nerysia Running Minecraft 1.21.1 (Fabric v0.19.2)",
             "icon": "https://apk.nerysia.fr/Logo.png",
-            "version": "1.13.0",
+            "version": "1.14.0",
             "address": "node.hloureiro.fr:45545",
             "minecraftVersion": "1.21.1",
             "mainServer": true,
@@ -286,13 +286,13 @@
                     }
                 },
                 {
-                    "id": "generated.fabricmod:Nerysia-MOD-1.6.8:1.0.0@jar",
-                    "name": "Nerysia-MOD-1.6.8",
+                    "id": "generated.fabricmod:Nerysia-MOD-1.7.1:1.0.0@jar",
+                    "name": "Nerysia-MOD-1.7.1",
                     "type": "FabricMod",
                     "artifact": {
-                        "size": 149464700,
-                        "MD5": "9f267ce88a97a6650e8a669f7dbbb807",
-                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/Nerysia-MOD-1.6.8.jar"
+                        "size": 149467168,
+                        "MD5": "e16b40a4b2a76f46765c5df4217b111f",
+                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/Nerysia-MOD-1.7.1.jar"
                     }
                 },
                 {
@@ -916,13 +916,13 @@
                     }
                 },
                 {
-                    "id": "generated.fabricmod:nery-faction-1.67.0:1.0.0@jar",
-                    "name": "nery-faction-1.67.0",
+                    "id": "generated.fabricmod:nery-faction-1.68.7:1.0.0@jar",
+                    "name": "nery-faction-1.68.7",
                     "type": "FabricMod",
                     "artifact": {
-                        "size": 3850201,
-                        "MD5": "93353541fa92d5e212c7381df33ee471",
-                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/nery-faction-1.67.0.jar"
+                        "size": 3891595,
+                        "MD5": "58664498b1929e13076662c322409ea1",
+                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/nery-faction-1.68.7.jar"
                     }
                 },
                 {
