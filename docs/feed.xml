@@ -13,6 +13,94 @@
     <!-- ARTICLE 1 — Le plus récent en premier        -->
     <!-- ============================================ -->
     <item>
+      <title>Mise à jour majeure — Mod Nerysia v1.0.6 + Factions V6.6</title>
+      <link>https://apk.nerysia.fr</link>
+      <pubDate>Sat, 02 May 2026 14:00:00 +0200</pubDate>
+      <dc:creator>Lightshadow02</dc:creator>
+      <slash:comments>0</slash:comments>
+      <content:encoded><![CDATA[
+        <h2>🎉 Grosse mise à jour !</h2>
+        <p>Une grosse update vient d'arriver sur Nerysia, regroupant les patchs <strong>Mod Nerysia v1.0.6</strong> et <strong>Factions/Cobblemon V6.6</strong>. Voici tout ce qui change pour vous.</p>
+
+        <h3>🛡️ Raid Dens enfin tranquilles</h3>
+        <p>Plus aucune interruption pendant vos combats de raid Cobblemon :</p>
+        <ul>
+          <li><strong>Vos Pokémon sauvages ne disparaissent plus</strong> pendant le raid</li>
+          <li><strong>Les drops d'objets restent au sol</strong> leur durée vanilla, plus de despawn boost</li>
+          <li><strong>Aucun monstre hostile ne peut spawner</strong> dans le donjon</li>
+          <li><strong>TPA et /home bloqués</strong> dans les raid dens (anti-cheat)</li>
+        </ul>
+
+        <h3>🌳 Branches Factions : refonte totale</h3>
+        <p>Fini les coûts ridicules ! Investir dans une branche est maintenant accessible à tous :</p>
+        <ul>
+          <li><strong>1 seul point par tier</strong> (au lieu de 2 à 8 selon le tier)</li>
+          <li><strong>10 points pour maxer une branche</strong> entière (au lieu de 45)</li>
+          <li><strong>40 points pour TOUT maxer</strong> les 4 branches (Agriculture, Expansion, Forge, Chasseur) — atteignable au niveau 40</li>
+          <li>+10 points de marge au cap pour les bonus admin/events</li>
+        </ul>
+
+        <h3>📊 Nouveaux écrans dans le Nexus</h3>
+        <ul>
+          <li><strong>Paliers XP</strong> — table complète des 50 niveaux, ta progression, prochain niveau, sources d'XP avec valeurs. Scrollable, auto-centrée sur ton niveau actuel.</li>
+          <li><strong>Joueurs</strong> (Leaders &amp; Co-Leaders) — gérez vos membres : promouvoir, rétrograder, exclure, statut online/offline en un coup d'œil.</li>
+        </ul>
+
+        <h3>🏠 Renommage homes &amp; faction</h3>
+        <ul>
+          <li><strong>Renommer une home</strong> : commande <code>/f renamehome &lt;ancien&gt; &lt;nouveau&gt;</code> ou bouton <strong>R</strong> jaune dans le Nexus → Territoire</li>
+          <li><strong>Renommer ta faction</strong> (Leader &amp; Co-Leader) directement via le Nexus → Accueil</li>
+        </ul>
+
+        <h3>🎮 Confort de jeu</h3>
+        <ul>
+          <li><strong>HUDs déplacés en haut-gauche</strong> (Bounty, Leurre, Catalyst) — ne masquent plus l'inventaire</li>
+          <li><strong>Blocs faction rendus à l'inventaire</strong> si placement invalide (hors claim, branche pas débloquée, etc.) — fini les Forges qui disparaissent dans le vide</li>
+          <li><strong>Nexus destructible plus facilement</strong> (résistance pierre au lieu d'obsidienne) — toujours protégé par les permissions Co-Leader+</li>
+          <li><strong>Plus de "vrombissement d'abeille"</strong> sans abeille à proximité</li>
+        </ul>
+
+        <h3>🔒 Sécurité &amp; serveur</h3>
+        <ul>
+          <li><strong>Mobs hostiles bloqués partout</strong> : wither skeleton, piglin, noyé, gardien, elder guardian, vindicateur, évocateur</li>
+          <li><strong>Crate zones strictes</strong> — dans les zones d'events, seules les crates sont cliquables (fini le placement de blocs ou clic sur n'importe quoi)</li>
+        </ul>
+
+        <h3>🆘 Découvre tout en jeu : <code>/nhelp</code></h3>
+        <p>Nouvelle commande pour explorer toutes les fonctionnalités selon ton rang :</p>
+        <ul>
+          <li><code>/nhelp</code> — vue d'ensemble</li>
+          <li><code>/nhelp joueur</code> — commandes joueur (TPA, home, raid, daily…)</li>
+          <li><code>/nhelp staff</code> / <code>/nhelp modo</code> / <code>/nhelp admin</code> — selon tes permissions</li>
+        </ul>
+
+        <h3>👮 Pour le staff (récap)</h3>
+        <p>Nouveaux outils dispo : <code>/vanish</code> cross-serveur, <code>/fly</code>, <code>/speed</code>, <code>/nightvision</code>, panneau <code>/modo</code> avec liste cross-serveur de tous les joueurs, <code>/annonce</code> diffusée sur tout le réseau, <code>/ntp</code> téléport cross-serveur. Voir <code>/nhelp staff</code> en jeu.</p>
+
+        <h3>🐛 Bugs corrigés</h3>
+        <ul>
+          <li>Plus de crash client pour les joueurs sans LuckPerms installé</li>
+          <li>Le focus des champs de texte (Nexus, Admin) ne se perd plus pendant la saisie</li>
+          <li>Le compteur de points disponibles dans le Nexus prend bien en compte les +pts admin</li>
+          <li>Quêtes synchronisées entre tous les serveurs du réseau</li>
+          <li>Faction chat compatible avec les chat-sync de proxy</li>
+        </ul>
+
+        <h3>📌 À savoir</h3>
+        <ul>
+          <li><strong>Aucun reset</strong> : vos points, homes, factions, Pokémon, banque restent intacts</li>
+          <li><strong>Compatibilité totale</strong> avec vos configurations actuelles</li>
+          <li>Si vous étiez modo non-OP utilisant <code>/kick</code> <code>/ban</code> <code>/tp</code> → utilisez maintenant <code>/nkick</code>, <code>/nban</code>, <code>/ntp</code></li>
+        </ul>
+
+        <p><em>Bonne aventure sur Nerysia ! 🐉⚔️</em></p>
+      ]]></content:encoded>
+    </item>
+
+    <!-- ============================================ -->
+    <!-- ARTICLE 2 — Bienvenue (premier post)         -->
+    <!-- ============================================ -->
+    <item>
       <title>Bienvenue sur Nerysia !</title>
       <link>https://apk.nerysia.fr</link>
       <pubDate>Fri, 02 May 2026 12:00:00 +0200</pubDate>
@@ -28,31 +116,6 @@
           <li>Le launcher télécharge et installe tout automatiquement</li>
         </ol>
         <p>Bonne aventure à tous ! 🐉</p>
-      ]]></content:encoded>
-    </item>
-
-    <!-- ============================================ -->
-    <!-- ARTICLE 2                                    -->
-    <!-- ============================================ -->
-    <item>
-      <title>Modpack v1.0.0 — Liste des mods</title>
-      <link>https://apk.nerysia.fr</link>
-      <pubDate>Fri, 02 May 2026 10:00:00 +0200</pubDate>
-      <dc:creator>Lightshadow02</dc:creator>
-      <slash:comments>0</slash:comments>
-      <content:encoded><![CDATA[
-        <h2>📦 Mods inclus dans le modpack</h2>
-        <p>Voici la liste des mods installés automatiquement par le launcher :</p>
-        <h3>Mods obligatoires</h3>
-        <ul>
-          <li><strong>Cobblemon 1.6.1</strong> — Attrapez des Pokémon dans Minecraft</li>
-          <li><strong>Fabric API 0.116.7</strong> — API de base pour Fabric</li>
-          <li><strong>Sodium 0.6.13</strong> — Optimisation graphique</li>
-        </ul>
-        <h3>Mods optionnels (désactivés par défaut)</h3>
-        <ul>
-          <li><strong>Iris Shaders 1.8.8</strong> — Support des shaders (activer dans Paramètres)</li>
-        </ul>
       ]]></content:encoded>
     </item>
 
