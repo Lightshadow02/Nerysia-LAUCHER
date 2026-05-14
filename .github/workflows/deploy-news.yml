@@ -70,14 +70,26 @@ jobs:
           echo ""
           echo "=== Upload via lftp ==="
           lftp -u "$FTP_USER,$FTP_PASS" -e "
-            set net:timeout 15;
-            set net:max-retries 2;
-            set net:reconnect-interval-base 3;
+            set net:timeout 30;
+            set net:max-retries 3;
+            set net:reconnect-interval-base 5;
+            set ftp:passive-mode on;
+            set ftp:prefer-epsv no;
             set ftp:ssl-allow yes;
+            set ftp:ssl-force no;
+            set ftp:ssl-protect-data yes;
             set ssl:verify-certificate no;
             debug 3;
-            cd /apk/nerysia-laucher;
+            echo \"--- Listing root pour verifier connexion ---\";
+            ls;
+            echo \"--- Listing /apk/ ---\";
+            cd /apk && ls;
+            echo \"--- Listing /apk/nerysia-laucher/ ---\";
+            cd /apk/nerysia-laucher && ls;
+            echo \"--- Upload feed.xml ---\";
             put docs/feed.xml;
+            echo \"--- Verification post-upload ---\";
+            ls feed.xml;
             bye
           " "$URL" 2>&1
 
