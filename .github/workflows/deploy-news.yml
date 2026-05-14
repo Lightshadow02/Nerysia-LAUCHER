@@ -68,30 +68,36 @@ jobs:
           fi
 
           echo ""
-          echo "=== Upload via lftp ==="
-          lftp -u "$FTP_USER,$FTP_PASS" -e "
+          echo "=== Test 1 : curl FTPS (explicit TLS, ce que OVH veut) ==="
+          curl -v --connect-timeout 15 --max-time 30 \
+               --user "$FTP_USER:$FTP_PASS" \
+               --ssl --insecure \
+               "ftp://$CLEAN_HOST/" 2>&1 | head -40 || echo "curl FTPS a echoue"
+
+          echo ""
+          echo "=== Test 2 : lftp avec FTPS force (recommande OVH) ==="
+          lftp -d -u "$FTP_USER,$FTP_PASS" -e "
             set net:timeout 30;
-            set net:max-retries 3;
+            set net:max-retries 2;
             set net:reconnect-interval-base 5;
             set ftp:passive-mode on;
             set ftp:prefer-epsv no;
             set ftp:ssl-allow yes;
-            set ftp:ssl-force no;
+            set ftp:ssl-force yes;
             set ftp:ssl-protect-data yes;
             set ssl:verify-certificate no;
-            debug 3;
-            echo \"--- Listing root pour verifier connexion ---\";
-            ls;
-            echo \"--- Listing /apk/ ---\";
-            cd /apk && ls;
-            echo \"--- Listing /apk/nerysia-laucher/ ---\";
-            cd /apk/nerysia-laucher && ls;
-            echo \"--- Upload feed.xml ---\";
+            cd /apk/nerysia-laucher;
             put docs/feed.xml;
-            echo \"--- Verification post-upload ---\";
-            ls feed.xml;
             bye
-          " "$URL" 2>&1
+          " "$CLEAN_HOST" 2>&1 || true
+
+          echo ""
+          echo "=== Test 3 : curl upload direct (fallback) ==="
+          curl -v --connect-timeout 15 --max-time 60 \
+               --user "$FTP_USER:$FTP_PASS" \
+               --ssl --insecure \
+               -T docs/feed.xml \
+               "ftp://$CLEAN_HOST/apk/nerysia-laucher/feed.xml" 2>&1
 
       - name: Confirm
         run: echo "✓ feed.xml deployed to ${{ secrets.FTP_HOST }}:/apk/nerysia-laucher/feed.xml"
