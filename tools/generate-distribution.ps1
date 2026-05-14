@@ -3,9 +3,81 @@
 # Usage: .\generate-distribution.ps1
 # Output: docs\distribution.json
 
+param(
+    [ValidateSet("none","patch","minor","major")]
+    [string]$Bump = "none"
+)
+
 $serverRoot   = "Y:\apk\nerysia-laucher\servers\Nerysia-1.21.1"
 $baseUrl      = "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1"
 $outputFile   = "$PSScriptRoot\..\docs\distribution.json"
+
+# ----------------------------------------------------------------
+# GARDE : refuse de tourner si le drive Y: n'est pas monte.
+# Sinon le script ecrirait un distribution.json vide (0 mods) qui
+# pourrait corrompre la version locale.
+# ----------------------------------------------------------------
+if (-not (Test-Path $serverRoot)) {
+    Write-Host ""
+    Write-Host "==============================================================" -ForegroundColor Red
+    Write-Host "  ERREUR : Le drive Y: n'est pas monte !" -ForegroundColor Red
+    Write-Host "==============================================================" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "  Chemin attendu : $serverRoot" -ForegroundColor Yellow
+    Write-Host "  Statut         : INTROUVABLE" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "  Le script REFUSE de tourner pour eviter de corrompre" -ForegroundColor White
+    Write-Host "  ton distribution.json local avec un fichier vide." -ForegroundColor White
+    Write-Host ""
+    Write-Host "  Action a faire :" -ForegroundColor Cyan
+    Write-Host "    1. Monter ton drive Y: (FileZilla, mount FTP, etc.)" -ForegroundColor Cyan
+    Write-Host "    2. Verifier dans l'explorateur que Y:\apk\... est accessible" -ForegroundColor Cyan
+    Write-Host "    3. Relancer ce script" -ForegroundColor Cyan
+    Write-Host ""
+    exit 1
+}
+
+# ----------------------------------------------------------------
+# VERSION : lit l'existant et calcule la nouvelle version
+# ----------------------------------------------------------------
+function Get-NextVersion($current, $bumpType) {
+    if ([string]::IsNullOrWhiteSpace($current)) { $current = "1.0.0" }
+    $parts = $current -split "\."
+    if ($parts.Count -ne 3) {
+        Write-Host "  [WARN] Version $current invalide, reset a 1.0.0" -ForegroundColor Yellow
+        $parts = @("1","0","0")
+    }
+    $major = [int]$parts[0]
+    $minor = [int]$parts[1]
+    $patch = [int]$parts[2]
+    switch ($bumpType) {
+        "major" { $major++; $minor = 0; $patch = 0 }
+        "minor" { $minor++; $patch = 0 }
+        "patch" { $patch++ }
+        default { } # "none" = pas de changement
+    }
+    return "$major.$minor.$patch"
+}
+
+$currentVersion = "1.0.0"
+if (Test-Path $outputFile) {
+    try {
+        $existing = Get-Content $outputFile -Raw | ConvertFrom-Json
+        if ($existing.servers -and $existing.servers[0].version) {
+            $currentVersion = $existing.servers[0].version
+        }
+    } catch {
+        Write-Host "  [WARN] Impossible de parser distribution.json existant, defaut = 1.0.0" -ForegroundColor Yellow
+    }
+}
+$newVersion = Get-NextVersion $currentVersion $Bump
+
+Write-Host ""
+if ($Bump -eq "none") {
+    Write-Host "Version serveur : $currentVersion (inchangee)" -ForegroundColor Cyan
+} else {
+    Write-Host "Version serveur : $currentVersion -> $newVersion (bump $Bump)" -ForegroundColor Green
+}
 
 # ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 # Fichiers EXCLUS de la distribution
@@ -27,7 +99,9 @@ function Should-Exclude($relativePath) {
 }
 
 function Get-MD5($path) {
-    return (Get-FileHash $path -Algorithm MD5).Hash.ToLower()
+    $hash = Get-FileHash $path -Algorithm MD5 -ErrorAction SilentlyContinue
+    if ($hash) { return $hash.Hash.ToLower() }
+    return "00000000000000000000000000000000"
 }
 
 function New-ModEntry($file, $id, $name, $type, $url, $required = $null) {
@@ -186,17 +260,18 @@ foreach ($file in $allFiles) {
 
     Write-Host "  [FILE] $relativePath" -ForegroundColor Blue -NoNewline
     $md5 = Get-MD5 $file.FullName
-    Write-Host " ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ $md5" -ForegroundColor DarkGray
-
-    $id = "generated.fabricmod:$safeId:1.0.0@jar"
+    Write-Host " -> $md5" -ForegroundColor DarkGray
+    $safeId = $relativePath -replace "[^a-zA-Z0-9._\-]", "_"
+    $encodedPath = $relativePath -replace " ", "%20" -replace "\[", "%5B" -replace "\]", "%5D"
+    $fileId = "generated.file:$($safeId):1.0.0"
     $modules.Add([ordered]@{
-        id       = $safeId
+        id       = $fileId
         name     = $file.Name
         type     = "File"
         artifact = [ordered]@{
             size = $file.Length
             MD5  = $md5
-            url  = "$baseUrl/files/$($relativePath -replace ' ','%20')"
+            url  = "$baseUrl/files/$encodedPath"
             path = $relativePath
         }
     })
@@ -219,7 +294,7 @@ $distribution = [ordered]@{
             name             = "Nerysia (Minecraft 1.21.1)"
             description      = "Nerysia Running Minecraft 1.21.1 (Fabric v0.19.2)"
             icon             = "https://apk.nerysia.fr/Logo.png"
-            version          = "1.0.0"
+            version          = $newVersion
             address          = "node.hloureiro.fr:45545"
             minecraftVersion = "1.21.1"
             mainServer       = $true
@@ -248,4 +323,5 @@ if (Test-Path (Split-Path $serverDest)) {
 Write-Host ""
 Write-Host "=== TERMINE ===" -ForegroundColor Green
 Write-Host "Fichier genere : $outputFile" -ForegroundColor White
+Write-Host "Version modpack: $newVersion" -ForegroundColor White
 Write-Host "Total modules  : $($modules.Count)" -ForegroundColor White

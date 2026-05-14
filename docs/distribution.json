@@ -7,7 +7,7 @@
                         "name":  "Nerysia (Minecraft 1.21.1)",
                         "description":  "Nerysia Running Minecraft 1.21.1 (Fabric v0.19.2)",
                         "icon":  "https://apk.nerysia.fr/Logo.png",
-                        "version":  "1.0.0",
+                        "version":  "1.12.0",
                         "address":  "node.hloureiro.fr:45545",
                         "minecraftVersion":  "1.21.1",
                         "mainServer":  true,
@@ -636,16 +636,6 @@
                                                          }
                                         },
                                         {
-                                            "id":  "generated.fabricmod:iris-fabric-1.8.8+mc1.21.1:1.0.0@jar",
-                                            "name":  "iris-fabric-1.8.8+mc1.21.1",
-                                            "type":  "FabricMod",
-                                            "artifact":  {
-                                                             "size":  2690177,
-                                                             "MD5":  "1179fe09b9ba970e84ed59259adfe65a",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/iris-fabric-1.8.8+mc1.21.1.jar"
-                                                         }
-                                        },
-                                        {
                                             "id":  "generated.fabricmod:IronChests-2.0.4:1.0.0@jar",
                                             "name":  "IronChests-2.0.4",
                                             "type":  "FabricMod",
@@ -836,23 +826,23 @@
                                                          }
                                         },
                                         {
-                                            "id":  "generated.fabricmod:nery-faction-1.65.0:1.0.0@jar",
-                                            "name":  "nery-faction-1.65.0",
+                                            "id":  "generated.fabricmod:nery-faction-1.67.0:1.0.0@jar",
+                                            "name":  "nery-faction-1.67.0",
                                             "type":  "FabricMod",
                                             "artifact":  {
-                                                             "size":  3796657,
-                                                             "MD5":  "1d80155647922969c826a5bd0213f23c",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/nery-faction-1.65.0.jar"
+                                                             "size":  3850201,
+                                                             "MD5":  "93353541fa92d5e212c7381df33ee471",
+                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/nery-faction-1.67.0.jar"
                                                          }
                                         },
                                         {
-                                            "id":  "generated.fabricmod:Nerysia-MOD-1.0.6:1.0.0@jar",
-                                            "name":  "Nerysia-MOD-1.0.6",
+                                            "id":  "generated.fabricmod:Nerysia-MOD-1.6.8:1.0.0@jar",
+                                            "name":  "Nerysia-MOD-1.6.8",
                                             "type":  "FabricMod",
                                             "artifact":  {
-                                                             "size":  146702690,
-                                                             "MD5":  "6327c8d1052624cc77c4c33c239ca128",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/Nerysia-MOD-1.0.6.jar"
+                                                             "size":  149464700,
+                                                             "MD5":  "9f267ce88a97a6650e8a669f7dbbb807",
+                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/Nerysia-MOD-1.6.8.jar"
                                                          }
                                         },
                                         {
@@ -896,6 +886,16 @@
                                                          }
                                         },
                                         {
+                                            "id":  "generated.fabricmod:plasmovoice-fabric-1.21.1-2.1.9:1.0.0@jar",
+                                            "name":  "plasmovoice-fabric-1.21.1-2.1.9",
+                                            "type":  "FabricMod",
+                                            "artifact":  {
+                                                             "size":  12261871,
+                                                             "MD5":  "6d7e20f8bb449d12b36114272ce208a5",
+                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/plasmovoice-fabric-1.21.1-2.1.9.jar"
+                                                         }
+                                        },
+                                        {
                                             "id":  "generated.fabricmod:polymer-bundled-0.9.19+1.21.1:1.0.0@jar",
                                             "name":  "polymer-bundled-0.9.19+1.21.1",
                                             "type":  "FabricMod",
@@ -913,6 +913,16 @@
                                                              "size":  87229,
                                                              "MD5":  "507c4368b9c2c19ad99b02413fe34865",
                                                              "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/prickle-fabric-1.21.1-21.1.11.jar"
+                                                         }
+                                        },
+                                        {
+                                            "id":  "generated.fabricmod:pv-addon-soundphysics-1.1.2:1.0.0@jar",
+                                            "name":  "pv-addon-soundphysics-1.1.2",
+                                            "type":  "FabricMod",
+                                            "artifact":  {
+                                                             "size":  16176,
+                                                             "MD5":  "11288e50e45acd4a8f463051c26840d8",
+                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/pv-addon-soundphysics-1.1.2.jar"
                                                          }
                                         },
                                         {
@@ -1136,6 +1146,20 @@
                                                          }
                                         },
                                         {
+                                            "id":  "generated.fabricmod:iris-fabric-1.8.8+mc1.21.1:1.0.0@jar",
+                                            "name":  "iris-fabric-1.8.8+mc1.21.1",
+                                            "type":  "FabricMod",
+                                            "artifact":  {
+                                                             "size":  2690177,
+                                                             "MD5":  "1179fe09b9ba970e84ed59259adfe65a",
+                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/optionaloff/iris-fabric-1.8.8+mc1.21.1.jar"
+                                                         },
+                                            "required":  {
+                                                             "value":  false,
+                                                             "def":  false
+                                                         }
+                                        },
+                                        {
                                             "id":  "generated.fabricmod:litematica-fabric-1.21-0.19.60:1.0.0@jar",
                                             "name":  "litematica-fabric-1.21-0.19.60",
                                             "type":  "FabricMod",
@@ -1199,6 +1223,20 @@
                                                              "size":  381270,
                                                              "MD5":  "d51dd849b7da6d2dab817e5993937f1e",
                                                              "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/optionalon/chatanimation-fabric-1.21.1-1.1.3.jar"
+                                                         },
+                                            "required":  {
+                                                             "value":  false,
+                                                             "def":  true
+                                                         }
+                                        },
+                                        {
+                                            "id":  "generated.fabricmod:continuity-3.0.0+1.21:1.0.0@jar",
+                                            "name":  "continuity-3.0.0+1.21",
+                                            "type":  "FabricMod",
+                                            "artifact":  {
+                                                             "size":  1014044,
+                                                             "MD5":  "daee3841730e2576a621943f289deadb",
+                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/optionalon/continuity-3.0.0+1.21.jar"
                                                          },
                                             "required":  {
                                                              "value":  false,
@@ -1290,7 +1328,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_accessories.json5:1.0.0",
                                             "name":  "accessories.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1301,7 +1339,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_accessories_compat.json5:1.0.0",
                                             "name":  "accessories_compat.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1312,7 +1350,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_amendments-client.json:1.0.0",
                                             "name":  "amendments-client.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1323,7 +1361,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_amendments-common.json:1.0.0",
                                             "name":  "amendments-common.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1334,7 +1372,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_appleskin.json5:1.0.0",
                                             "name":  "appleskin.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1345,7 +1383,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_badoptimizations.txt:1.0.0",
                                             "name":  "badoptimizations.txt",
                                             "type":  "File",
                                             "artifact":  {
@@ -1356,7 +1394,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cardinal-components-api.properties:1.0.0",
                                             "name":  "cardinal-components-api.properties",
                                             "type":  "File",
                                             "artifact":  {
@@ -1367,7 +1405,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_carryon-client.json:1.0.0",
                                             "name":  "carryon-client.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1378,7 +1416,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_carryon-common.json:1.0.0",
                                             "name":  "carryon-common.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1389,7 +1427,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_chat_heads.json5:1.0.0",
                                             "name":  "chat_heads.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1400,7 +1438,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_chatanimation.json:1.0.0",
                                             "name":  "chatanimation.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1411,7 +1449,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobbled_counter.json:1.0.0",
                                             "name":  "cobbled_counter.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1422,7 +1460,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobbledollars_bank.json:1.0.0",
                                             "name":  "bank.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1433,7 +1471,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobbledollars_client.json:1.0.0",
                                             "name":  "client.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1444,7 +1482,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobbledollars_common.json:1.0.0",
                                             "name":  "common.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1455,7 +1493,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobbledollars_default_shop.json:1.0.0",
                                             "name":  "default_shop.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1466,7 +1504,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemon_main.json:1.0.0",
                                             "name":  "main.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1477,7 +1515,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemon-additions_cobblemon-additions.json:1.0.0",
                                             "name":  "cobblemon-additions.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1488,7 +1526,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemonalphas_config.json:1.0.0",
                                             "name":  "config.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1499,18 +1537,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
-                                            "name":  "cobblemon-battle-extras.json",
-                                            "type":  "File",
-                                            "artifact":  {
-                                                             "size":  4024,
-                                                             "MD5":  "a1828a664f925ca0f1d63c58c5823779",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/cobblemon-battle-extras.json",
-                                                             "path":  "config/cobblemon-battle-extras.json"
-                                                         }
-                                        },
-                                        {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemonintegrations-common.toml:1.0.0",
                                             "name":  "cobblemonintegrations-common.toml",
                                             "type":  "File",
                                             "artifact":  {
@@ -1521,7 +1548,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemonraiddens_blacklist.json5:1.0.0",
                                             "name":  "blacklist.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1532,7 +1559,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemonraiddens_client.json5:1.0.0",
                                             "name":  "client.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1543,7 +1570,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemonraiddens_common.json5:1.0.0",
                                             "name":  "common.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1554,7 +1581,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemonraiddens_conditions.json5:1.0.0",
                                             "name":  "conditions.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1565,7 +1592,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemonraiddens_tier_five.json5:1.0.0",
                                             "name":  "tier_five.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1576,7 +1603,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemonraiddens_tier_four.json5:1.0.0",
                                             "name":  "tier_four.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1587,7 +1614,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemonraiddens_tier_one.json5:1.0.0",
                                             "name":  "tier_one.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1598,7 +1625,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemonraiddens_tier_seven.json5:1.0.0",
                                             "name":  "tier_seven.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1609,7 +1636,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemonraiddens_tier_six.json5:1.0.0",
                                             "name":  "tier_six.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1620,7 +1647,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemonraiddens_tier_three.json5:1.0.0",
                                             "name":  "tier_three.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1631,7 +1658,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblemonraiddens_tier_two.json5:1.0.0",
                                             "name":  "tier_two.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -1642,7 +1669,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblenav_client-config.json:1.0.0",
                                             "name":  "client-config.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1653,7 +1680,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobblenav_server-config.json:1.0.0",
                                             "name":  "server-config.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1664,7 +1691,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cobbreeding_main.json:1.0.0",
                                             "name":  "main.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1675,7 +1702,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_CoroUtil_General.toml:1.0.0",
                                             "name":  "General.toml",
                                             "type":  "File",
                                             "artifact":  {
@@ -1686,7 +1713,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_creativecore-client.json:1.0.0",
                                             "name":  "creativecore-client.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1697,18 +1724,18 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_cubes-without-borders.json:1.0.0",
                                             "name":  "cubes-without-borders.json",
                                             "type":  "File",
                                             "artifact":  {
-                                                             "size":  209,
-                                                             "MD5":  "8fe42f112bc0417ad9906474866cfa13",
+                                                             "size":  202,
+                                                             "MD5":  "da5770af1826e8866ea5763e26d50f1e",
                                                              "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/cubes-without-borders.json",
                                                              "path":  "config/cubes-without-borders.json"
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_durabilitytooltip-common.toml:1.0.0",
                                             "name":  "durabilitytooltip-common.toml",
                                             "type":  "File",
                                             "artifact":  {
@@ -1719,7 +1746,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_dynamic_fps.json:1.0.0",
                                             "name":  "dynamic_fps.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1730,7 +1757,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_enhanced_bes.properties:1.0.0",
                                             "name":  "enhanced_bes.properties",
                                             "type":  "File",
                                             "artifact":  {
@@ -1741,7 +1768,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_entityculling.json:1.0.0",
                                             "name":  "entityculling.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1752,7 +1779,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_exlinecopperequipmentconfig.properties:1.0.0",
                                             "name":  "exlinecopperequipmentconfig.properties",
                                             "type":  "File",
                                             "artifact":  {
@@ -1763,18 +1790,18 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fabric_indigo-renderer.properties:1.0.0",
                                             "name":  "indigo-renderer.properties",
                                             "type":  "File",
                                             "artifact":  {
                                                              "size":  291,
-                                                             "MD5":  "d11765b389ba830d5ca7a33069708af5",
+                                                             "MD5":  "0c55760e98e0d4975434421f319f1408",
                                                              "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/fabric/indigo-renderer.properties",
                                                              "path":  "config/fabric/indigo-renderer.properties"
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_assets_image_nerysia_gonoe.png:1.0.0",
                                             "name":  "nerysia_gonoe.png",
                                             "type":  "File",
                                             "artifact":  {
@@ -1785,7 +1812,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_assets_image_nerysia_title.png:1.0.0",
                                             "name":  "nerysia_title.png",
                                             "type":  "File",
                                             "artifact":  {
@@ -1796,7 +1823,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_assets_image_rendu_9.png:1.0.0",
                                             "name":  "rendu_9.png",
                                             "type":  "File",
                                             "artifact":  {
@@ -1807,7 +1834,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_assets_son_1.wav:1.0.0",
                                             "name":  "1.wav",
                                             "type":  "File",
                                             "artifact":  {
@@ -1818,7 +1845,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_assets_texture_button_button2.png:1.0.0",
                                             "name":  "button2.png",
                                             "type":  "File",
                                             "artifact":  {
@@ -1829,7 +1856,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_assets_texture_button_button3.png:1.0.0",
                                             "name":  "button3.png",
                                             "type":  "File",
                                             "artifact":  {
@@ -1840,7 +1867,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_assets_texture_button_button4.png:1.0.0",
                                             "name":  "button4.png",
                                             "type":  "File",
                                             "artifact":  {
@@ -1851,7 +1878,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_assets_texture_button_button5.png:1.0.0",
                                             "name":  "button5.png",
                                             "type":  "File",
                                             "artifact":  {
@@ -1862,7 +1889,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_assets_texture_hover-button_hover_button3.png:1.0.0",
                                             "name":  "hover_button3.png",
                                             "type":  "File",
                                             "artifact":  {
@@ -1873,7 +1900,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_assets_texture_hover-button_hover-button.png:1.0.0",
                                             "name":  "hover-button.png",
                                             "type":  "File",
                                             "artifact":  {
@@ -1884,7 +1911,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_assets_texture_hover-button_hover-classic-button.png:1.0.0",
                                             "name":  "hover-classic-button.png",
                                             "type":  "File",
                                             "artifact":  {
@@ -1895,7 +1922,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_audio_element_controller_metas.json:1.0.0",
                                             "name":  "audio_element_controller_metas.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1906,7 +1933,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_custom_gui_screens.txt:1.0.0",
                                             "name":  "custom_gui_screens.txt",
                                             "type":  "File",
                                             "artifact":  {
@@ -1917,7 +1944,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_customizablemenus.txt:1.0.0",
                                             "name":  "customizablemenus.txt",
                                             "type":  "File",
                                             "artifact":  {
@@ -1928,18 +1955,18 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_customization_nerysia-menu.txt:1.0.0",
                                             "name":  "nerysia-menu.txt",
                                             "type":  "File",
                                             "artifact":  {
-                                                             "size":  36721,
-                                                             "MD5":  "39fa60793e8dc77e16b0eaf03d53e1c2",
+                                                             "size":  36720,
+                                                             "MD5":  "1b4d452aaa2fc9c88638dfa28b687aad",
                                                              "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/fancymenu/customization/nerysia-menu.txt",
                                                              "path":  "config/fancymenu/customization/nerysia-menu.txt"
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_layout_editor_widgets_element_layer_control.lewidget:1.0.0",
                                             "name":  "element_layer_control.lewidget",
                                             "type":  "File",
                                             "artifact":  {
@@ -1950,7 +1977,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_legacy_checklist.txt:1.0.0",
                                             "name":  "legacy_checklist.txt",
                                             "type":  "File",
                                             "artifact":  {
@@ -1961,7 +1988,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_normalized_scroll_screens.json:1.0.0",
                                             "name":  "normalized_scroll_screens.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1972,7 +1999,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_options.txt:1.0.0",
                                             "name":  "options.txt",
                                             "type":  "File",
                                             "artifact":  {
@@ -1983,7 +2010,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_ui_themes_dark.json:1.0.0",
                                             "name":  "dark.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -1994,7 +2021,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_ui_themes_light.json:1.0.0",
                                             "name":  "light.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2005,7 +2032,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fancymenu_user_variables.db:1.0.0",
                                             "name":  "user_variables.db",
                                             "type":  "File",
                                             "artifact":  {
@@ -2016,7 +2043,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_ferritecore.mixin.properties:1.0.0",
                                             "name":  "ferritecore.mixin.properties",
                                             "type":  "File",
                                             "artifact":  {
@@ -2027,7 +2054,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fightorflight.json5:1.0.0",
                                             "name":  "fightorflight.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -2038,7 +2065,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fightorflight_moves.json5:1.0.0",
                                             "name":  "fightorflight_moves.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -2049,7 +2076,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_fightorflight_visual_effect.json5:1.0.0",
                                             "name":  "fightorflight_visual_effect.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -2060,7 +2087,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_filament.json:1.0.0",
                                             "name":  "filament.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2071,7 +2098,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_forgeconfigapiport.toml:1.0.0",
                                             "name":  "forgeconfigapiport.toml",
                                             "type":  "File",
                                             "artifact":  {
@@ -2082,7 +2109,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_highlighter.toml:1.0.0",
                                             "name":  "highlighter.toml",
                                             "type":  "File",
                                             "artifact":  {
@@ -2093,7 +2120,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_immediatelyfast.json:1.0.0",
                                             "name":  "immediatelyfast.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2104,7 +2131,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_inventoryprofilesnext_integrationHints_exampleIntegrationHints.json:1.0.0",
                                             "name":  "exampleIntegrationHints.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2115,7 +2142,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_inventoryprofilesnext_inventoryprofiles.json:1.0.0",
                                             "name":  "inventoryprofiles.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2126,7 +2153,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_inventoryprofilesnext_node.hloureiro.fr_45545_villager-trading-config-v2.json:1.0.0",
                                             "name":  "villager-trading-config-v2.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2137,7 +2164,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_inventoryprofilesnext_server.ldeuscher.fr_12103_villager-trading-config-v2.json:1.0.0",
                                             "name":  "villager-trading-config-v2.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2148,40 +2175,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
-                                            "name":  "iris.properties",
-                                            "type":  "File",
-                                            "artifact":  {
-                                                             "size":  303,
-                                                             "MD5":  "c1874e695b5b8be3dfe254466a21fb39",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/iris.properties",
-                                                             "path":  "config/iris.properties"
-                                                         }
-                                        },
-                                        {
-                                            "id":  null,
-                                            "name":  "iris-excluded.json",
-                                            "type":  "File",
-                                            "artifact":  {
-                                                             "size":  31,
-                                                             "MD5":  "670592b1394f12ab96d8432f14ac8dd9",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/iris-excluded.json",
-                                                             "path":  "config/iris-excluded.json"
-                                                         }
-                                        },
-                                        {
-                                            "id":  null,
-                                            "name":  "ironsmelters.json",
-                                            "type":  "File",
-                                            "artifact":  {
-                                                             "size":  3533,
-                                                             "MD5":  "74d4b336eeaef2bf30db24b2db10f5ff",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/ironsmelters.json",
-                                                             "path":  "config/ironsmelters.json"
-                                                         }
-                                        },
-                                        {
-                                            "id":  null,
+                                            "id":  "generated.file:config_jade_hide-blocks.json:1.0.0",
                                             "name":  "hide-blocks.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2192,7 +2186,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_jade_hide-entities.json:1.0.0",
                                             "name":  "hide-entities.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2203,18 +2197,18 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_jade_jade.json:1.0.0",
                                             "name":  "jade.json",
                                             "type":  "File",
                                             "artifact":  {
-                                                             "size":  1121,
-                                                             "MD5":  "e404edf4c73a4223434cfeb0d252749a",
+                                                             "size":  1089,
+                                                             "MD5":  "ad37277172d44ee4f0b17d486850c163",
                                                              "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/jade/jade.json",
                                                              "path":  "config/jade/jade.json"
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_jade_plugins.json:1.0.0",
                                             "name":  "plugins.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2225,7 +2219,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_jade_sort-order.json:1.0.0",
                                             "name":  "sort-order.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2236,7 +2230,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_jade_usernamecache.json:1.0.0",
                                             "name":  "usernamecache.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2247,7 +2241,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_jei_blacklist.json:1.0.0",
                                             "name":  "blacklist.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2258,18 +2252,18 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_jei_ingredient-list-mod-sort-order.ini:1.0.0",
                                             "name":  "ingredient-list-mod-sort-order.ini",
                                             "type":  "File",
                                             "artifact":  {
-                                                             "size":  636,
-                                                             "MD5":  "54860464d62476ce2ac6135337879ec3",
+                                                             "size":  564,
+                                                             "MD5":  "06de8f7e1818d2ddbedd2a7746d6848c",
                                                              "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/jei/ingredient-list-mod-sort-order.ini",
                                                              "path":  "config/jei/ingredient-list-mod-sort-order.ini"
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_jei_ingredient-list-type-sort-order.ini:1.0.0",
                                             "name":  "ingredient-list-type-sort-order.ini",
                                             "type":  "File",
                                             "artifact":  {
@@ -2280,7 +2274,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_jei_jei-client.ini:1.0.0",
                                             "name":  "jei-client.ini",
                                             "type":  "File",
                                             "artifact":  {
@@ -2291,7 +2285,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_jei_jei-colors.ini:1.0.0",
                                             "name":  "jei-colors.ini",
                                             "type":  "File",
                                             "artifact":  {
@@ -2302,7 +2296,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_jei_jei-debug.ini:1.0.0",
                                             "name":  "jei-debug.ini",
                                             "type":  "File",
                                             "artifact":  {
@@ -2313,7 +2307,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_jei_jei-mod-id-format.ini:1.0.0",
                                             "name":  "jei-mod-id-format.ini",
                                             "type":  "File",
                                             "artifact":  {
@@ -2324,7 +2318,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_jei_recipe-category-sort-order.ini:1.0.0",
                                             "name":  "recipe-category-sort-order.ini",
                                             "type":  "File",
                                             "artifact":  {
@@ -2335,7 +2329,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_konkrete_locals_de_de.local:1.0.0",
                                             "name":  "de_de.local",
                                             "type":  "File",
                                             "artifact":  {
@@ -2346,7 +2340,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_konkrete_locals_en_us.local:1.0.0",
                                             "name":  "en_us.local",
                                             "type":  "File",
                                             "artifact":  {
@@ -2357,7 +2351,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_konkrete_locals_pl_pl.local:1.0.0",
                                             "name":  "pl_pl.local",
                                             "type":  "File",
                                             "artifact":  {
@@ -2368,7 +2362,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_konkrete_locals_pt_br.local:1.0.0",
                                             "name":  "pt_br.local",
                                             "type":  "File",
                                             "artifact":  {
@@ -2379,7 +2373,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_LegendaryMonuments_pedestals.json:1.0.0",
                                             "name":  "pedestals.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2390,18 +2384,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
-                                            "name":  "libgui.json5",
-                                            "type":  "File",
-                                            "artifact":  {
-                                                             "size":  101,
-                                                             "MD5":  "8fedeb67f790fe8c9a81964f01709347",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/libgui.json5",
-                                                             "path":  "config/libgui.json5"
-                                                         }
-                                        },
-                                        {
-                                            "id":  null,
+                                            "id":  "generated.file:config_litematica.json:1.0.0",
                                             "name":  "litematica.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2412,7 +2395,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_lithium.properties:1.0.0",
                                             "name":  "lithium.properties",
                                             "type":  "File",
                                             "artifact":  {
@@ -2423,7 +2406,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_malilib.json:1.0.0",
                                             "name":  "malilib.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2434,18 +2417,18 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_mega_showdown_config.json:1.0.0",
                                             "name":  "config.json",
                                             "type":  "File",
                                             "artifact":  {
-                                                             "size":  573,
-                                                             "MD5":  "9e30e312b1841a682dd1d22375d1d22d",
+                                                             "size":  490,
+                                                             "MD5":  "e49e8773e631fa9212dca0ea54edca3c",
                                                              "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/mega_showdown/config.json",
                                                              "path":  "config/mega_showdown/config.json"
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_modernfix-mixins.properties:1.0.0",
                                             "name":  "modernfix-mixins.properties",
                                             "type":  "File",
                                             "artifact":  {
@@ -2456,7 +2439,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_modmenu.json:1.0.0",
                                             "name":  "modmenu.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2467,7 +2450,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_moonlight-client.json:1.0.0",
                                             "name":  "moonlight-client.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2478,7 +2461,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_moonlight-common.json:1.0.0",
                                             "name":  "moonlight-common.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2489,7 +2472,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_MouseTweaks.cfg:1.0.0",
                                             "name":  "MouseTweaks.cfg",
                                             "type":  "File",
                                             "artifact":  {
@@ -2500,7 +2483,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_naturescompass.json:1.0.0",
                                             "name":  "naturescompass.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2511,7 +2494,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_banned_mods.json:1.0.0",
                                             "name":  "banned_mods.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2522,7 +2505,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_banned_words.json:1.0.0",
                                             "name":  "banned_words.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2533,7 +2516,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_blocked_spawns.json:1.0.0",
                                             "name":  "blocked_spawns.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2544,7 +2527,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_clearlag.json:1.0.0",
                                             "name":  "clearlag.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2555,7 +2538,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_crates_blue_light_blue_crate.json:1.0.0",
                                             "name":  "blue_light_blue_crate.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2566,7 +2549,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_crates_brown_silver_crate.json:1.0.0",
                                             "name":  "brown_silver_crate.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2577,7 +2560,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_crates_earth_crate.json:1.0.0",
                                             "name":  "earth_crate.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2588,7 +2571,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_crates_fire_crate.json:1.0.0",
                                             "name":  "fire_crate.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2599,7 +2582,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_crates_medieval_crate_1.json:1.0.0",
                                             "name":  "medieval_crate_1.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2610,7 +2593,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_crates_medieval_crate_2.json:1.0.0",
                                             "name":  "medieval_crate_2.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2621,7 +2604,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_crates_medieval_crate_3.json:1.0.0",
                                             "name":  "medieval_crate_3.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2632,7 +2615,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_crates_medieval_crate_4.json:1.0.0",
                                             "name":  "medieval_crate_4.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2643,7 +2626,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_crates_pink_green_crate.json:1.0.0",
                                             "name":  "pink_green_crate.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2654,7 +2637,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_crates_purple_light_purple_crate.json:1.0.0",
                                             "name":  "purple_light_purple_crate.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2665,7 +2648,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_crates_red_golden_crate.json:1.0.0",
                                             "name":  "red_golden_crate.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2676,7 +2659,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_crates_silver_crate.json:1.0.0",
                                             "name":  "silver_crate.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2687,7 +2670,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_crates_water_crate.json:1.0.0",
                                             "name":  "water_crate.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2698,7 +2681,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_crates_wind_crate.json:1.0.0",
                                             "name":  "wind_crate.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2709,7 +2692,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_music_music_config.json:1.0.0",
                                             "name":  "music_config.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2720,7 +2703,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_raids_bosses_mega_charizard.json:1.0.0",
                                             "name":  "mega_charizard.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2731,7 +2714,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_raids_locations.json:1.0.0",
                                             "name":  "locations.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2742,7 +2725,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_raids_rewards.json:1.0.0",
                                             "name":  "rewards.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2753,7 +2736,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_raids_schedules.json:1.0.0",
                                             "name":  "schedules.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2764,7 +2747,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysia_mod_redis.json:1.0.0",
                                             "name":  "redis.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2775,7 +2758,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysiaquest_data.db:1.0.0",
                                             "name":  "data.db",
                                             "type":  "File",
                                             "artifact":  {
@@ -2786,7 +2769,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysiaquest_database.properties:1.0.0",
                                             "name":  "database.properties",
                                             "type":  "File",
                                             "artifact":  {
@@ -2797,7 +2780,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysiaquest_dialogues_example_dialog.json:1.0.0",
                                             "name":  "example_dialog.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2808,7 +2791,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysiaquest_quests_01_debut.json:1.0.0",
                                             "name":  "01_debut.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2819,7 +2802,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysiaquest_quests_02_cobblemon.json:1.0.0",
                                             "name":  "02_cobblemon.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2830,7 +2813,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_nerysiaquest_shops_example_shop.json:1.0.0",
                                             "name":  "example_shop.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2841,7 +2824,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_patchouli.json5:1.0.0",
                                             "name":  "patchouli.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -2852,7 +2835,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_polymer_client.json:1.0.0",
                                             "name":  "client.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2863,7 +2846,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_polymer_common.json:1.0.0",
                                             "name":  "common.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2874,7 +2857,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_polymer_resource-pack.json:1.0.0",
                                             "name":  "resource-pack.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2885,7 +2868,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_polymer_server.json:1.0.0",
                                             "name":  "server.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2896,7 +2879,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_rctmod-client.toml:1.0.0",
                                             "name":  "rctmod-client.toml",
                                             "type":  "File",
                                             "artifact":  {
@@ -2907,7 +2890,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_rctmod-server.toml:1.0.0",
                                             "name":  "rctmod-server.toml",
                                             "type":  "File",
                                             "artifact":  {
@@ -2918,7 +2901,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_refurbished_furniture.client.toml:1.0.0",
                                             "name":  "refurbished_furniture.client.toml",
                                             "type":  "File",
                                             "artifact":  {
@@ -2929,7 +2912,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_runiclib.json:1.0.0",
                                             "name":  "runiclib.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -2940,84 +2923,18 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_scalablelux.properties:1.0.0",
                                             "name":  "scalablelux.properties",
                                             "type":  "File",
                                             "artifact":  {
                                                              "size":  85,
-                                                             "MD5":  "9cc7c744075c1edfb5052b5253f07bc5",
+                                                             "MD5":  "edcf9894f2ba953e2b454b31846781ad",
                                                              "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/scalablelux.properties",
                                                              "path":  "config/scalablelux.properties"
                                                          }
                                         },
                                         {
-                                            "id":  null,
-                                            "name":  "main.json",
-                                            "type":  "File",
-                                            "artifact":  {
-                                                             "size":  1224,
-                                                             "MD5":  "4513643eeee510192347ad0a06e159c4",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/simpletms/main.json",
-                                                             "path":  "config/simpletms/main.json"
-                                                         }
-                                        },
-                                        {
-                                            "id":  null,
-                                            "name":  "default_tm_moves.json",
-                                            "type":  "File",
-                                            "artifact":  {
-                                                             "size":  30177,
-                                                             "MD5":  "3ef6b194e9062abace6adb73f70deea2",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/simpletms/moves/default_tm_moves.json",
-                                                             "path":  "config/simpletms/moves/default_tm_moves.json"
-                                                         }
-                                        },
-                                        {
-                                            "id":  null,
-                                            "name":  "default_tr_moves.json",
-                                            "type":  "File",
-                                            "artifact":  {
-                                                             "size":  30177,
-                                                             "MD5":  "3ef6b194e9062abace6adb73f70deea2",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/simpletms/moves/default_tr_moves.json",
-                                                             "path":  "config/simpletms/moves/default_tr_moves.json"
-                                                         }
-                                        },
-                                        {
-                                            "id":  null,
-                                            "name":  "excluded_moves_from_blank_learning.json",
-                                            "type":  "File",
-                                            "artifact":  {
-                                                             "size":  2,
-                                                             "MD5":  "d751713988987e9331980363e24189ce",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/simpletms/moves/excluded_moves_from_blank_learning.json",
-                                                             "path":  "config/simpletms/moves/excluded_moves_from_blank_learning.json"
-                                                         }
-                                        },
-                                        {
-                                            "id":  null,
-                                            "name":  "excluded_moves_from_pokemon_drops.json",
-                                            "type":  "File",
-                                            "artifact":  {
-                                                             "size":  2,
-                                                             "MD5":  "d751713988987e9331980363e24189ce",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/simpletms/moves/excluded_moves_from_pokemon_drops.json",
-                                                             "path":  "config/simpletms/moves/excluded_moves_from_pokemon_drops.json"
-                                                         }
-                                        },
-                                        {
-                                            "id":  null,
-                                            "name":  "excluded_moves_from_tmtr_learning.json",
-                                            "type":  "File",
-                                            "artifact":  {
-                                                             "size":  2,
-                                                             "MD5":  "d751713988987e9331980363e24189ce",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/simpletms/moves/excluded_moves_from_tmtr_learning.json",
-                                                             "path":  "config/simpletms/moves/excluded_moves_from_tmtr_learning.json"
-                                                         }
-                                        },
-                                        {
-                                            "id":  null,
+                                            "id":  "generated.file:config_skinlayers.json:1.0.0",
                                             "name":  "skinlayers.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3028,7 +2945,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_smoothscroll.json:1.0.0",
                                             "name":  "smoothscroll.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3039,7 +2956,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_sodium-extra.properties:1.0.0",
                                             "name":  "sodium-extra.properties",
                                             "type":  "File",
                                             "artifact":  {
@@ -3050,7 +2967,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_sodium-extra-options.json:1.0.0",
                                             "name":  "sodium-extra-options.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3061,7 +2978,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_sodium-fingerprint.json:1.0.0",
                                             "name":  "sodium-fingerprint.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3072,7 +2989,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_sodium-mixins.properties:1.0.0",
                                             "name":  "sodium-mixins.properties",
                                             "type":  "File",
                                             "artifact":  {
@@ -3083,7 +3000,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_sodium-options.json:1.0.0",
                                             "name":  "sodium-options.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3094,7 +3011,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_sound_physics_remastered_occlusion.properties:1.0.0",
                                             "name":  "occlusion.properties",
                                             "type":  "File",
                                             "artifact":  {
@@ -3105,7 +3022,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_sound_physics_remastered_reflectivity.properties:1.0.0",
                                             "name":  "reflectivity.properties",
                                             "type":  "File",
                                             "artifact":  {
@@ -3116,7 +3033,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_sound_physics_remastered_soundphysics.properties:1.0.0",
                                             "name":  "soundphysics.properties",
                                             "type":  "File",
                                             "artifact":  {
@@ -3127,7 +3044,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_spark_activity.json:1.0.0",
                                             "name":  "activity.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3138,7 +3055,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_spark_config.json:1.0.0",
                                             "name":  "config.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3149,7 +3066,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_spark_tmp_about.txt:1.0.0",
                                             "name":  "about.txt",
                                             "type":  "File",
                                             "artifact":  {
@@ -3160,7 +3077,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_spark_tmp-client_about.txt:1.0.0",
                                             "name":  "about.txt",
                                             "type":  "File",
                                             "artifact":  {
@@ -3171,7 +3088,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_supplementaries-client.json:1.0.0",
                                             "name":  "supplementaries-client.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3182,7 +3099,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_supplementaries-common.json:1.0.0",
                                             "name":  "supplementaries-common.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3193,7 +3110,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_suppsquared-common.json:1.0.0",
                                             "name":  "suppsquared-common.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3204,7 +3121,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_terrablender.toml:1.0.0",
                                             "name":  "terrablender.toml",
                                             "type":  "File",
                                             "artifact":  {
@@ -3215,7 +3132,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_tim_core.json:1.0.0",
                                             "name":  "tim_core.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3226,7 +3143,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_toadlib_config.json:1.0.0",
                                             "name":  "toadlib_config.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3237,7 +3154,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_transition.json:1.0.0",
                                             "name":  "transition.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3248,18 +3165,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
-                                            "name":  "travelersbackpack.json5",
-                                            "type":  "File",
-                                            "artifact":  {
-                                                             "size":  11894,
-                                                             "MD5":  "b767ff075ecbddd99fcb199936771fe6",
-                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/config/travelersbackpack.json5",
-                                                             "path":  "config/travelersbackpack.json5"
-                                                         }
-                                        },
-                                        {
-                                            "id":  null,
+                                            "id":  "generated.file:config_trender.json:1.0.0",
                                             "name":  "trender.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3270,7 +3176,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_watut-client.toml:1.0.0",
                                             "name":  "watut-client.toml",
                                             "type":  "File",
                                             "artifact":  {
@@ -3281,7 +3187,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_watut-common.toml:1.0.0",
                                             "name":  "watut-common.toml",
                                             "type":  "File",
                                             "artifact":  {
@@ -3292,7 +3198,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_watut-item-arm-adjustments.json:1.0.0",
                                             "name":  "watut-item-arm-adjustments.json",
                                             "type":  "File",
                                             "artifact":  {
@@ -3303,7 +3209,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_watut-server.toml:1.0.0",
                                             "name":  "watut-server.toml",
                                             "type":  "File",
                                             "artifact":  {
@@ -3314,7 +3220,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:config_yacl.json5:1.0.0",
                                             "name":  "yacl.json5",
                                             "type":  "File",
                                             "artifact":  {
@@ -3325,7 +3231,40 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:resourcepacks_allthemons_r3.4.zip:1.0.0",
+                                            "name":  "allthemons_r3.4.zip",
+                                            "type":  "File",
+                                            "artifact":  {
+                                                             "size":  12226050,
+                                                             "MD5":  "ca85c6d6423d1681b7d42dbea88ed654",
+                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/resourcepacks/allthemons_r3.4.zip",
+                                                             "path":  "resourcepacks/allthemons_r3.4.zip"
+                                                         }
+                                        },
+                                        {
+                                            "id":  "generated.file:resourcepacks_Clear_Glass_1.2.1.zip:1.0.0",
+                                            "name":  "Clear Glass 1.2.1.zip",
+                                            "type":  "File",
+                                            "artifact":  {
+                                                             "size":  115097,
+                                                             "MD5":  "5a8fec2dd852b72ad7814d08b7c77950",
+                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/resourcepacks/Clear%20Glass%201.2.1.zip",
+                                                             "path":  "resourcepacks/Clear Glass 1.2.1.zip"
+                                                         }
+                                        },
+                                        {
+                                            "id":  "generated.file:resourcepacks_maxis_jm_cm_pixel_u11.zip:1.0.0",
+                                            "name":  "maxis_jm_cm_pixel_u11.zip",
+                                            "type":  "File",
+                                            "artifact":  {
+                                                             "size":  2784083,
+                                                             "MD5":  "4e7e2f8e35882ebdcfed3cd2aec205c7",
+                                                             "url":  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/files/resourcepacks/maxis_jm_cm_pixel_u11.zip",
+                                                             "path":  "resourcepacks/maxis_jm_cm_pixel_u11.zip"
+                                                         }
+                                        },
+                                        {
+                                            "id":  "generated.file:shaderpacks_Bliss_v2.1.2__Chocapic13_Shaders_edit_.zip:1.0.0",
                                             "name":  "Bliss_v2.1.2_(Chocapic13_Shaders_edit).zip",
                                             "type":  "File",
                                             "artifact":  {
@@ -3336,7 +3275,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:shaderpacks_BSL_v10.1.3.zip:1.0.0",
                                             "name":  "BSL_v10.1.3.zip",
                                             "type":  "File",
                                             "artifact":  {
@@ -3347,7 +3286,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:shaderpacks_ComplementaryUnbound_r5.7.1.zip:1.0.0",
                                             "name":  "ComplementaryUnbound_r5.7.1.zip",
                                             "type":  "File",
                                             "artifact":  {
@@ -3358,7 +3297,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:shaderpacks_photon_v1.3b.zip:1.0.0",
                                             "name":  "photon_v1.3b.zip",
                                             "type":  "File",
                                             "artifact":  {
@@ -3369,7 +3308,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:shaderpacks_rethinking-voxels_r0.1-beta9.zip:1.0.0",
                                             "name":  "rethinking-voxels_r0.1-beta9.zip",
                                             "type":  "File",
                                             "artifact":  {
@@ -3380,7 +3319,7 @@
                                                          }
                                         },
                                         {
-                                            "id":  null,
+                                            "id":  "generated.file:shaderpacks_Solas_Shader_V3.5.zip:1.0.0",
                                             "name":  "Solas Shader V3.5.zip",
                                             "type":  "File",
                                             "artifact":  {
