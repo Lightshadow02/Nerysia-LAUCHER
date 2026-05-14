@@ -1,0 +1,74 @@
+name: Update Modpack
+
+# Trigger : bouton "Run workflow" sur GitHub
+# https://github.com/Lightshadow02/Nerysia-LAUCHER/actions/workflows/update-modpack.yml
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Type de bump version (default: minor)'
+        type: choice
+        options:
+          - minor
+          - patch
+          - major
+          - none
+        default: minor
+
+# Le workflow doit pouvoir push le distribution.json mis a jour
+permissions:
+  contents: write
+
+jobs:
+  update:
+    name: Regenerate distribution.json from FTP
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          # Token avec write perms pour pouvoir push le commit ensuite
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Generate distribution.json from FTP
+        env:
+          FTP_HOST: ${{ secrets.FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          python3 tools/generate-distribution-from-ftp.py --bump "${{ inputs.bump }}"
+
+      - name: Commit and push distribution.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/distribution.json
+          if git diff --cached --quiet; then
+            echo "Aucun changement dans distribution.json (ni dans les mods, ni dans la version)"
+          else
+            VERSION=$(python3 -c "import json; print(json.load(open('docs/distribution.json'))['servers'][0]['version'])")
+            COUNT=$(python3 -c "import json; print(len(json.load(open('docs/distribution.json'))['servers'][0]['modules']))")
+            git commit -m "chore: modpack v${VERSION} (${COUNT} modules, bump ${{ inputs.bump }})"
+            git push
+            echo "Commit + push OK : modpack v${VERSION}"
+          fi
+
+      - name: Summary
+        run: |
+          VERSION=$(python3 -c "import json; print(json.load(open('docs/distribution.json'))['servers'][0]['version'])")
+          COUNT=$(python3 -c "import json; print(len(json.load(open('docs/distribution.json'))['servers'][0]['modules']))")
+          echo "## Modpack regenere :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Champ | Valeur |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Version | \`${VERSION}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Bump | \`${{ inputs.bump }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Modules | ${COUNT} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Upload FTP | https://apk.nerysia.fr/nerysia-laucher/distribution.json |" >> $GITHUB_STEP_SUMMARY
