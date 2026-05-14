@@ -31,18 +31,55 @@ jobs:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USER: ${{ secrets.FTP_USERNAME }}
           FTP_PASS: ${{ secrets.FTP_PASSWORD }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_PROTOCOL: ${{ secrets.FTP_PROTOCOL }}
         run: |
           if [ -z "$FTP_HOST" ] || [ -z "$FTP_USER" ] || [ -z "$FTP_PASS" ]; then
-            echo "::error::Secrets FTP_HOST / FTP_USERNAME / FTP_PASSWORD manquants. Ajoute-les dans Settings → Secrets and variables → Actions."
+            echo "::error::Secrets FTP_HOST / FTP_USERNAME / FTP_PASSWORD manquants."
             exit 1
           fi
+
+          # Sanitize : enleve un prefixe protocole eventuel (ftp://, sftp://, https://...) et slash final
+          CLEAN_HOST=$(echo "$FTP_HOST" | sed -E 's|^[a-z]+://||I' | sed 's|/$||')
+          PROTO="${FTP_PROTOCOL:-ftp}"
+          PORT_SUFFIX=""
+          if [ -n "$FTP_PORT" ]; then
+            PORT_SUFFIX=":$FTP_PORT"
+          fi
+          URL="$PROTO://$CLEAN_HOST$PORT_SUFFIX"
+
+          echo "=== Diagnostic ==="
+          echo "Host (sanitise) : $CLEAN_HOST"
+          echo "Protocole       : $PROTO"
+          echo "Port            : ${FTP_PORT:-(defaut $PROTO)}"
+          echo "User length     : ${#FTP_USER}"
+          echo "Password length : ${#FTP_PASS}"
+          echo "URL finale      : $PROTO://***@$CLEAN_HOST$PORT_SUFFIX"
+          echo "=================="
+
+          # Test resolution DNS d'abord
+          echo ""
+          echo "Test resolution DNS de $CLEAN_HOST :"
+          if getent hosts "$CLEAN_HOST"; then
+            echo "  -> DNS OK"
+          else
+            echo "::error::DNS resolution failed pour $CLEAN_HOST. Verifie que FTP_HOST est correct (ex: 'apk.nerysia.fr' sans http:// ni slash)."
+            exit 1
+          fi
+
+          echo ""
+          echo "=== Upload via lftp ==="
           lftp -u "$FTP_USER,$FTP_PASS" -e "
+            set net:timeout 15;
+            set net:max-retries 2;
+            set net:reconnect-interval-base 3;
             set ftp:ssl-allow yes;
             set ssl:verify-certificate no;
+            debug 3;
             cd /apk/nerysia-laucher;
             put docs/feed.xml;
             bye
-          " "$FTP_HOST"
+          " "$URL" 2>&1
 
       - name: Confirm
         run: echo "✓ feed.xml deployed to ${{ secrets.FTP_HOST }}:/apk/nerysia-laucher/feed.xml"
