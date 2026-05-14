@@ -1,7 +1,7 @@
 name: Deploy News (feed.xml)
 
-# Quand ça se déclenche :
-#  1. À chaque push sur master qui touche docs/feed.xml → auto
+# Quand ca se declenche :
+#  1. A chaque push sur master qui touche docs/feed.xml -> auto
 #  2. Manuellement via le bouton "Run workflow" sur GitHub
 on:
   push:
@@ -15,89 +15,33 @@ permissions:
 
 jobs:
   deploy:
-    name: Upload feed.xml to FTP
+    name: Upload feed.xml to FTP (OVH)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
-      - name: Install lftp
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y lftp
 
       - name: Upload feed.xml via FTP
         env:
           FTP_HOST: ${{ secrets.FTP_HOST }}
           FTP_USER: ${{ secrets.FTP_USERNAME }}
           FTP_PASS: ${{ secrets.FTP_PASSWORD }}
-          FTP_PORT: ${{ secrets.FTP_PORT }}
-          FTP_PROTOCOL: ${{ secrets.FTP_PROTOCOL }}
         run: |
           if [ -z "$FTP_HOST" ] || [ -z "$FTP_USER" ] || [ -z "$FTP_PASS" ]; then
             echo "::error::Secrets FTP_HOST / FTP_USERNAME / FTP_PASSWORD manquants."
             exit 1
           fi
 
-          # Sanitize : enleve un prefixe protocole eventuel (ftp://, sftp://, https://...) et slash final
+          # Sanitize host (au cas ou un protocole prefix aurait ete colle dedans)
           CLEAN_HOST=$(echo "$FTP_HOST" | sed -E 's|^[a-z]+://||I' | sed 's|/$||')
-          PROTO="${FTP_PROTOCOL:-ftp}"
-          PORT_SUFFIX=""
-          if [ -n "$FTP_PORT" ]; then
-            PORT_SUFFIX=":$FTP_PORT"
-          fi
-          URL="$PROTO://$CLEAN_HOST$PORT_SUFFIX"
 
-          echo "=== Diagnostic ==="
-          echo "Host (sanitise) : $CLEAN_HOST"
-          echo "Protocole       : $PROTO"
-          echo "Port            : ${FTP_PORT:-(defaut $PROTO)}"
-          echo "User length     : ${#FTP_USER}"
-          echo "Password length : ${#FTP_PASS}"
-          echo "URL finale      : $PROTO://***@$CLEAN_HOST$PORT_SUFFIX"
-          echo "=================="
-
-          # Test resolution DNS d'abord
-          echo ""
-          echo "Test resolution DNS de $CLEAN_HOST :"
-          if getent hosts "$CLEAN_HOST"; then
-            echo "  -> DNS OK"
-          else
-            echo "::error::DNS resolution failed pour $CLEAN_HOST. Verifie que FTP_HOST est correct (ex: 'apk.nerysia.fr' sans http:// ni slash)."
-            exit 1
-          fi
-
-          echo ""
-          echo "=== Test 1 : curl FTPS (explicit TLS, ce que OVH veut) ==="
-          curl -v --connect-timeout 15 --max-time 30 \
+          echo "Upload vers ftp://$CLEAN_HOST/apk/nerysia-laucher/feed.xml..."
+          curl --fail --silent --show-error \
+               --connect-timeout 15 --max-time 60 \
                --user "$FTP_USER:$FTP_PASS" \
-               --ssl --insecure \
-               "ftp://$CLEAN_HOST/" 2>&1 | head -40 || echo "curl FTPS a echoue"
-
-          echo ""
-          echo "=== Test 2 : lftp avec FTPS force (recommande OVH) ==="
-          lftp -d -u "$FTP_USER,$FTP_PASS" -e "
-            set net:timeout 30;
-            set net:max-retries 2;
-            set net:reconnect-interval-base 5;
-            set ftp:passive-mode on;
-            set ftp:prefer-epsv no;
-            set ftp:ssl-allow yes;
-            set ftp:ssl-force yes;
-            set ftp:ssl-protect-data yes;
-            set ssl:verify-certificate no;
-            cd /apk/nerysia-laucher;
-            put docs/feed.xml;
-            bye
-          " "$CLEAN_HOST" 2>&1 || true
-
-          echo ""
-          echo "=== Test 3 : curl upload direct (fallback) ==="
-          curl -v --connect-timeout 15 --max-time 60 \
-               --user "$FTP_USER:$FTP_PASS" \
-               --ssl --insecure \
                -T docs/feed.xml \
-               "ftp://$CLEAN_HOST/apk/nerysia-laucher/feed.xml" 2>&1
+               "ftp://$CLEAN_HOST/apk/nerysia-laucher/feed.xml"
+          echo "Upload OK"
 
       - name: Confirm
-        run: echo "✓ feed.xml deployed to ${{ secrets.FTP_HOST }}:/apk/nerysia-laucher/feed.xml"
+        run: echo "feed.xml deploye sur OVH -> visible sur https://apk.nerysia.fr/nerysia-laucher/feed.xml"
