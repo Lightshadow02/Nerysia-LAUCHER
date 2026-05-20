@@ -7,7 +7,7 @@
             "name": "Nerysia (Minecraft 1.21.1)",
             "description": "Nerysia Running Minecraft 1.21.1 (Fabric v0.19.2)",
             "icon": "https://apk.nerysia.fr/Logo.png",
-            "version": "1.19.0",
+            "version": "1.20.0",
             "address": "node.hloureiro.fr:45545",
             "minecraftVersion": "1.21.1",
             "mainServer": true,
@@ -916,13 +916,13 @@
                     }
                 },
                 {
-                    "id": "generated.fabricmod:nery-faction-1.69.7:1.0.0@jar",
-                    "name": "nery-faction-1.69.7",
+                    "id": "generated.fabricmod:nery-faction-1.69.10:1.0.0@jar",
+                    "name": "nery-faction-1.69.10",
                     "type": "FabricMod",
                     "artifact": {
-                        "size": 3916387,
-                        "MD5": "61b6bb0141c1933c26a2c8a4f83e5c8c",
-                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/nery-faction-1.69.7.jar"
+                        "size": 3915021,
+                        "MD5": "18953f0b1cdd71e94af810a96db76753",
+                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/nery-faction-1.69.10.jar"
                     }
                 },
                 {
