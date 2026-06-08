@@ -7,7 +7,7 @@
             "name": "Nerysia (Minecraft 1.21.1)",
             "description": "Nerysia Running Minecraft 1.21.1 (Fabric v0.19.2)",
             "icon": "https://apk.nerysia.fr/Logo.png",
-            "version": "1.21.0",
+            "version": "1.22.0",
             "address": "node.hloureiro.fr:45545",
             "minecraftVersion": "1.21.1",
             "mainServer": true,
@@ -636,6 +636,16 @@
                     }
                 },
                 {
+                    "id": "generated.fabricmod:emi-1.1.24+1.21.1+fabric:1.0.0@jar",
+                    "name": "emi-1.1.24+1.21.1+fabric",
+                    "type": "FabricMod",
+                    "artifact": {
+                        "size": 1098223,
+                        "MD5": "b0cd594a9eddb552494f147fc1dff596",
+                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/emi-1.1.24%2B1.21.1%2Bfabric.jar"
+                    }
+                },
+                {
                     "id": "generated.fabricmod:enchanted-vertical-slabs-2.3.2-fabric-mc1.21:1.0.0@jar",
                     "name": "enchanted-vertical-slabs-2.3.2-fabric-mc1.21",
                     "type": "FabricMod",
@@ -773,16 +783,6 @@
                         "size": 653722,
                         "MD5": "0044e7b8b4d4096257031692f5995a2c",
                         "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/geckolib-fabric-1.21.1-4.8.4.jar"
-                    }
-                },
-                {
-                    "id": "generated.fabricmod:jei-1.21.1-fabric-19.27.0.340:1.0.0@jar",
-                    "name": "jei-1.21.1-fabric-19.27.0.340",
-                    "type": "FabricMod",
-                    "artifact": {
-                        "size": 1561711,
-                        "MD5": "d64d528f9e689ce83421ab022e41c7ac",
-                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/jei-1.21.1-fabric-19.27.0.340.jar"
                     }
                 },
                 {
