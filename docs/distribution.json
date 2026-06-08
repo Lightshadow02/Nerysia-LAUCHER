@@ -7,7 +7,7 @@
             "name": "Nerysia (Minecraft 1.21.1)",
             "description": "Nerysia Running Minecraft 1.21.1 (Fabric v0.19.2)",
             "icon": "https://apk.nerysia.fr/Logo.png",
-            "version": "1.22.0",
+            "version": "1.23.0",
             "address": "node.hloureiro.fr:45545",
             "minecraftVersion": "1.21.1",
             "mainServer": true,
@@ -483,6 +483,16 @@
                         "size": 1157166,
                         "MD5": "a2c091b027ad6ba8e54b07020fd45884",
                         "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/cloth-config-15.0.140-fabric.jar"
+                    }
+                },
+                {
+                    "id": "generated.fabricmod:cobbledex-rei-emi-jei-fabric-2.0.2:1.0.0@jar",
+                    "name": "cobbledex-rei-emi-jei-fabric-2.0.2",
+                    "type": "FabricMod",
+                    "artifact": {
+                        "size": 5003681,
+                        "MD5": "78aa646c4ba9dfb82cfa8a04770c6b31",
+                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/cobbledex-rei-emi-jei-fabric-2.0.2.jar"
                     }
                 },
                 {
