@@ -8,7 +8,7 @@ asar: true
 compression: 'maximum'
 
 files:
-  - '!{dist,.gitignore,.vscode,docs,dev-app-update.yml,.nvmrc,.eslintrc.json,tools,.github,.claude}'
+  - '!{dist,.gitignore,.vscode,docs,dev-app-update.yml,.nvmrc,.eslintrc.json,tools,.github,.claude,CLAUDE.md}'
 
 # Windows Configuration
 win:
@@ -35,6 +35,9 @@ publish:
   provider: github
   owner: Lightshadow02
   repo: Nerysia-LAUCHER
+  # Publie directement la release (par defaut electron-builder cree un brouillon,
+  # invisible pour la mise a jour automatique du launcher).
+  releaseType: release
 
 directories:
   buildResources: 'build'

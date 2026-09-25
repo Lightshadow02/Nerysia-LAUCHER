@@ -2886,7 +2886,9 @@ input:checked + .toggleSwitchSlider:before {
 }
 
 /* Logo container styles w/ update. */
+/* Nerysia : le logo est masque par defaut, on l'affiche uniquement pour signaler une MAJ du launcher. */
 #image_seal_container[update]{
+    display: block;
     cursor: pointer
 }
 #image_seal_container[update]:before,

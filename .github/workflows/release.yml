@@ -17,6 +17,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      # electron-builder publie avec la version de package.json, pas celle du tag.
+      # On bloque si les deux ne correspondent pas (sinon on republie l'ancienne version).
+      - name: Check tag matches package.json version
+        shell: bash
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if [ "v${PKG_VERSION}" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::Le tag ${GITHUB_REF_NAME} ne correspond pas a package.json (v${PKG_VERSION}). Mets a jour la version dans package.json avant de tagger."
+            exit 1
+          fi
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20

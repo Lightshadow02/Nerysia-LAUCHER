@@ -14,16 +14,30 @@ on:
           - major
           - none
         default: minor
+      force:
+        description: 'Forcer meme si beaucoup de modules disparaissent (garde anti-scan-vide)'
+        type: boolean
+        default: false
 
 # Le workflow doit pouvoir push le distribution.json mis a jour
 permissions:
   contents: write
+
+# Jamais deux MAJ modpack en meme temps (sinon versions en double)
+concurrency:
+  group: update-modpack
+  cancel-in-progress: false
 
 jobs:
   update:
     name: Regenerate distribution.json from FTP
     runs-on: ubuntu-latest
     timeout-minutes: 60
+
+    env:
+      FTP_HOST: ${{ secrets.FTP_HOST }}
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
 
     steps:
       - name: Checkout repo
@@ -37,19 +51,20 @@ jobs:
         with:
           python-version: '3.x'
 
+      # 1. Genere en local SANS publier (la publication FTP se fait apres le push)
       - name: Generate distribution.json from FTP
-        env:
-          FTP_HOST: ${{ secrets.FTP_HOST }}
-          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          python3 tools/generate-distribution-from-ftp.py --bump "${{ inputs.bump }}"
+          FORCE_FLAG=""
+          if [ "${{ inputs.force }}" = "true" ]; then FORCE_FLAG="--force"; fi
+          python3 tools/generate-distribution-from-ftp.py --bump "${{ inputs.bump }}" --no-upload $FORCE_FLAG
 
+      # 2. Commit + push. Si le push echoue (quelqu'un a commite entre-temps),
+      #    le job s'arrete ici et RIEN n'est publie sur le FTP -> pas de desync.
       - name: Commit and push distribution.json
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/distribution.json
+          git add docs/distribution.json tools/md5-cache.json
           if git diff --cached --quiet; then
             echo "Aucun changement dans distribution.json (ni dans les mods, ni dans la version)"
           else
@@ -59,6 +74,10 @@ jobs:
             git push
             echo "Commit + push OK : modpack v${VERSION}"
           fi
+
+      # 3. Publication sur le FTP (upload .tmp + renommage)
+      - name: Upload distribution.json to FTP
+        run: python3 tools/generate-distribution-from-ftp.py --upload-only
 
       - name: Summary
         run: |
