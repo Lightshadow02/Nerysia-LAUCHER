@@ -1,16 +1,31 @@
-# Script PowerShell ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â GÃƒÆ’Ã‚Â©nÃƒÆ’Ã‚Â¨re automatiquement le distribution.json
-# depuis les fichiers prÃƒÆ’Ã‚Â©sents sur le serveur (Y:\apk)
-# Usage: .\generate-distribution.ps1
-# Output: docs\distribution.json
+# Script PowerShell - Genere automatiquement le distribution.json
+# depuis les fichiers presents sur le serveur (Y:\apk, drive FTP monte)
+#
+# Usage :
+#   & "tools/generate-distribution.ps1" -Bump patch     # ou minor / major / sans param
+#   & "tools/generate-distribution.ps1" -Bump patch -Force   # ignore la garde anti-scan-vide
+#   & "tools/generate-distribution.ps1" -NoUpload            # genere en local sans publier
+#
+# Output : docs\distribution.json + copie vers Y:\apk\nerysia-laucher\distribution.json
+#
+# Toute la configuration (exclusions, bloc Fabric, infos serveur) est dans
+# tools\distribution-config.json, partagee avec tools\generate-distribution-from-ftp.py.
+# NB : fichier volontairement sans accents (evite les soucis d'encodage PowerShell 5.1).
 
 param(
     [ValidateSet("none","patch","minor","major")]
-    [string]$Bump = "none"
+    [string]$Bump = "none",
+    [switch]$Force,
+    [switch]$NoUpload
 )
 
-$serverRoot   = "Y:\apk\nerysia-laucher\servers\Nerysia-1.21.1"
-$baseUrl      = "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1"
-$outputFile   = "$PSScriptRoot\..\docs\distribution.json"
+$ErrorActionPreference = "Stop"
+
+$config       = Get-Content "$PSScriptRoot\distribution-config.json" -Raw -Encoding UTF8 | ConvertFrom-Json
+$serverRoot   = $config.localServerRoot -replace "/", "\"
+$baseUrl      = $config.baseUrl
+$outputFile   = [System.IO.Path]::GetFullPath("$PSScriptRoot\..\docs\distribution.json")
+$serverDest   = $config.localDistributionTarget -replace "/", "\"
 
 # ----------------------------------------------------------------
 # GARDE : refuse de tourner si le drive Y: n'est pas monte.
@@ -60,18 +75,22 @@ function Get-NextVersion($current, $bumpType) {
 }
 
 $currentVersion = "1.0.0"
+$previousModuleCount = 0
 if (Test-Path $outputFile) {
     try {
-        $existing = Get-Content $outputFile -Raw | ConvertFrom-Json
+        $existing = Get-Content $outputFile -Raw -Encoding UTF8 | ConvertFrom-Json
         if ($existing.servers -and $existing.servers[0].version) {
             $currentVersion = $existing.servers[0].version
+        }
+        if ($existing.servers -and $existing.servers[0].modules) {
+            $previousModuleCount = @($existing.servers[0].modules).Count
         }
     } catch {
         Write-Host "  [WARN] Impossible de parser distribution.json existant, defaut = 1.0.0" -ForegroundColor Yellow
     }
 }
-$newVersion = Get-NextVersion $currentVersion $Bump
 
+$newVersion = Get-NextVersion $currentVersion $Bump
 Write-Host ""
 if ($Bump -eq "none") {
     Write-Host "Version serveur : $currentVersion (inchangee)" -ForegroundColor Cyan
@@ -79,226 +98,171 @@ if ($Bump -eq "none") {
     Write-Host "Version serveur : $currentVersion -> $newVersion (bump $Bump)" -ForegroundColor Green
 }
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
-# Fichiers EXCLUS de la distribution
-# (donnÃƒÆ’Ã‚Â©es joueur spÃƒÆ’Ã‚Â©cifiques, pas ÃƒÆ’Ã‚Â  distribuer)
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
-$excludePatterns = @(
-    "config\jei\world\*",
-    "config\litematica\*",
-    "fancymenu_data\*",
-    "config\cobblemonintegrations-common-1.toml.bak",
-    "config\sound_physics_remastered\sound_rates.properties"
-)
+# ----------------------------------------------------------------
+# Helpers
+# ----------------------------------------------------------------
+# Regex d'exclusion (cf distribution-config.json), testees sur le chemin relatif avec des /
+$excludePatterns = @()
+foreach ($group in $config.excludePatterns.PSObject.Properties) {
+    if ($group.Name.StartsWith("_")) { continue }
+    $excludePatterns += @($group.Value)
+}
 
-function Should-Exclude($relativePath) {
+function Test-Excluded($relativePath) {
     foreach ($pattern in $excludePatterns) {
-        if ($relativePath -like $pattern) { return $true }
+        if ($relativePath -match $pattern) { return $true }
     }
     return $false
 }
 
+# MD5 d'un fichier. S'il est illisible (ouvert par un autre programme), on ARRETE :
+# publier un hash faux bloquerait le lancement du jeu chez tous les joueurs.
 function Get-MD5($path) {
-    $hash = Get-FileHash $path -Algorithm MD5 -ErrorAction SilentlyContinue
-    if ($hash) { return $hash.Hash.ToLower() }
-    return "00000000000000000000000000000000"
+    try {
+        return (Get-FileHash $path -Algorithm MD5).Hash.ToLower()
+    } catch {
+        Write-Host ""
+        Write-Host "  ERREUR : impossible de lire $path" -ForegroundColor Red
+        Write-Host "  Le fichier est probablement ouvert par un autre programme." -ForegroundColor Red
+        Write-Host "  Ferme-le puis relance le script. Rien n'a ete publie." -ForegroundColor Red
+        exit 1
+    }
 }
 
-function New-ModEntry($file, $id, $name, $type, $url, $required = $null) {
-    $md5 = Get-MD5 $file.FullName
-    $entry = [ordered]@{
-        id       = $id
-        name     = $name
-        type     = $type
-        artifact = [ordered]@{
-            size = $file.Length
-            MD5  = $md5
-            url  = $url
-        }
-    }
-    if ($required -ne $null) {
-        $entry["required"] = $required
-    }
-    return $entry
+# Encode chaque segment du chemin (espaces, +, #, [], accents...) comme le script Python
+function ConvertTo-UrlPath($relativePath) {
+    return (($relativePath -split "/") | ForEach-Object { [Uri]::EscapeDataString($_) }) -join "/"
 }
 
-Write-Host "=== GÃƒÆ’Ã‚Â©nÃƒÆ’Ã‚Â©ration du distribution.json ===" -ForegroundColor Cyan
+# Tri ordinal (meme ordre que le script Python -> diffs git plus lisibles)
+function Sort-Ordinal($items, [scriptblock]$key) {
+    $list = [System.Collections.Generic.List[object]]::new()
+    foreach ($i in $items) { $list.Add($i) }
+    $list.Sort([System.Comparison[object]]{ param($a, $b) [string]::CompareOrdinal((& $key $a), (& $key $b)) })
+    return ,$list
+}
+
+Write-Host "=== Generation du distribution.json ===" -ForegroundColor Cyan
 Write-Host ""
 
 $modules = [System.Collections.Generic.List[object]]::new()
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
-# FABRIC CORE (entrÃƒÆ’Ã‚Â©e statique, ne change pas)
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
-Write-Host "[1/4] Ajout du bloc Fabric Core..." -ForegroundColor Yellow
+# ----------------------------------------------------------------
+# FABRIC CORE (entree statique, cf distribution-config.json)
+# ----------------------------------------------------------------
+Write-Host "[1/5] Ajout du bloc Fabric Core..." -ForegroundColor Yellow
+$modules.Add($config.fabricCore)
 
-$fabricRepoUrl = "https://apk.nerysia.fr/nerysia-laucher/repo"
-
-$fabricEntry = [ordered]@{
-    id   = "net.fabricmc:fabric-loader:0.19.2"
-    name = "Fabric (fabric-loader)"
-    type = "Fabric"
-    artifact = [ordered]@{
-        size = 1968930
-        MD5  = "d692407a67129e913b4210218edebb20"
-        url  = "$fabricRepoUrl/lib/net/fabricmc/fabric-loader/0.19.2/fabric-loader-0.19.2.jar"
-    }
-    subModules = @(
-        [ordered]@{ id="1.21.1-fabric-0.19.2"; name="Fabric (version.json)"; type="VersionManifest"; artifact=[ordered]@{size=2847;MD5="d2dd97583145d543897681ba0caa87ce";url="$fabricRepoUrl/versions/1.21.1-fabric-0.19.2/1.21.1-fabric-0.19.2.json"} },
-        [ordered]@{ id="org.ow2.asm:asm:9.9"; name="Fabric (asm)"; type="Library"; artifact=[ordered]@{size=126122;MD5="6d1dd0482c03a6dc1807d9d004456021";url="$fabricRepoUrl/lib/org/ow2/asm/asm/9.9/asm-9.9.jar"} },
-        [ordered]@{ id="org.ow2.asm:asm-analysis:9.9"; name="Fabric (asm-analysis)"; type="Library"; artifact=[ordered]@{size=35149;MD5="f07383cfbd50f097558341a03b8871e1";url="$fabricRepoUrl/lib/org/ow2/asm/asm-analysis/9.9/asm-analysis-9.9.jar"} },
-        [ordered]@{ id="org.ow2.asm:asm-commons:9.9"; name="Fabric (asm-commons)"; type="Library"; artifact=[ordered]@{size=74348;MD5="8103b3de8f48fb4c7f97efdaa46ce809";url="$fabricRepoUrl/lib/org/ow2/asm/asm-commons/9.9/asm-commons-9.9.jar"} },
-        [ordered]@{ id="org.ow2.asm:asm-tree:9.9"; name="Fabric (asm-tree)"; type="Library"; artifact=[ordered]@{size=51947;MD5="912eeaba1a63d574ffc66c651c7c6725";url="$fabricRepoUrl/lib/org/ow2/asm/asm-tree/9.9/asm-tree-9.9.jar"} },
-        [ordered]@{ id="org.ow2.asm:asm-util:9.9"; name="Fabric (asm-util)"; type="Library"; artifact=[ordered]@{size=94565;MD5="ef5e90e736cd09bc407c1d46a3faba0f";url="$fabricRepoUrl/lib/org/ow2/asm/asm-util/9.9/asm-util-9.9.jar"} },
-        [ordered]@{ id="net.fabricmc:sponge-mixin:0.17.2+mixin.0.8.7"; name="Fabric (sponge-mixin)"; type="Library"; artifact=[ordered]@{size=1540039;MD5="4b6b96074976cc7aa096b9e569ca623e";url="$fabricRepoUrl/lib/net/fabricmc/sponge-mixin/0.17.2+mixin.0.8.7/sponge-mixin-0.17.2+mixin.0.8.7.jar"} },
-        [ordered]@{ id="net.fabricmc:intermediary:1.21.1"; name="Fabric (intermediary)"; type="Library"; artifact=[ordered]@{size=657725;MD5="850be48a3406b9efdf8e64b1c2db97f8";url="$fabricRepoUrl/lib/net/fabricmc/intermediary/1.21.1/intermediary-1.21.1.jar"} }
-    )
-}
-$modules.Add($fabricEntry)
-
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
-# MODS OBLIGATOIRES (required/)
-# On exclut les vieilles versions dupliquÃƒÆ’Ã‚Â©es
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
-Write-Host "[2/4] Scan des mods obligatoires (required/)..." -ForegroundColor Yellow
-
-$excludedMods = @(
-    "Cobblemon-fabric-1.6.1+1.21.1.jar",   # RemplacÃƒÆ’Ã‚Â© par 1.7.3
-    "fabric-api-0.116.7+1.21.1.jar"         # RemplacÃƒÆ’Ã‚Â© par 0.116.11
+# ----------------------------------------------------------------
+# MODS : required / optionaloff / optionalon
+# ----------------------------------------------------------------
+$modFolders = @(
+    @{ step = "[2/5]"; dir = "required";    label = "[MOD]"; color = "Green";   required = $null },
+    @{ step = "[3/5]"; dir = "optionaloff"; label = "[OFF]"; color = "Magenta"; required = [ordered]@{ value = $false; def = $false } },
+    @{ step = "[4/5]"; dir = "optionalon";  label = "[ON] "; color = "Cyan";    required = [ordered]@{ value = $false; def = $true } }
 )
 
-$requiredMods = Get-ChildItem "$serverRoot\fabricmods\required\" -Filter "*.jar" | Sort-Object Name
-$count = 0
-foreach ($mod in $requiredMods) {
-    if ($excludedMods -contains $mod.Name) {
-        Write-Host "  [SKIP] $($mod.Name) (ancienne version)" -ForegroundColor DarkGray
-        continue
+$modCount = 0
+foreach ($folder in $modFolders) {
+    Write-Host "$($folder.step) Scan des mods ($($folder.dir)/)..." -ForegroundColor Yellow
+    $jars = Get-ChildItem "$serverRoot\fabricmods\$($folder.dir)\" -Filter "*.jar" -File
+    foreach ($mod in (Sort-Ordinal $jars { param($f) $f.Name })) {
+        if ($config.excludedMods -contains $mod.Name) {
+            Write-Host "  [SKIP] $($mod.Name) (ancienne version)" -ForegroundColor DarkGray
+            continue
+        }
+        Write-Host "  $($folder.label)  $($mod.Name)" -ForegroundColor $folder.color -NoNewline
+        $md5 = Get-MD5 $mod.FullName
+        Write-Host " -> $md5" -ForegroundColor DarkGray
+        $baseName = [System.IO.Path]::GetFileNameWithoutExtension($mod.Name)
+        $entry = [ordered]@{
+            id       = "generated.fabricmod:$($baseName):1.0.0@jar"
+            name     = $baseName
+            type     = "FabricMod"
+            artifact = [ordered]@{
+                size = $mod.Length
+                MD5  = $md5
+                url  = "$baseUrl/fabricmods/$($folder.dir)/$(ConvertTo-UrlPath $mod.Name)"
+            }
+        }
+        if ($null -ne $folder.required) { $entry["required"] = $folder.required }
+        $modules.Add($entry)
+        $modCount++
     }
-    Write-Host "  [MOD]  $($mod.Name)" -ForegroundColor Green -NoNewline
-    $md5 = Get-MD5 $mod.FullName
-    Write-Host " ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ $md5" -ForegroundColor DarkGray
-
-    $id = "generated.fabricmod:$([System.IO.Path]::GetFileNameWithoutExtension($mod.Name)):1.0.0@jar"
-    $modules.Add([ordered]@{
-        id       = $id
-        name     = [System.IO.Path]::GetFileNameWithoutExtension($mod.Name)
-        type     = "FabricMod"
-        artifact = [ordered]@{
-            size = $mod.Length
-            MD5  = $md5
-            url  = "$baseUrl/fabricmods/required/$($mod.Name)"
-        }
-    })
-    $count++
 }
-Write-Host "  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ $count mods obligatoires ajoutÃƒÆ’Ã‚Â©s" -ForegroundColor Cyan
+Write-Host "  -> $modCount mods ajoutes" -ForegroundColor Cyan
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
-# MODS OPTIONNELS DÃƒÆ’Ã¢â‚¬Â°SACTIVÃƒÆ’Ã¢â‚¬Â°S (optionaloff/)
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
-Write-Host "[3/5] Scan des mods optionnels dÃƒÆ’Ã‚Â©sactivÃƒÆ’Ã‚Â©s (optionaloff/)..." -ForegroundColor Yellow
-
-$optionalOffMods = Get-ChildItem "$serverRoot\fabricmods\optionaloff\" -Filter "*.jar" | Sort-Object Name
-foreach ($mod in $optionalOffMods) {
-    Write-Host "  [OFF]  $($mod.Name)" -ForegroundColor Magenta -NoNewline
-    $md5 = Get-MD5 $mod.FullName
-    Write-Host " ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ $md5" -ForegroundColor DarkGray
-
-    $id = "generated.fabricmod:$([System.IO.Path]::GetFileNameWithoutExtension($mod.Name)):1.0.0@jar"
-    $modules.Add([ordered]@{
-        id       = $id
-        name     = [System.IO.Path]::GetFileNameWithoutExtension($mod.Name)
-        type     = "FabricMod"
-        artifact = [ordered]@{
-            size = $mod.Length
-            MD5  = $md5
-            url  = "$baseUrl/fabricmods/optionaloff/$($mod.Name)"
-        }
-        required = [ordered]@{ value = $false; def = $false }
-    })
-}
-
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
-# MODS OPTIONNELS ACTIVÃƒÆ’Ã¢â‚¬Â°S PAR DÃƒÆ’Ã¢â‚¬Â°FAUT (optionalon/)
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
-Write-Host "[4/5] Scan des mods optionnels activÃƒÆ’Ã‚Â©s (optionalon/)..." -ForegroundColor Yellow
-
-$optionalOnMods = Get-ChildItem "$serverRoot\fabricmods\optionalon\" -Filter "*.jar" | Sort-Object Name
-foreach ($mod in $optionalOnMods) {
-    Write-Host "  [ON]   $($mod.Name)" -ForegroundColor Cyan -NoNewline
-    $md5 = Get-MD5 $mod.FullName
-    Write-Host " ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ $md5" -ForegroundColor DarkGray
-
-    $id = "generated.fabricmod:$([System.IO.Path]::GetFileNameWithoutExtension($mod.Name)):1.0.0@jar"
-    $modules.Add([ordered]@{
-        id       = $id
-        name     = [System.IO.Path]::GetFileNameWithoutExtension($mod.Name)
-        type     = "FabricMod"
-        artifact = [ordered]@{
-            size = $mod.Length
-            MD5  = $md5
-            url  = "$baseUrl/fabricmods/optionalon/$($mod.Name)"
-        }
-        required = [ordered]@{ value = $false; def = $true }
-    })
-}
-
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
-# FICHIERS (configs, resourcepacks, shadersÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦)
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ----------------------------------------------------------------
+# FICHIERS (configs, resourcepacks, shaders...)
+# ----------------------------------------------------------------
 Write-Host "[5/5] Scan des fichiers (config, resourcepacks, shaders...)..." -ForegroundColor Yellow
-
-$allFiles = Get-ChildItem "$serverRoot\files\" -Recurse -File | Sort-Object FullName
+$filesRoot = (Resolve-Path "$serverRoot\files").ProviderPath.TrimEnd("\") + "\"
+$allFiles = Get-ChildItem $filesRoot -Recurse -File |
+    ForEach-Object { [pscustomobject]@{ File = $_; Rel = $_.FullName.Substring($filesRoot.Length).Replace("\", "/") } }
 $fileCount = 0
-foreach ($file in $allFiles) {
-    $relativePath = $file.FullName.Replace("$serverRoot\files\", "").Replace("\", "/")
-
-    if (Should-Exclude ($relativePath.Replace("/","\"))) {
+foreach ($item in (Sort-Ordinal $allFiles { param($x) $x.Rel })) {
+    $relativePath = $item.Rel
+    if (Test-Excluded $relativePath) {
         Write-Host "  [SKIP] $relativePath" -ForegroundColor DarkGray
         continue
     }
-
     Write-Host "  [FILE] $relativePath" -ForegroundColor Blue -NoNewline
-    $md5 = Get-MD5 $file.FullName
+    $md5 = Get-MD5 $item.File.FullName
     Write-Host " -> $md5" -ForegroundColor DarkGray
     $safeId = $relativePath -replace "[^a-zA-Z0-9._\-]", "_"
-    $encodedPath = $relativePath -replace " ", "%20" -replace "\[", "%5B" -replace "\]", "%5D"
-    $fileId = "generated.file:$($safeId):1.0.0"
     $modules.Add([ordered]@{
-        id       = $fileId
-        name     = $file.Name
+        id       = "generated.file:$($safeId):1.0.0"
+        name     = $item.File.Name
         type     = "File"
         artifact = [ordered]@{
-            size = $file.Length
+            size = $item.File.Length
             MD5  = $md5
-            url  = "$baseUrl/files/$encodedPath"
+            url  = "$baseUrl/files/$(ConvertTo-UrlPath $relativePath)"
             path = $relativePath
         }
     })
     $fileCount++
 }
-Write-Host "  ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ $fileCount fichiers ajoutÃƒÆ’Ã‚Â©s" -ForegroundColor Cyan
+Write-Host "  -> $fileCount fichiers ajoutes" -ForegroundColor Cyan
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ----------------------------------------------------------------
+# GARDE-FOU : refuse de publier un modpack vide ou ampute
+# ----------------------------------------------------------------
+$ratio = [double]$config.safety.minModuleRatio
+if ($modCount -eq 0) {
+    Write-Host "  ERREUR : 0 mod trouve. Rien n'a ete publie." -ForegroundColor Red
+    exit 1
+}
+if ($previousModuleCount -gt 0 -and $modules.Count -lt $previousModuleCount * $ratio) {
+    $msg = "Le nombre de modules chute de $previousModuleCount a $($modules.Count) (seuil $([int]($ratio*100))%)."
+    if ($Force) {
+        Write-Host "  [WARN] $msg -Force utilise, on continue." -ForegroundColor Yellow
+    } else {
+        Write-Host "  ERREUR : $msg Scan incomplet ? Relance avec -Force si c'est voulu. Rien n'a ete publie." -ForegroundColor Red
+        exit 1
+    }
+}
+
+# ----------------------------------------------------------------
 # ASSEMBLAGE DU JSON FINAL
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ----------------------------------------------------------------
 Write-Host ""
 Write-Host "Assemblage du JSON..." -ForegroundColor Yellow
-
+$srv = $config.server
 $distribution = [ordered]@{
-    version = "1.0.0"
-    rss     = "https://apk.nerysia.fr/nerysia-laucher/feed.xml"
+    version = "1.0.0"   # Schema version Helios (ne pas toucher)
+    rss     = $config.rss
     servers = @(
         [ordered]@{
-            id               = "Nerysia-1.21.1"
-            name             = "Nerysia (Minecraft 1.21.1)"
-            description      = "Nerysia Running Minecraft 1.21.1 (Fabric v0.19.2)"
-            icon             = "https://apk.nerysia.fr/Logo.png"
+            id               = $srv.id
+            name             = $srv.name
+            description      = $srv.description
+            icon             = $srv.icon
             version          = $newVersion
-            address          = "node.hloureiro.fr:45545"
-            minecraftVersion = "1.21.1"
-            mainServer       = $true
-            autoconnect      = $false
+            address          = $srv.address
+            minecraftVersion = $srv.minecraftVersion
+            mainServer       = $srv.mainServer
+            autoconnect      = $srv.autoconnect
             modules          = $modules.ToArray()
         }
     )
@@ -306,15 +270,28 @@ $distribution = [ordered]@{
 
 $json = $distribution | ConvertTo-Json -Depth 20 -Compress:$false
 
-# ÃƒÆ’Ã¢â‚¬Â°crire SANS BOM (UTF-8 sans BOM) ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â important pour que Node.js puisse parser le JSON
+# Ecrire SANS BOM (UTF-8 sans BOM), important pour que Node.js puisse parser le JSON
 $utf8NoBom = New-Object System.Text.UTF8Encoding $false
 [System.IO.File]::WriteAllText($outputFile, $json, $utf8NoBom)
 
+# ----------------------------------------------------------------
+# UPLOAD : copie vers un .tmp puis renommage, pour que les joueurs
+# ne recuperent jamais un JSON a moitie copie.
+# ----------------------------------------------------------------
 Write-Host ""
 Write-Host "=== UPLOAD vers le serveur ===" -ForegroundColor Yellow
-$serverDest = "Y:\apk\nerysia-laucher\distribution.json"
-if (Test-Path (Split-Path $serverDest)) {
-    Copy-Item $outputFile $serverDest -Force
+if ($NoUpload) {
+    Write-Host "  -NoUpload : rien n'a ete publie" -ForegroundColor Yellow
+} elseif (Test-Path (Split-Path $serverDest)) {
+    $tmpDest = "$serverDest.tmp"
+    Copy-Item $outputFile $tmpDest -Force
+    try {
+        Move-Item $tmpDest $serverDest -Force
+    } catch {
+        # Certains drives FTP refusent d'ecraser en renommant : on supprime puis on renomme
+        Remove-Item $serverDest -Force
+        Move-Item $tmpDest $serverDest
+    }
     Write-Host "  Upload OK : $serverDest" -ForegroundColor Green
 } else {
     Write-Host "  Serveur non monte (Y:\apk introuvable) - upload manuel requis" -ForegroundColor Yellow

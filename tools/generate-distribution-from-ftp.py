@@ -2,17 +2,21 @@
 """
 Genere le distribution.json en scannant le FTP OVH directement (sans avoir Y: monte).
 
-Utilise un cache MD5 base sur la taille pour eviter de re-telecharger les fichiers
-qui n'ont pas change : seuls les fichiers nouveaux ou de taille differente sont
-telecharges pour recalculer le MD5.
+Cache MD5 : tools/md5-cache.json garde {url: {size, modify, md5}}. Un fichier n'est
+re-telecharge que si sa taille OU sa date de modification FTP a change. (Avant, seule
+la taille comptait : une config modifiee a taille egale gardait un MD5 faux.)
 
 Usage:
-    python3 tools/generate-distribution-from-ftp.py --bump minor
+    python3 tools/generate-distribution-from-ftp.py --bump minor            # genere + upload
+    python3 tools/generate-distribution-from-ftp.py --bump patch --no-upload
+    python3 tools/generate-distribution-from-ftp.py --upload-only           # upload du JSON local
+    python3 tools/generate-distribution-from-ftp.py --bump patch --force    # ignore la garde anti-scan-vide
 
 Env vars requises:
     FTP_HOST, FTP_USERNAME, FTP_PASSWORD
 
-Equivalent FTP du script PowerShell tools/generate-distribution.ps1.
+Toute la configuration (exclusions, bloc Fabric, infos serveur) est dans
+tools/distribution-config.json, partage avec tools/generate-distribution.ps1.
 """
 import argparse
 import ftplib
@@ -21,82 +25,38 @@ import json
 import os
 import re
 import sys
-import tempfile
 import time
 from pathlib import Path
 from urllib.parse import quote
 
-# ----------------------------------------------------------------
-# Configuration (alignee avec generate-distribution.ps1)
-# ----------------------------------------------------------------
-SERVER_ID = "Nerysia-1.21.1"
-SERVER_REMOTE_PATH = f"/apk/nerysia-laucher/servers/{SERVER_ID}"
-BASE_URL = f"https://apk.nerysia.fr/nerysia-laucher/servers/{SERVER_ID}"
-DIST_REMOTE = "/apk/nerysia-laucher/distribution.json"
-OUTPUT_FILE = Path(__file__).parent.parent / "docs" / "distribution.json"
+ROOT = Path(__file__).resolve().parent.parent
+CONFIG_FILE = ROOT / "tools" / "distribution-config.json"
+OUTPUT_FILE = ROOT / "docs" / "distribution.json"
+MD5_CACHE_FILE = ROOT / "tools" / "md5-cache.json"
 
+CONFIG = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
+
+SERVER_REMOTE_PATH = CONFIG["ftpServerRoot"]
+BASE_URL = CONFIG["baseUrl"]
+DIST_REMOTE = CONFIG["ftpDistributionTarget"]
+EXCLUDED_MODS = set(CONFIG["excludedMods"])
 EXCLUDE_PATTERNS = [
-    re.compile(r"^config/jei/world/"),
-    re.compile(r"^config/litematica/"),
-    re.compile(r"^fancymenu_data/"),
-    re.compile(r"^config/cobblemonintegrations-common-1\.toml\.bak$"),
-    re.compile(r"^config/sound_physics_remastered/sound_rates\.properties$"),
+    re.compile(p, re.IGNORECASE)
+    for key, patterns in CONFIG["excludePatterns"].items()
+    if not key.startswith("_")
+    for p in patterns
 ]
+MIN_MODULE_RATIO = CONFIG["safety"]["minModuleRatio"]
 
-# Vieilles versions de mods a NE PAS distribuer (gardees sur FTP en backup)
-EXCLUDED_MODS = {
-    "Cobblemon-fabric-1.6.1+1.21.1.jar",
-    "fabric-api-0.116.7+1.21.1.jar",
-}
-
-# ----------------------------------------------------------------
-# Fabric Core (statique, change uniquement si on bump Fabric/MC)
-# ----------------------------------------------------------------
-FABRIC_REPO_URL = "https://apk.nerysia.fr/nerysia-laucher/repo"
-
-FABRIC_CORE_BLOCK = {
-    "id": "net.fabricmc:fabric-loader:0.19.2",
-    "name": "Fabric (fabric-loader)",
-    "type": "Fabric",
-    "artifact": {
-        "size": 1968930,
-        "MD5": "d692407a67129e913b4210218edebb20",
-        "url": f"{FABRIC_REPO_URL}/lib/net/fabricmc/fabric-loader/0.19.2/fabric-loader-0.19.2.jar",
-    },
-    "subModules": [
-        {"id": "1.21.1-fabric-0.19.2", "name": "Fabric (version.json)", "type": "VersionManifest",
-         "artifact": {"size": 2847, "MD5": "d2dd97583145d543897681ba0caa87ce",
-                      "url": f"{FABRIC_REPO_URL}/versions/1.21.1-fabric-0.19.2/1.21.1-fabric-0.19.2.json"}},
-        {"id": "org.ow2.asm:asm:9.9", "name": "Fabric (asm)", "type": "Library",
-         "artifact": {"size": 126122, "MD5": "6d1dd0482c03a6dc1807d9d004456021",
-                      "url": f"{FABRIC_REPO_URL}/lib/org/ow2/asm/asm/9.9/asm-9.9.jar"}},
-        {"id": "org.ow2.asm:asm-analysis:9.9", "name": "Fabric (asm-analysis)", "type": "Library",
-         "artifact": {"size": 35149, "MD5": "f07383cfbd50f097558341a03b8871e1",
-                      "url": f"{FABRIC_REPO_URL}/lib/org/ow2/asm/asm-analysis/9.9/asm-analysis-9.9.jar"}},
-        {"id": "org.ow2.asm:asm-commons:9.9", "name": "Fabric (asm-commons)", "type": "Library",
-         "artifact": {"size": 74348, "MD5": "8103b3de8f48fb4c7f97efdaa46ce809",
-                      "url": f"{FABRIC_REPO_URL}/lib/org/ow2/asm/asm-commons/9.9/asm-commons-9.9.jar"}},
-        {"id": "org.ow2.asm:asm-tree:9.9", "name": "Fabric (asm-tree)", "type": "Library",
-         "artifact": {"size": 51947, "MD5": "912eeaba1a63d574ffc66c651c7c6725",
-                      "url": f"{FABRIC_REPO_URL}/lib/org/ow2/asm/asm-tree/9.9/asm-tree-9.9.jar"}},
-        {"id": "org.ow2.asm:asm-util:9.9", "name": "Fabric (asm-util)", "type": "Library",
-         "artifact": {"size": 94565, "MD5": "ef5e90e736cd09bc407c1d46a3faba0f",
-                      "url": f"{FABRIC_REPO_URL}/lib/org/ow2/asm/asm-util/9.9/asm-util-9.9.jar"}},
-        {"id": "net.fabricmc:sponge-mixin:0.17.2+mixin.0.8.7", "name": "Fabric (sponge-mixin)", "type": "Library",
-         "artifact": {"size": 1540039, "MD5": "4b6b96074976cc7aa096b9e569ca623e",
-                      "url": f"{FABRIC_REPO_URL}/lib/net/fabricmc/sponge-mixin/0.17.2+mixin.0.8.7/sponge-mixin-0.17.2+mixin.0.8.7.jar"}},
-        {"id": "net.fabricmc:intermediary:1.21.1", "name": "Fabric (intermediary)", "type": "Library",
-         "artifact": {"size": 657725, "MD5": "850be48a3406b9efdf8e64b1c2db97f8",
-                      "url": f"{FABRIC_REPO_URL}/lib/net/fabricmc/intermediary/1.21.1/intermediary-1.21.1.jar"}},
-    ],
-}
+# Sans date de modif FTP connue, on ne fait confiance a la taille seule que pour les
+# gros fichiers (jars, zips). Les petites configs sont toujours re-hashees.
+TRUST_SIZE_ONLY_ABOVE = 1024 * 1024
 
 
 # ----------------------------------------------------------------
 # Helpers
 # ----------------------------------------------------------------
 def should_exclude(relative_path: str) -> bool:
-    """Returns True if the relative path matches any exclude pattern."""
     normalized = relative_path.replace("\\", "/")
     return any(p.search(normalized) for p in EXCLUDE_PATTERNS)
 
@@ -116,44 +76,37 @@ def bump_version(current: str, bump_type: str) -> str:
 
 
 def url_encode_path(path: str) -> str:
-    """URL-encode a path component (spaces, brackets, etc.). Slashes preserved."""
+    """URL-encode a path (spaces, brackets, +, #...). Slashes preserved."""
     return quote(path, safe="/")
 
 
 def safe_id(path: str) -> str:
-    """Build a safe ID from a path (replace special chars)."""
     return re.sub(r"[^a-zA-Z0-9._\-]", "_", path)
 
 
-def load_existing_cache() -> dict:
-    """Load existing distribution.json and build {url: (size, md5)} cache."""
-    cache = {}
+def load_existing_distribution() -> dict:
     if not OUTPUT_FILE.exists():
-        return cache
+        return {}
     try:
-        with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        for module in data.get("servers", [{}])[0].get("modules", []):
-            if "artifact" in module and "url" in module["artifact"]:
-                cache[module["artifact"]["url"]] = (
-                    module["artifact"].get("size", 0),
-                    module["artifact"].get("MD5", ""),
-                )
+        return json.loads(OUTPUT_FILE.read_text(encoding="utf-8"))
     except Exception as e:
         print(f"  [WARN] Failed to parse existing distribution.json: {e}", file=sys.stderr)
+        return {}
+
+
+def load_md5_cache(existing: dict) -> dict:
+    """{url: {size, modify, md5}}. Complete avec l'ancien distribution.json (sans date)."""
+    cache = {}
+    for module in (existing.get("servers") or [{}])[0].get("modules", []):
+        art = module.get("artifact", {})
+        if art.get("url") and art.get("MD5"):
+            cache[art["url"]] = {"size": art.get("size", 0), "modify": None, "md5": art["MD5"]}
+    if MD5_CACHE_FILE.exists():
+        try:
+            cache.update(json.loads(MD5_CACHE_FILE.read_text(encoding="utf-8")))
+        except Exception as e:
+            print(f"  [WARN] Failed to parse md5-cache.json: {e}", file=sys.stderr)
     return cache
-
-
-def get_current_version() -> str:
-    """Read servers[0].version from existing distribution.json."""
-    if not OUTPUT_FILE.exists():
-        return "1.0.0"
-    try:
-        with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        return data["servers"][0].get("version", "1.0.0")
-    except Exception:
-        return "1.0.0"
 
 
 # ----------------------------------------------------------------
@@ -176,25 +129,31 @@ def ftp_connect() -> ftplib.FTP:
     return ftp
 
 
-def ftp_list_files(ftp: ftplib.FTP, remote_dir: str) -> list:
-    """List files in remote_dir. Returns [(name, size, is_dir), ...]."""
+def ftp_list_files(ftp: ftplib.FTP, remote_dir: str, required: bool = True) -> list:
+    """List files in remote_dir. Returns [(name, size, is_dir, modify), ...].
+
+    Si required=True et que le dossier n'existe pas, on ARRETE le script : mieux vaut
+    ne rien publier que publier un modpack incomplet.
+    """
     try:
         ftp.cwd(remote_dir)
     except ftplib.error_perm as e:
+        if required:
+            raise SystemExit(f"ERROR: dossier FTP introuvable : {remote_dir} ({e}). Rien n'a ete publie.")
         print(f"  [SKIP] {remote_dir} does not exist ({e})")
         return []
 
     entries = []
     try:
-        # mlsd is more reliable when available
+        # mlsd is more reliable when available, and gives the modification date
         for name, facts in ftp.mlsd():
-            if name in (".", ".."):
+            if name in (".", "..") or facts.get("type") in ("cdir", "pdir"):
                 continue
             is_dir = facts.get("type") == "dir"
             size = int(facts.get("size", 0)) if not is_dir else 0
-            entries.append((name, size, is_dir))
+            entries.append((name, size, is_dir, facts.get("modify")))
     except (ftplib.error_perm, AttributeError):
-        # Fallback: parse list
+        # Fallback: parse list (pas de date fiable -> modify=None)
         lines = []
         ftp.retrlines("LIST", lines.append)
         for line in lines:
@@ -210,21 +169,19 @@ def ftp_list_files(ftp: ftplib.FTP, remote_dir: str) -> list:
                 size = int(parts[4])
             except (ValueError, IndexError):
                 size = 0
-            entries.append((name, size, is_dir))
+            entries.append((name, size, is_dir, None))
     return entries
 
 
 def ftp_list_recursive(ftp: ftplib.FTP, remote_dir: str, prefix: str = "") -> list:
-    """Recursively list all files under remote_dir. Returns [(relative_path, size), ...]."""
+    """Recursively list all files under remote_dir. Returns [(relative_path, size, modify), ...]."""
     results = []
-    entries = ftp_list_files(ftp, remote_dir)
-    for name, size, is_dir in entries:
+    for name, size, is_dir, modify in ftp_list_files(ftp, remote_dir):
         rel = f"{prefix}{name}"
         if is_dir:
-            sub = ftp_list_recursive(ftp, f"{remote_dir}/{name}", prefix=f"{rel}/")
-            results.extend(sub)
+            results.extend(ftp_list_recursive(ftp, f"{remote_dir}/{name}", prefix=f"{rel}/"))
         else:
-            results.append((rel, size))
+            results.append((rel, size, modify))
     return results
 
 
@@ -236,75 +193,108 @@ def ftp_download_md5(ftp: ftplib.FTP, remote_path: str) -> str:
     return h.hexdigest()
 
 
-def ftp_upload_file(ftp: ftplib.FTP, local_path: Path, remote_path: str) -> None:
-    """Upload a local file to remote_path on the FTP."""
+def ftp_upload_atomic(ftp: ftplib.FTP, local_path: Path, remote_path: str) -> None:
+    """Upload vers un .tmp puis renomme : les joueurs ne voient jamais un JSON a moitie envoye."""
+    tmp_path = remote_path + ".tmp"
     ftp.voidcmd("TYPE I")
     with open(local_path, "rb") as f:
-        ftp.storbinary(f"STOR {remote_path}", f)
+        ftp.storbinary(f"STOR {tmp_path}", f)
+    try:
+        ftp.rename(tmp_path, remote_path)
+    except ftplib.error_perm:
+        # Certains serveurs refusent d'ecraser via RNTO : on supprime puis on renomme
+        ftp.delete(remote_path)
+        ftp.rename(tmp_path, remote_path)
 
 
 # ----------------------------------------------------------------
 # Module builders
 # ----------------------------------------------------------------
-def build_mod_entry(ftp, cache, jar_name, ftp_subdir, remote_size, url_subpath, required=None):
-    """
-    Build a FabricMod module entry. Uses cache to skip download if size matches.
-    """
+class Hasher:
+    def __init__(self, ftp, cache):
+        self.ftp = ftp
+        self.cache = cache
+        self.new_cache = {}
+        # Stats pour voir le gain du cache (affichees en fin de script + resume GitHub)
+        self.hits = 0
+        self.hits_bytes = 0
+        self.downloads = 0
+        self.download_bytes = 0
+
+    def md5(self, url, remote_path, label, size, modify):
+        cached = self.cache.get(url)
+        reuse = False
+        if cached and cached.get("md5") and cached.get("size") == size:
+            if modify and cached.get("modify"):
+                reuse = cached["modify"] == modify
+            else:
+                reuse = size > TRUST_SIZE_ONLY_ABOVE
+        if reuse:
+            md5 = cached["md5"]
+            print(f"  [CACHE] {label} -> {md5}")
+            self.hits += 1
+            self.hits_bytes += size
+        else:
+            print(f"  [DL]    {label} (downloading to compute MD5)...", end=" ", flush=True)
+            t0 = time.time()
+            md5 = ftp_download_md5(self.ftp, remote_path)
+            print(f"-> {md5} ({time.time()-t0:.1f}s)")
+            self.downloads += 1
+            self.download_bytes += size
+        self.new_cache[url] = {"size": size, "modify": modify, "md5": md5}
+        return md5
+
+
+def build_mod_entry(hasher, jar_name, subdir, size, modify, required=None):
     base_id = jar_name[:-4] if jar_name.lower().endswith(".jar") else jar_name
-    full_url = f"{BASE_URL}/{url_subpath}/{url_encode_path(jar_name)}"
-
-    cached = cache.get(full_url)
-    if cached and cached[0] == remote_size and cached[1]:
-        md5 = cached[1]
-        print(f"  [CACHE] {jar_name} -> {md5}")
-    else:
-        print(f"  [DL]    {jar_name} (downloading to compute MD5)...", end=" ", flush=True)
-        t0 = time.time()
-        md5 = ftp_download_md5(ftp, f"{SERVER_REMOTE_PATH}/{ftp_subdir}/{jar_name}")
-        print(f"-> {md5} ({time.time()-t0:.1f}s)")
-
+    full_url = f"{BASE_URL}/{subdir}/{url_encode_path(jar_name)}"
+    md5 = hasher.md5(full_url, f"{SERVER_REMOTE_PATH}/{subdir}/{jar_name}", jar_name, size, modify)
     entry = {
         "id": f"generated.fabricmod:{base_id}:1.0.0@jar",
         "name": base_id,
         "type": "FabricMod",
-        "artifact": {
-            "size": remote_size,
-            "MD5": md5,
-            "url": full_url,
-        },
+        "artifact": {"size": size, "MD5": md5, "url": full_url},
     }
     if required is not None:
         entry["required"] = required
     return entry
 
 
-def build_file_entry(ftp, cache, relative_path, remote_size):
-    """Build a File module entry. Uses cache to skip download if size matches."""
-    url_path = url_encode_path(relative_path)
-    full_url = f"{BASE_URL}/files/{url_path}"
-
-    cached = cache.get(full_url)
-    if cached and cached[0] == remote_size and cached[1]:
-        md5 = cached[1]
-        print(f"  [CACHE] {relative_path} -> {md5}")
-    else:
-        print(f"  [DL]    {relative_path} (downloading to compute MD5)...", end=" ", flush=True)
-        t0 = time.time()
-        md5 = ftp_download_md5(ftp, f"{SERVER_REMOTE_PATH}/files/{relative_path}")
-        print(f"-> {md5} ({time.time()-t0:.1f}s)")
-
-    sid = safe_id(relative_path)
+def build_file_entry(hasher, relative_path, size, modify):
+    full_url = f"{BASE_URL}/files/{url_encode_path(relative_path)}"
+    md5 = hasher.md5(full_url, f"{SERVER_REMOTE_PATH}/files/{relative_path}", relative_path, size, modify)
     return {
-        "id": f"generated.file:{sid}:1.0.0",
+        "id": f"generated.file:{safe_id(relative_path)}:1.0.0",
         "name": os.path.basename(relative_path),
         "type": "File",
-        "artifact": {
-            "size": remote_size,
-            "MD5": md5,
-            "url": full_url,
-            "path": relative_path,
-        },
+        "artifact": {"size": size, "MD5": md5, "url": full_url, "path": relative_path},
     }
+
+
+def check_sanity(distribution: dict, previous: dict, force: bool) -> None:
+    """Refuse de publier un modpack vide ou qui a perdu une grosse partie de ses modules."""
+    modules = distribution["servers"][0]["modules"]
+    mods = [m for m in modules if m["type"] == "FabricMod"]
+    if not mods:
+        raise SystemExit("ERROR: 0 mod trouve. Rien n'a ete publie.")
+    prev_modules = (previous.get("servers") or [{}])[0].get("modules", [])
+    if prev_modules and len(modules) < len(prev_modules) * MIN_MODULE_RATIO:
+        msg = (f"Le nombre de modules chute de {len(prev_modules)} a {len(modules)} "
+               f"(seuil {int(MIN_MODULE_RATIO*100)}%).")
+        if force:
+            print(f"  [WARN] {msg} --force utilise, on continue.")
+        else:
+            raise SystemExit(f"ERROR: {msg} Scan incomplet ? Relance avec --force si c'est voulu. Rien n'a ete publie.")
+
+
+def upload(ftp) -> None:
+    # Re-valide le JSON local avant de l'envoyer
+    data = json.loads(OUTPUT_FILE.read_text(encoding="utf-8"))
+    if not data["servers"][0]["modules"]:
+        raise SystemExit("ERROR: distribution.json local sans modules, upload annule.")
+    print("Upload distribution.json sur le FTP...")
+    ftp_upload_atomic(ftp, OUTPUT_FILE, DIST_REMOTE)
+    print(f"  Upload OK : {DIST_REMOTE}")
 
 
 # ----------------------------------------------------------------
@@ -312,134 +302,126 @@ def build_file_entry(ftp, cache, relative_path, remote_size):
 # ----------------------------------------------------------------
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--bump",
-        choices=["none", "patch", "minor", "major"],
-        default="minor",
-        help="Type de bump version (default: minor)",
-    )
-    parser.add_argument(
-        "--no-upload",
-        action="store_true",
-        help="Generate locally but do not upload to FTP",
-    )
+    parser.add_argument("--bump", choices=["none", "patch", "minor", "major"], default="minor",
+                        help="Type de bump version (default: minor)")
+    parser.add_argument("--no-upload", action="store_true", help="Generate locally but do not upload to FTP")
+    parser.add_argument("--upload-only", action="store_true", help="Only upload the existing docs/distribution.json")
+    parser.add_argument("--force", action="store_true", help="Ignore la garde anti-scan-vide")
     args = parser.parse_args()
 
-    # Read current version
-    current_version = get_current_version()
+    if args.upload_only:
+        ftp = ftp_connect()
+        try:
+            upload(ftp)
+        finally:
+            ftp.close()
+        return
+
+    previous = load_existing_distribution()
+    current_version = (previous.get("servers") or [{}])[0].get("version", "1.0.0")
     new_version = bump_version(current_version, args.bump)
     if args.bump == "none":
         print(f"Version serveur : {current_version} (inchangee)")
     else:
         print(f"Version serveur : {current_version} -> {new_version} (bump {args.bump})")
 
-    # Cache existing MD5s by URL
-    cache = load_existing_cache()
+    cache = load_md5_cache(previous)
     print(f"Cache MD5 charge : {len(cache)} entries")
     print()
 
-    # Connect FTP
     ftp = ftp_connect()
-
+    hasher = Hasher(ftp, cache)
     modules = []
 
-    # 1. Fabric Core
-    print("[1/4] Ajout du bloc Fabric Core (statique)")
-    modules.append(FABRIC_CORE_BLOCK)
+    print("[1/5] Ajout du bloc Fabric Core (statique)")
+    modules.append(CONFIG["fabricCore"])
 
-    # 2. Required mods
-    print("[2/4] Scan fabricmods/required/")
-    required_jars = ftp_list_files(ftp, f"{SERVER_REMOTE_PATH}/fabricmods/required")
-    for name, size, is_dir in sorted(required_jars):
-        if is_dir or not name.endswith(".jar"):
-            continue
-        if name in EXCLUDED_MODS:
-            print(f"  [SKIP] {name} (excluded version)")
-            continue
-        modules.append(build_mod_entry(ftp, cache, name, "fabricmods/required", size, "fabricmods/required"))
+    mod_dirs = [
+        ("[2/5]", "fabricmods/required", None),
+        ("[3/5]", "fabricmods/optionaloff", {"value": False, "def": False}),
+        ("[4/5]", "fabricmods/optionalon", {"value": False, "def": True}),
+    ]
+    for step, subdir, required in mod_dirs:
+        print(f"{step} Scan {subdir}/")
+        for name, size, is_dir, modify in sorted(ftp_list_files(ftp, f"{SERVER_REMOTE_PATH}/{subdir}")):
+            if is_dir or not name.endswith(".jar"):
+                continue
+            if name in EXCLUDED_MODS:
+                print(f"  [SKIP] {name} (excluded version)")
+                continue
+            modules.append(build_mod_entry(hasher, name, subdir, size, modify, required=required))
 
-    # 3. Optional off mods
-    print("[3/4] Scan fabricmods/optionaloff/")
-    opt_off_jars = ftp_list_files(ftp, f"{SERVER_REMOTE_PATH}/fabricmods/optionaloff")
-    for name, size, is_dir in sorted(opt_off_jars):
-        if is_dir or not name.endswith(".jar"):
-            continue
-        modules.append(build_mod_entry(
-            ftp, cache, name, "fabricmods/optionaloff", size, "fabricmods/optionaloff",
-            required={"value": False, "def": False},
-        ))
-
-    # 4. Optional on mods
-    print("[4/4] Scan fabricmods/optionalon/")
-    opt_on_jars = ftp_list_files(ftp, f"{SERVER_REMOTE_PATH}/fabricmods/optionalon")
-    for name, size, is_dir in sorted(opt_on_jars):
-        if is_dir or not name.endswith(".jar"):
-            continue
-        modules.append(build_mod_entry(
-            ftp, cache, name, "fabricmods/optionalon", size, "fabricmods/optionalon",
-            required={"value": False, "def": True},
-        ))
-
-    # 5. Files (configs, resourcepacks, shaderpacks)
     print("[5/5] Scan files/ (recursif)")
-    all_files = ftp_list_recursive(ftp, f"{SERVER_REMOTE_PATH}/files")
     file_count = 0
-    for rel, size in sorted(all_files):
+    for rel, size, modify in sorted(ftp_list_recursive(ftp, f"{SERVER_REMOTE_PATH}/files")):
         if should_exclude(rel):
             print(f"  [SKIP] {rel}")
             continue
-        modules.append(build_file_entry(ftp, cache, rel, size))
+        modules.append(build_file_entry(hasher, rel, size, modify))
         file_count += 1
     print(f"  -> {file_count} fichiers ajoutes")
 
-    # Assemble distribution.json
     print()
     print("Assemblage du JSON...")
+    server = dict(CONFIG["server"])
     distribution = {
         "version": "1.0.0",  # Schema version (do not touch)
-        "rss": "https://apk.nerysia.fr/nerysia-laucher/feed.xml",
+        "rss": CONFIG["rss"],
         "servers": [
             {
-                "id": SERVER_ID,
-                "name": "Nerysia (Minecraft 1.21.1)",
-                "description": "Nerysia Running Minecraft 1.21.1 (Fabric v0.19.2)",
-                "icon": "https://apk.nerysia.fr/Logo.png",
+                "id": server["id"],
+                "name": server["name"],
+                "description": server["description"],
+                "icon": server["icon"],
                 "version": new_version,
-                "address": "node.hloureiro.fr:45545",
-                "minecraftVersion": "1.21.1",
-                "mainServer": True,
-                "autoconnect": False,
+                "address": server["address"],
+                "minecraftVersion": server["minecraftVersion"],
+                "mainServer": server["mainServer"],
+                "autoconnect": server["autoconnect"],
                 "modules": modules,
             }
         ],
     }
 
-    # Write local
+    check_sanity(distribution, previous, args.force)
+
     OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_FILE.write_text(
-        json.dumps(distribution, indent=4, ensure_ascii=False),
-        encoding="utf-8",
-    )
+    OUTPUT_FILE.write_text(json.dumps(distribution, indent=4, ensure_ascii=False), encoding="utf-8")
     print(f"Fichier ecrit : {OUTPUT_FILE}")
+    MD5_CACHE_FILE.write_text(json.dumps(hasher.new_cache, indent=1, sort_keys=True), encoding="utf-8")
+    print(f"Cache MD5 ecrit : {MD5_CACHE_FILE}")
 
-    # Upload to FTP
-    if not args.no_upload:
-        print()
-        print("Upload distribution.json sur le FTP...")
-        try:
-            ftp_upload_file(ftp, OUTPUT_FILE, DIST_REMOTE)
-            print(f"  Upload OK : {DIST_REMOTE}")
-        except Exception as e:
-            print(f"  [ERROR] Upload failed: {e}", file=sys.stderr)
-            ftp.close()
-            sys.exit(1)
-
-    ftp.close()
+    try:
+        if not args.no_upload:
+            print()
+            upload(ftp)
+    finally:
+        ftp.close()
 
     print()
     print("=== TERMINE ===")
     print(f"Version modpack: {new_version}")
     print(f"Total modules  : {len(modules)}")
+    print_cache_stats(hasher)
+
+
+def print_cache_stats(hasher) -> None:
+    mb = lambda b: f"{b / 1048576:.1f} Mo"
+    lines = [
+        f"Repris du cache (inchanges) : {hasher.hits} fichiers ({mb(hasher.hits_bytes)} evites)",
+        f"Telecharges (nouveaux/modifies) : {hasher.downloads} fichiers ({mb(hasher.download_bytes)})",
+    ]
+    print()
+    for line in lines:
+        print(line)
+    # Resume visible directement sur la page du run GitHub Actions
+    summary = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary:
+        with open(summary, "a", encoding="utf-8") as f:
+            f.write("### Cache MD5\n\n")
+            for line in lines:
+                f.write(f"- {line}\n")
+            f.write("\n")
 
 
 if __name__ == "__main__":
