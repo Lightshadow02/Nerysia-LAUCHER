@@ -125,6 +125,6 @@ npm run dist -- -w -p never
 
 - Microsoft whitelist du Client ID Nerysia : **demandé le 2026-05-02**, toujours sans réponse au 2026-09-25 (délai annoncé 24-72h largement dépassé → relancer)
 - Audit du 2026-09-25 : configs serveur (DB, Redis, anti-triche, raids, crates, quêtes) retirées du modpack et déplacées dans `Y:\_backup_hors_web\` (mots de passe vérifiés vides par Hugo)
-- Build v1.0.2 : **publiée** sur GitHub Releases (Win .exe + Linux AppImage)
+- Build v1.0.3 : **publiée** sur GitHub Releases le 2026-09-26 (Win .exe + Linux AppImage + latest.yml → MAJ auto des joueurs en 1.0.2). Prochaine version : v1.0.4 (tag Helios existant → `git push origin v1.0.4 --force`)
 - Mod DefaultOptions + `config/defaultoptions/options.txt` : ajoutés au modpack pour fixer le pb de GUI scale auto
 - Bug fix critique gardé : `decodeURI → decodeURIComponent` dans `index.js:155` (parsing OAuth code)
