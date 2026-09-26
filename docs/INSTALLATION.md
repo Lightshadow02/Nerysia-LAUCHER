@@ -75,7 +75,7 @@ Le launcher n'est pas signé par Apple (le certificat coûte 99 €/an), donc ma
 1. Télécharge le fichier `.deb`.
 2. Ouvre un terminal dans ton dossier Téléchargements et tape :
    ```
-   sudo apt install ./Nerysia-Launcher-setup-*.deb
+   sudo apt install ./Nerysia*.deb
    ```
    (ou double-clique sur le `.deb` pour l'ouvrir avec la Logithèque / le Gestionnaire de paquets)
 3. Lance **Nerysia Launcher** depuis le menu des applications (catégorie Jeux).
@@ -91,7 +91,7 @@ Le launcher n'est pas signé par Apple (le certificat coûte 99 €/an), donc ma
 1. Télécharge le fichier `.pacman`.
 2. Ouvre un terminal dans ton dossier Téléchargements et tape :
    ```
-   sudo pacman -U ./Nerysia-Launcher-setup-*.pacman
+   sudo pacman -U ./Nerysia*.pacman
    ```
 3. Lance **Nerysia Launcher** depuis le menu des applications.
 
@@ -108,7 +108,7 @@ L'AppImage marche partout sans installation et **se met à jour toute seule**.
 1. Télécharge le fichier `.AppImage`.
 2. Rends-le exécutable :
    - clic droit sur le fichier → **Propriétés** → **Permissions** → coche **Autoriser l'exécution comme un programme**
-   - ou dans un terminal : `chmod +x Nerysia-Launcher-setup-*.AppImage`
+   - ou dans un terminal : `chmod +x Nerysia*.AppImage`
 3. Double-clique dessus pour lancer le launcher.
 
 **Si rien ne se passe**, il manque FUSE (nécessaire aux AppImage) :

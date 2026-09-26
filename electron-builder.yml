@@ -1,6 +1,6 @@
 appId: 'fr.nerysia.launcher'
 productName: 'Nerysia Launcher'
-artifactName: '${productName}-setup-${version}.${ext}'
+artifactName: 'Nerysia-Launcher-setup-${version}.${ext}'  # sans espace : le paquet .pacman gardait un point a la place
 
 copyright: 'Copyright © 2026 Nerysia'
 
