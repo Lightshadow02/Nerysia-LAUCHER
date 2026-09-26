@@ -7,7 +7,7 @@
             "name": "Nerysia (Minecraft 1.21.1)",
             "description": "Nerysia - Minecraft 1.21.1 (Fabric 0.19.2)",
             "icon": "https://apk.nerysia.fr/Logo.png",
-            "version": "1.24.0",
+            "version": "1.25.0",
             "address": "node.hloureiro.fr:45545",
             "minecraftVersion": "1.21.1",
             "mainServer": true,
@@ -136,13 +136,13 @@
                     }
                 },
                 {
-                    "id": "generated.fabricmod:Cobblemon-fabric-1.7.3+1.21.1:1.0.0@jar",
-                    "name": "Cobblemon-fabric-1.7.3+1.21.1",
+                    "id": "generated.fabricmod:Cobblemon-fabric-1.8.1+1.21.1:1.0.0@jar",
+                    "name": "Cobblemon-fabric-1.8.1+1.21.1",
                     "type": "FabricMod",
                     "artifact": {
-                        "size": 135801550,
-                        "MD5": "1de64f280372ec94e4376976fb579d52",
-                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/Cobblemon-fabric-1.7.3%2B1.21.1.jar"
+                        "size": 137391338,
+                        "MD5": "508e825d834c4ad354ff12cdf2b3a76c",
+                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/Cobblemon-fabric-1.8.1%2B1.21.1.jar"
                     }
                 },
                 {
@@ -290,8 +290,8 @@
                     "name": "Nerysia-MOD-1.7.1",
                     "type": "FabricMod",
                     "artifact": {
-                        "size": 149467168,
-                        "MD5": "e16b40a4b2a76f46765c5df4217b111f",
+                        "size": 5232467,
+                        "MD5": "400238eeee643dadb504c1dc584363c8",
                         "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/Nerysia-MOD-1.7.1.jar"
                     }
                 },
@@ -866,13 +866,13 @@
                     }
                 },
                 {
-                    "id": "generated.fabricmod:mega_showdown-fabric-1.8.2+1.7.3+1.21.1-hotfix:1.0.0@jar",
-                    "name": "mega_showdown-fabric-1.8.2+1.7.3+1.21.1-hotfix",
+                    "id": "generated.fabricmod:mega_showdown-fabric-1.2.0+1.8.1+1.21.1-release:1.0.0@jar",
+                    "name": "mega_showdown-fabric-1.2.0+1.8.1+1.21.1-release",
                     "type": "FabricMod",
                     "artifact": {
-                        "size": 17101047,
-                        "MD5": "940a87a5a521436377bcf3f6b4e68d91",
-                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/mega_showdown-fabric-1.8.2%2B1.7.3%2B1.21.1-hotfix.jar"
+                        "size": 20152218,
+                        "MD5": "f51a99a2f7b7ad3e18e4bd73f2bafa0d",
+                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/mega_showdown-fabric-1.2.0%2B1.8.1%2B1.21.1-release.jar"
                     }
                 },
                 {
@@ -933,6 +933,36 @@
                         "size": 3915997,
                         "MD5": "d810f4a5dfccf6a140867ca4a401d23a",
                         "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/nery-faction-1.69.12.jar"
+                    }
+                },
+                {
+                    "id": "generated.fabricmod:nerylib-0.14.0:1.0.0@jar",
+                    "name": "nerylib-0.14.0",
+                    "type": "FabricMod",
+                    "artifact": {
+                        "size": 1338474,
+                        "MD5": "5f9509a2e9bc587b80dd9728e55ba5b2",
+                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/nerylib-0.14.0.jar"
+                    }
+                },
+                {
+                    "id": "generated.fabricmod:nerysia-assets-1.7.1:1.0.0@jar",
+                    "name": "nerysia-assets-1.7.1",
+                    "type": "FabricMod",
+                    "artifact": {
+                        "size": 144522011,
+                        "MD5": "0a1de4c4fbcc15e66d0997dbf5129a56",
+                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/nerysia-assets-1.7.1.jar"
+                    }
+                },
+                {
+                    "id": "generated.fabricmod:nerysia-cosmetics-1.7.1:1.0.0@jar",
+                    "name": "nerysia-cosmetics-1.7.1",
+                    "type": "FabricMod",
+                    "artifact": {
+                        "size": 100909,
+                        "MD5": "ac7419465f2bf4f602ca502c216e4f00",
+                        "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/nerysia-cosmetics-1.7.1.jar"
                     }
                 },
                 {
