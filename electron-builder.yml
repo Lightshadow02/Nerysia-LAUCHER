@@ -22,9 +22,29 @@ nsis:
   allowElevation: true
   allowToChangeInstallationDirectory: true
 
+# macOS Configuration
+# Pas de certificat Apple : app signee "ad-hoc" par build/mac-adhoc-sign.js (sinon elle
+# ne demarre pas sur Apple Silicon). Nom sans espace + arch : utilise par uicore.js
+# pour le lien de mise a jour (pas de MAJ auto sur Mac sans certificat).
+mac:
+  target:
+    - target: 'dmg'
+      arch:
+        - 'x64'
+        - 'arm64'
+  artifactName: 'Nerysia-Launcher-setup-${version}-${arch}.${ext}'
+  category: 'public.app-category.games'
+  identity: null
+
+afterPack: './build/mac-adhoc-sign.js'
+
 # Linux Configuration
+# AppImage : toutes distributions + MAJ auto. deb : Ubuntu/Debian/Mint. pacman : Arch/Manjaro/EndeavourOS.
 linux:
-  target: 'AppImage'
+  target:
+    - 'AppImage'
+    - 'deb'
+    - 'pacman'
   maintainer: 'Hugo Loureiro <loureirohugo70@gmail.com>'
   vendor: 'Nerysia'
   synopsis: 'Launcher Minecraft Nerysia (Cobblemon)'
