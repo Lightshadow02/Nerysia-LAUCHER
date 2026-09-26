@@ -133,6 +133,27 @@
                 </div>
             </div>
             <div id="settingsModsContainer">
+                <div id="settingsPresetContainer" style="display: none;">
+                    <div class="settingsModsHeader"><%- lang('settings.presetTitle') %></div>
+                    <div id="settingsPresetContent">
+                        <div id="settingsPresetButtons">
+                            <button class="settingsPresetButton" preset="faible"><%- lang('settings.presetLow') %></button>
+                            <button class="settingsPresetButton" preset="moyen"><%- lang('settings.presetMedium') %></button>
+                            <button class="settingsPresetButton" preset="ultra"><%- lang('settings.presetUltra') %></button>
+                        </div>
+                        <div id="settingsPresetDesc"></div>
+                        <div id="settingsPresetBuilderRow">
+                            <div class="settingsFieldLeft">
+                                <span class="settingsFieldTitle"><%- lang('settings.presetBuilderTitle') %></span>
+                                <span class="settingsFieldDesc"><%- lang('settings.presetBuilderDesc') %></span>
+                            </div>
+                            <label class="toggleSwitch">
+                                <input type="checkbox" id="settingsPresetBuilder">
+                                <span class="toggleSwitchSlider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
                 <div id="settingsReqModsContainer">
                     <div class="settingsModsHeader"><%- lang('settings.requiredMods') %></div>
                     <div id="settingsReqModsContent">

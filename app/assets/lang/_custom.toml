@@ -13,8 +13,20 @@ mediaDiscordURL = "https://discord.gg/dtvMfS69hU"
 [ejs.settings]
 sourceGithubLink = "https://github.com/Lightshadow02/Nerysia-LAUCHER"
 supportLink = "https://github.com/Lightshadow02/Nerysia-LAUCHER/issues"
+presetTitle = "Préréglage de performance"
+presetLow = "Faible"
+presetMedium = "Moyen"
+presetUltra = "Ultra"
+presetBuilderTitle = "Mode Builder"
+presetBuilderDesc = "Ajoute les outils de construction (Litematica…). Compatible avec tous les préréglages."
 
 [ejs.welcome]
 welcomeHeader = "Welcome to Nerysia"
 welcomeDescription = "Nerysia is a French Cobblemon server. We have exclusive Pokemon, a GTS, shops, battle arenas, and roleplay features. "
 welcomeDescCTA = "You are just a few clicks away from Nerysia."
+
+[js.settings.presets]
+faible = "Juste l'essentiel pour jouer : idéal pour les petits PC."
+moyen = "Essentiel + mods de confort (inventaire, chat, textures connectées…). Recommandé."
+ultra = "Tout activé : shaders, sons réalistes, skins 3D… Pour les PC puissants."
+custom = "Réglage personnalisé : tu as modifié des mods à la main. Clique sur un préréglage pour revenir à une configuration standard."

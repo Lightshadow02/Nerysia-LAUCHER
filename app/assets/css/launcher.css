@@ -1703,6 +1703,57 @@ input:checked + .toggleSwitchSlider:before {
     margin-bottom: 10px;
 }
 
+/* Presets de performance (Faible / Moyen / Ultra + Builder). */
+#settingsPresetContainer {
+    padding-bottom: 25px;
+}
+#settingsPresetContent {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 3px;
+    padding: 15px;
+    color: white;
+}
+#settingsPresetButtons {
+    display: flex;
+    gap: 10px;
+}
+.settingsPresetButton {
+    flex: 1;
+    height: 36px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(126, 126, 126, 0.57);
+    border-radius: 3px;
+    color: white;
+    font-family: 'Avenir Medium';
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    transition: 0.25s ease;
+}
+.settingsPresetButton:hover,
+.settingsPresetButton:focus {
+    background: rgba(255, 255, 255, 0.15);
+}
+.settingsPresetButton[selected] {
+    background: rgb(31, 140, 11);
+    border-color: rgb(31, 140, 11);
+    cursor: default;
+}
+#settingsPresetDesc {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+    margin-top: 10px;
+    min-height: 16px;
+}
+#settingsPresetBuilderRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
 /* Mod elements sub-containers. */
 #settingsReqModsContainer,
 #settingsOptModsContainer,

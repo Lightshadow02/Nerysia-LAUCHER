@@ -150,22 +150,40 @@ $modules = [System.Collections.Generic.List[object]]::new()
 # ----------------------------------------------------------------
 # FABRIC CORE (entree statique, cf distribution-config.json)
 # ----------------------------------------------------------------
-Write-Host "[1/5] Ajout du bloc Fabric Core..." -ForegroundColor Yellow
+Write-Host "[1/4] Ajout du bloc Fabric Core..." -ForegroundColor Yellow
 $modules.Add($config.fabricCore)
 
 # ----------------------------------------------------------------
-# MODS : required / optionaloff / optionalon
+# MODS : required + dossiers de preset (moyen / ultra / builder) + optionalon / optionaloff
+# (liste et ordre dans distribution-config.json -> modFolders)
 # ----------------------------------------------------------------
-$modFolders = @(
-    @{ step = "[2/5]"; dir = "required";    label = "[MOD]"; color = "Green";   required = $null },
-    @{ step = "[3/5]"; dir = "optionaloff"; label = "[OFF]"; color = "Magenta"; required = [ordered]@{ value = $false; def = $false } },
-    @{ step = "[4/5]"; dir = "optionalon";  label = "[ON] "; color = "Cyan";    required = [ordered]@{ value = $false; def = $true } }
-)
-
+Write-Host "[2/4] Scan des mods (fabricmods/)..." -ForegroundColor Yellow
+# Un dossier inconnu avec des jars = mods qui disparaitraient du modpack sans prevenir
+$knownDirs = @($config.modFolders.folders | ForEach-Object { $_.dir })
+foreach ($dir in (Get-ChildItem "$serverRoot\fabricmods" -Directory)) {
+    if ($knownDirs -contains $dir.Name) { continue }
+    $orphans = @(Get-ChildItem $dir.FullName -Filter "*.jar" -File)
+    if ($orphans.Count -gt 0) {
+        Write-Host "  ERREUR : fabricmods/$($dir.Name)/ contient $($orphans.Count) mod(s) mais n'est pas un dossier connu :" -ForegroundColor Red
+        foreach ($o in $orphans) { Write-Host "    - $($o.Name)" -ForegroundColor Red }
+        Write-Host "  Range-les dans $($knownDirs -join ' / ') puis supprime le dossier. Rien n'a ete publie." -ForegroundColor Red
+        exit 1
+    }
+}
 $modCount = 0
-foreach ($folder in $modFolders) {
-    Write-Host "$($folder.step) Scan des mods ($($folder.dir)/)..." -ForegroundColor Yellow
-    $jars = Get-ChildItem "$serverRoot\fabricmods\$($folder.dir)\" -Filter "*.jar" -File
+$scannedMods = [System.Collections.Generic.List[object]]::new()   # pour le controle des dependances
+foreach ($folder in $config.modFolders.folders) {
+    $folderPath = "$serverRoot\fabricmods\$($folder.dir)\"
+    if (-not (Test-Path $folderPath)) {
+        if ($folder.dir -eq "required") {
+            Write-Host "  ERREUR : dossier introuvable $folderPath. Rien n'a ete publie." -ForegroundColor Red
+            exit 1
+        }
+        Write-Host "  [SKIP] $($folder.dir)/ absent" -ForegroundColor DarkGray
+        continue
+    }
+    Write-Host "  --- $($folder.dir)/ ---" -ForegroundColor Yellow
+    $jars = Get-ChildItem $folderPath -Filter "*.jar" -File
     foreach ($mod in (Sort-Ordinal $jars { param($f) $f.Name })) {
         if ($config.excludedMods -contains $mod.Name) {
             Write-Host "  [SKIP] $($mod.Name) (ancienne version)" -ForegroundColor DarkGray
@@ -185,17 +203,78 @@ foreach ($folder in $modFolders) {
                 url  = "$baseUrl/fabricmods/$($folder.dir)/$(ConvertTo-UrlPath $mod.Name)"
             }
         }
-        if ($null -ne $folder.required) { $entry["required"] = $folder.required }
+        if ($null -ne $folder.required) {
+            $entry["required"] = [ordered]@{ value = $folder.required.value; def = $folder.required.def }
+        }
+        if ($folder.preset) { $entry["preset"] = $folder.preset }
         $modules.Add($entry)
+        $scannedMods.Add([pscustomobject]@{ File = $mod; Dir = $folder.dir })
         $modCount++
     }
 }
 Write-Host "  -> $modCount mods ajoutes" -ForegroundColor Cyan
 
 # ----------------------------------------------------------------
+# DEPENDANCES : un mod ne doit pas dependre d'un mod qui peut etre
+# desactive alors que lui reste actif (sinon le jeu crashe au lancement).
+# Ex : pv-addon-soundphysics (required) a besoin de sound-physics (optionnel).
+# ----------------------------------------------------------------
+Write-Host "[3/4] Controle des dependances entre dossiers..." -ForegroundColor Yellow
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+# Dossiers forcement actifs quand un mod du dossier X est actif (cf loadedWith dans distribution-config.json)
+$activeWith = @{}
+foreach ($folder in $config.modFolders.folders) { $activeWith[$folder.dir] = @($folder.loadedWith) }
+$modMeta = @()
+$providers = @{}   # id Fabric -> dossier
+foreach ($m in $scannedMods) {
+    try {
+        $zip = [System.IO.Compression.ZipFile]::OpenRead($m.File.FullName)
+        try {
+            $entryJson = $zip.GetEntry("fabric.mod.json")
+            if ($null -eq $entryJson) { continue }
+            $reader = New-Object System.IO.StreamReader($entryJson.Open())
+            $raw = $reader.ReadToEnd()
+            $reader.Close()
+        } finally { $zip.Dispose() }
+        $meta = ($raw -replace "[\x00-\x08\x0b\x0c\x0e-\x1f]", "") | ConvertFrom-Json
+    } catch {
+        Write-Host "  [WARN] fabric.mod.json illisible dans $($m.File.Name), ignore" -ForegroundColor DarkYellow
+        continue
+    }
+    $deps = @()
+    if ($meta.depends) { $deps = @($meta.depends.PSObject.Properties.Name) }
+    $modMeta += [pscustomobject]@{ Name = $m.File.Name; Dir = $m.Dir; Depends = $deps }
+    foreach ($id in @($meta.id) + @($meta.provides)) {
+        if ($id -and -not $providers.ContainsKey($id)) { $providers[$id] = $m.Dir }
+    }
+}
+$depProblems = @()
+foreach ($m in $modMeta) {
+    foreach ($dep in $m.Depends) {
+        if (-not $providers.ContainsKey($dep)) { continue }   # fourni par Minecraft/Fabric ou embarque
+        $depDir = $providers[$dep]
+        if ($activeWith[$m.Dir] -notcontains $depDir) {
+            $depProblems += "$($m.Dir)/$($m.Name) a besoin de '$dep' qui est dans $depDir/"
+        }
+    }
+}
+if ($depProblems.Count -gt 0) {
+    foreach ($p in $depProblems) { Write-Host "  [DEP] $p" -ForegroundColor Red }
+    $msg = "$($depProblems.Count) probleme(s) de dependance : deplace le mod dans le meme dossier que sa dependance (ou la dependance dans required/)."
+    if ($Force) {
+        Write-Host "  [WARN] $msg -Force utilise, on continue." -ForegroundColor Yellow
+    } else {
+        Write-Host "  ERREUR : $msg Rien n'a ete publie (-Force pour ignorer)." -ForegroundColor Red
+        exit 1
+    }
+} else {
+    Write-Host "  -> OK" -ForegroundColor Cyan
+}
+
+# ----------------------------------------------------------------
 # FICHIERS (configs, resourcepacks, shaders...)
 # ----------------------------------------------------------------
-Write-Host "[5/5] Scan des fichiers (config, resourcepacks, shaders...)..." -ForegroundColor Yellow
+Write-Host "[4/4] Scan des fichiers (config, resourcepacks, shaders...)..." -ForegroundColor Yellow
 $filesRoot = (Resolve-Path "$serverRoot\files").ProviderPath.TrimEnd("\") + "\"
 $allFiles = Get-ChildItem $filesRoot -Recurse -File |
     ForEach-Object { [pscustomobject]@{ File = $_; Rel = $_.FullName.Substring($filesRoot.Length).Replace("\", "/") } }

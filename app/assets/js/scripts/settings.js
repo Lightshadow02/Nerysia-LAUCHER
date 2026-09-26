@@ -716,10 +716,87 @@ async function resolveModsForUI(){
     const distro = await DistroAPI.getDistribution()
     const servConf = ConfigManager.getModConfiguration(serv)
 
-    const modStr = parseModulesForUI(distro.getServerById(serv).modules, false, servConf.mods)
+    const modules = distro.getServerById(serv).modules
+    const modStr = parseModulesForUI(modules, false, servConf.mods)
 
     document.getElementById('settingsReqModsContent').innerHTML = modStr.reqMods
     document.getElementById('settingsOptModsContent').innerHTML = modStr.optMods
+
+    // Mods optionnels rattaches a un preset (champ "preset" ajoute par tools/generate-distribution.ps1)
+    CACHE_PRESET_MODS = modules
+        .filter(mdl => mdl.rawModule.type === Type.FabricMod && !mdl.getRequired().value && mdl.rawModule.preset != null)
+        .map(mdl => ({ id: mdl.getVersionlessMavenIdentifier(), preset: mdl.rawModule.preset }))
+    document.getElementById('settingsPresetContainer').style.display = CACHE_PRESET_MODS.length > 0 ? '' : 'none'
+}
+
+/**
+ * Presets de performance (Faible / Moyen / Ultra + Builder).
+ *
+ * Un preset ne fait que cocher / decocher les interrupteurs des mods optionnels
+ * ci-dessous : l'enregistrement passe par saveModConfiguration() comme un reglage manuel.
+ * Faible = mods obligatoires seuls, Moyen = + dossier moyen/, Ultra = + moyen/ + ultra/.
+ * Builder est independant et s'ajoute a n'importe quel preset.
+ */
+const PRESET_LEVELS = ['faible', 'moyen', 'ultra']
+let CACHE_PRESET_MODS = []
+
+function setModToggle(id, enabled){
+    const input = settingsModsContainer.querySelector(`[formod='${id}']`)
+    if(input == null) return
+    input.checked = enabled
+    const el = document.getElementById(id)
+    if(enabled) el.setAttribute('enabled', '')
+    else el.removeAttribute('enabled')
+}
+
+function isModToggleOn(id){
+    const input = settingsModsContainer.querySelector(`[formod='${id}']`)
+    return input != null && input.checked
+}
+
+function applyPerformancePreset(level){
+    const rank = PRESET_LEVELS.indexOf(level)
+    for(const mod of CACHE_PRESET_MODS){
+        const modRank = PRESET_LEVELS.indexOf(mod.preset)
+        if(modRank !== -1){
+            setModToggle(mod.id, modRank <= rank)
+        }
+    }
+    refreshPresetUI()
+}
+
+/**
+ * Retrouve le preset actif a partir de l'etat des interrupteurs
+ * (aucun si le joueur a modifie des mods a la main).
+ */
+function refreshPresetUI(){
+    const leveled = CACHE_PRESET_MODS.filter(mod => PRESET_LEVELS.includes(mod.preset))
+    const active = PRESET_LEVELS.find((level, rank) =>
+        leveled.every(mod => isModToggleOn(mod.id) === (PRESET_LEVELS.indexOf(mod.preset) <= rank)))
+
+    for(const btn of document.getElementsByClassName('settingsPresetButton')){
+        if(btn.getAttribute('preset') === active) btn.setAttribute('selected', '')
+        else btn.removeAttribute('selected')
+    }
+    document.getElementById('settingsPresetDesc').innerHTML = Lang.queryJS(`settings.presets.${active ?? 'custom'}`)
+
+    const builderMods = CACHE_PRESET_MODS.filter(mod => mod.preset === 'builder')
+    document.getElementById('settingsPresetBuilderRow').style.display = builderMods.length > 0 ? '' : 'none'
+    document.getElementById('settingsPresetBuilder').checked = builderMods.length > 0 && builderMods.every(mod => isModToggleOn(mod.id))
+}
+
+function bindPresetControls(){
+    for(const btn of document.getElementsByClassName('settingsPresetButton')){
+        btn.onclick = () => applyPerformancePreset(btn.getAttribute('preset'))
+    }
+    const builder = document.getElementById('settingsPresetBuilder')
+    builder.onchange = () => {
+        for(const mod of CACHE_PRESET_MODS.filter(mod => mod.preset === 'builder')){
+            setModToggle(mod.id, builder.checked)
+        }
+        refreshPresetUI()
+    }
+    refreshPresetUI()
 }
 
 /**
@@ -807,6 +884,7 @@ function bindModsToggleSwitch(){
             } else {
                 document.getElementById(v.getAttribute('formod')).removeAttribute('enabled')
             }
+            refreshPresetUI()
         }
     })
 }
@@ -1137,6 +1215,7 @@ async function prepareModsTab(first){
     bindDropinModFileSystemButton()
     bindShaderpackButton()
     bindModsToggleSwitch()
+    bindPresetControls()
     await loadSelectedServerOnModsTab()
 }
 

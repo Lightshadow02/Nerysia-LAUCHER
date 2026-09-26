@@ -62,6 +62,7 @@ La version `servers[0].version` est affichée aux joueurs dans le launcher (over
 - **Auth Microsoft** : Client ID Helios partagé (`1ce6e35a-...`) en attendant whitelist Nerysia (`4979ff0d-...`). Procédure dans `docs/AUTH_AZURE.md`
 - **Build** : push tag `v*` → GitHub Actions build Win + Linux + release publique automatique. **Le tag doit être égal à `package.json` version** (sinon le build échoue volontairement)
 - **Config du modpack** : `tools/distribution-config.json` = source unique (exclusions, bloc Fabric, infos serveur) lue par `generate-distribution.ps1` (local, via `Y:`) ET `generate-distribution-from-ftp.py` (GitHub Actions). Ne jamais dupliquer ces infos dans les scripts
+- **Presets de performance** (onglet Mods du launcher) : Faible = `fabricmods/required/` seul, Moyen = + `moyen/`, Ultra = + `moyen/` + `ultra/`, case Builder = + `builder/`. Le dossier d'un jar donne le champ `"preset"` dans `distribution.json` (liste des dossiers dans `distribution-config.json` → `modFolders`). Nouveau joueur = Moyen par défaut. `optionalon/`/`optionaloff/` sont supprimés : tout dossier inconnu contenant des jars **bloque** la publication (les deux scripts)
 - **Theme launcher** : auto jour/nuit selon l'heure (7h-19h = clair, sinon sombre). Fichiers dans `app/assets/images/backgrounds/clair/` et `sombre/`
 
 ---
@@ -95,6 +96,7 @@ La version `servers[0].version` est affichée aux joueurs dans le launcher (over
 3. **`Get-FileHash`** sur fichier verrouillé : le script **s'arrête** (plus de MD5 `00000000...` publié, qui bloquait le lancement chez les joueurs).
 5. **Configs écrasées** : Helios re-télécharge tout fichier `files/` dont le MD5 diffère → les réglages que le joueur change dans ces configs sont perdus à chaque lancement. Pour des valeurs par défaut modifiables, passer par DefaultOptions (`config/defaultoptions/`).
 6. **Cache MD5 GitHub Actions** : `tools/md5-cache.json` (clé = taille + date de modif FTP). Commité par le workflow, ne pas l'éditer à la main.
+7. **Dépendances entre dossiers** : un mod ne doit jamais dépendre d'un mod d'un dossier "plus haut" (ex : `required/` qui dépend de `ultra/`), sinon crash au lancement chez ceux qui l'ont désactivé. `generate-distribution.ps1` lit les `fabric.mod.json` et **s'arrête** si c'est le cas (`[DEP] ...`). Solution : mettre le mod dans le même dossier que sa dépendance, ou la dépendance dans `required/`. Les librairies (malilib, iceberg, creativecore…) peuvent rester dans `required/`
 4. **Tags Git** : `v1.0.0`, `v1.0.1`, etc. existent dans l'historique Helios upstream du fork — ils pointent vers de vieux commits Helios. Pour une nouvelle release, on force-update le tag (`git push origin vX.Y.Z --force`).
 
 ---
