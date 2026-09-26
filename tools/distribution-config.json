@@ -20,6 +20,15 @@
         "_comment": "Le script refuse de publier si le nombre de modules chute sous ce ratio par rapport a la version precedente (protection contre un scan vide/incomplet). Contournable avec -Force / --force.",
         "minModuleRatio": 0.8
     },
+    "modFolders": {
+        "_comment": "Dossiers scannes dans fabricmods/, dans cet ordre. Un autre dossier contenant des jars bloque la publication (sinon ses mods disparaitraient du modpack sans prevenir). 'preset' = palier utilise par le selecteur Faible/Moyen/Ultra/Builder du launcher (Faible = required seul, Moyen = + moyen, Ultra = + moyen + ultra, Builder = case a cocher independante). 'required' absent = mod obligatoire. 'def' = etat par defaut pour un nouveau joueur (profil Moyen). 'loadedWith' = dossiers forcement actifs quand un mod de ce dossier l'est : un mod ne peut dependre que d'un mod de ces dossiers (controle fait par les deux scripts).",
+        "folders": [
+            { "dir": "required",    "label": "[MOD]", "color": "Green",       "loadedWith": ["required"] },
+            { "dir": "moyen",       "label": "[MOY]", "color": "Cyan",     "preset": "moyen",   "required": { "value": false, "def": true },  "loadedWith": ["required", "moyen"] },
+            { "dir": "ultra",       "label": "[ULT]", "color": "Magenta",  "preset": "ultra",   "required": { "value": false, "def": false }, "loadedWith": ["required", "moyen", "ultra"] },
+            { "dir": "builder",     "label": "[BLD]", "color": "Yellow",   "preset": "builder", "required": { "value": false, "def": false }, "loadedWith": ["required", "builder"] }
+        ]
+    },
     "excludedMods": [
         "Cobblemon-fabric-1.6.1+1.21.1.jar",
         "fabric-api-0.116.7+1.21.1.jar"

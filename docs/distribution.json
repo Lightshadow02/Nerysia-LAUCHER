@@ -7,7 +7,7 @@
       "name": "Nerysia (Minecraft 1.21.1)",
       "description": "Nerysia - Minecraft 1.21.1 (Fabric 0.19.2)",
       "icon": "https://apk.nerysia.fr/Logo.png",
-      "version": "1.23.2",
+      "version": "1.23.3",
       "address": "node.hloureiro.fr:45545",
       "minecraftVersion": "1.21.1",
       "mainServer": true,
@@ -1162,12 +1162,13 @@
           "artifact": {
             "size": 2690177,
             "MD5": "1179fe09b9ba970e84ed59259adfe65a",
-            "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/optionaloff/iris-fabric-1.8.8%2Bmc1.21.1.jar"
+            "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/ultra/iris-fabric-1.8.8%2Bmc1.21.1.jar"
           },
           "required": {
             "value": false,
             "def": false
-          }
+          },
+          "preset": "ultra"
         },
         {
           "id": "generated.fabricmod:litematica-fabric-1.21-0.19.60:1.0.0@jar",
@@ -1176,12 +1177,13 @@
           "artifact": {
             "size": 1578454,
             "MD5": "72a99316c2366d53d820076109604126",
-            "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/optionaloff/litematica-fabric-1.21-0.19.60.jar"
+            "url": "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/builder/litematica-fabric-1.21-0.19.60.jar"
           },
           "required": {
             "value": false,
             "def": false
-          }
+          },
+          "preset": "builder"
         },
         {
           "id": "generated.fabricmod:AmbientSounds_FABRIC_v6.3.6_mc1.21.1:1.0.0@jar",

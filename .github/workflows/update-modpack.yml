@@ -15,7 +15,7 @@ on:
           - none
         default: minor
       force:
-        description: 'Forcer meme si beaucoup de modules disparaissent (garde anti-scan-vide)'
+        description: 'Forcer meme si beaucoup de modules disparaissent (garde anti-scan-vide) ou si un mod depend d un mod desactivable (controle des dependances)'
         type: boolean
         default: false
 

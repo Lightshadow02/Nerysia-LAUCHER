@@ -21,11 +21,13 @@ tools/distribution-config.json, partage avec tools/generate-distribution.ps1.
 import argparse
 import ftplib
 import hashlib
+import io
 import json
 import os
 import re
 import sys
 import time
+import zipfile
 from pathlib import Path
 from urllib.parse import quote
 
@@ -185,12 +187,34 @@ def ftp_list_recursive(ftp: ftplib.FTP, remote_dir: str, prefix: str = "") -> li
     return results
 
 
-def ftp_download_md5(ftp: ftplib.FTP, remote_path: str) -> str:
-    """Download a remote file (streaming) and return its MD5 hash."""
+def ftp_download_md5(ftp: ftplib.FTP, remote_path: str, keep: bool = False):
+    """Download a remote file (streaming) and return (MD5, contenu si keep=True sinon None)."""
     h = hashlib.md5()
+    buf = bytearray() if keep else None
+
+    def on_chunk(chunk):
+        h.update(chunk)
+        if keep:
+            buf.extend(chunk)
+
     ftp.voidcmd("TYPE I")
-    ftp.retrbinary(f"RETR {remote_path}", h.update)
-    return h.hexdigest()
+    ftp.retrbinary(f"RETR {remote_path}", on_chunk)
+    return h.hexdigest(), (bytes(buf) if keep else None)
+
+
+def read_fabric_meta(jar_bytes: bytes):
+    """Extrait id / provides / depends du fabric.mod.json d'un jar (None si absent ou illisible)."""
+    try:
+        with zipfile.ZipFile(io.BytesIO(jar_bytes)) as z:
+            raw = z.read("fabric.mod.json").decode("utf-8", "replace")
+        data = json.loads(re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", "", raw), strict=False)
+    except (KeyError, zipfile.BadZipFile, ValueError):
+        return None
+    return {
+        "id": data.get("id"),
+        "provides": list(data.get("provides") or []),
+        "depends": sorted((data.get("depends") or {}).keys()),
+    }
 
 
 def ftp_upload_atomic(ftp: ftplib.FTP, local_path: Path, remote_path: str) -> None:
@@ -221,10 +245,11 @@ class Hasher:
         self.downloads = 0
         self.download_bytes = 0
 
-    def md5(self, url, remote_path, label, size, modify):
+    def md5(self, url, remote_path, label, size, modify, fabric=False):
+        """fabric=True : lit aussi le fabric.mod.json du jar (garde dans le cache, cle "fabric")."""
         cached = self.cache.get(url)
         reuse = False
-        if cached and cached.get("md5") and cached.get("size") == size:
+        if cached and cached.get("md5") and cached.get("size") == size and (not fabric or "fabric" in cached):
             if modify and cached.get("modify"):
                 reuse = cached["modify"] == modify
             else:
@@ -237,18 +262,21 @@ class Hasher:
         else:
             print(f"  [DL]    {label} (downloading to compute MD5)...", end=" ", flush=True)
             t0 = time.time()
-            md5 = ftp_download_md5(self.ftp, remote_path)
+            md5, content = ftp_download_md5(self.ftp, remote_path, keep=fabric)
             print(f"-> {md5} ({time.time()-t0:.1f}s)")
             self.downloads += 1
             self.download_bytes += size
-        self.new_cache[url] = {"size": size, "modify": modify, "md5": md5}
+        entry = {"size": size, "modify": modify, "md5": md5}
+        if fabric:
+            entry["fabric"] = cached["fabric"] if reuse else read_fabric_meta(content)
+        self.new_cache[url] = entry
         return md5
 
 
-def build_mod_entry(hasher, jar_name, subdir, size, modify, required=None):
+def build_mod_entry(hasher, jar_name, subdir, size, modify, required=None, preset=None):
     base_id = jar_name[:-4] if jar_name.lower().endswith(".jar") else jar_name
     full_url = f"{BASE_URL}/{subdir}/{url_encode_path(jar_name)}"
-    md5 = hasher.md5(full_url, f"{SERVER_REMOTE_PATH}/{subdir}/{jar_name}", jar_name, size, modify)
+    md5 = hasher.md5(full_url, f"{SERVER_REMOTE_PATH}/{subdir}/{jar_name}", jar_name, size, modify, fabric=True)
     entry = {
         "id": f"generated.fabricmod:{base_id}:1.0.0@jar",
         "name": base_id,
@@ -257,6 +285,8 @@ def build_mod_entry(hasher, jar_name, subdir, size, modify, required=None):
     }
     if required is not None:
         entry["required"] = required
+    if preset:
+        entry["preset"] = preset
     return entry
 
 
@@ -285,6 +315,36 @@ def check_sanity(distribution: dict, previous: dict, force: bool) -> None:
             print(f"  [WARN] {msg} --force utilise, on continue.")
         else:
             raise SystemExit(f"ERROR: {msg} Scan incomplet ? Relance avec --force si c'est voulu. Rien n'a ete publie.")
+
+
+def check_dependencies(mod_metas: list, force: bool) -> None:
+    """Un mod ne doit pas dependre d'un mod qui peut etre desactive alors que lui reste actif
+    (sinon crash au lancement). Regle : cf loadedWith dans distribution-config.json.
+    mod_metas = [(dossier, nom du jar, meta fabric ou None), ...]"""
+    loaded_with = {f["dir"]: f.get("loadedWith", [f["dir"]]) for f in CONFIG["modFolders"]["folders"]}
+    providers = {}
+    for folder, _, meta in mod_metas:
+        if meta:
+            for mod_id in [meta["id"]] + meta["provides"]:
+                if mod_id:
+                    providers.setdefault(mod_id, folder)
+    problems = []
+    for folder, name, meta in mod_metas:
+        for dep in (meta or {}).get("depends", []):
+            dep_folder = providers.get(dep)  # None = fourni par Minecraft/Fabric ou embarque
+            if dep_folder and dep_folder not in loaded_with[folder]:
+                problems.append(f"{folder}/{name} a besoin de '{dep}' qui est dans {dep_folder}/")
+    if not problems:
+        print("  -> dependances OK")
+        return
+    for p in problems:
+        print(f"  [DEP] {p}")
+    msg = (f"{len(problems)} probleme(s) de dependance : deplace le mod dans le meme dossier que sa "
+           f"dependance (ou la dependance dans required/).")
+    if force:
+        print(f"  [WARN] {msg} --force utilise, on continue.")
+    else:
+        raise SystemExit(f"ERROR: {msg} Rien n'a ete publie (--force pour ignorer).")
 
 
 def upload(ftp) -> None:
@@ -333,25 +393,42 @@ def main():
     hasher = Hasher(ftp, cache)
     modules = []
 
-    print("[1/5] Ajout du bloc Fabric Core (statique)")
+    print("[1/3] Ajout du bloc Fabric Core (statique)")
     modules.append(CONFIG["fabricCore"])
 
-    mod_dirs = [
-        ("[2/5]", "fabricmods/required", None),
-        ("[3/5]", "fabricmods/optionaloff", {"value": False, "def": False}),
-        ("[4/5]", "fabricmods/optionalon", {"value": False, "def": True}),
-    ]
-    for step, subdir, required in mod_dirs:
-        print(f"{step} Scan {subdir}/")
-        for name, size, is_dir, modify in sorted(ftp_list_files(ftp, f"{SERVER_REMOTE_PATH}/{subdir}")):
+    # Dossiers de mods (required, presets moyen/ultra/builder, optionalon/off) : cf distribution-config.json
+    # Un dossier inconnu avec des jars = mods qui disparaitraient du modpack sans prevenir
+    known_dirs = [f["dir"] for f in CONFIG["modFolders"]["folders"]]
+    for name, _, is_dir, _ in ftp_list_files(ftp, f"{SERVER_REMOTE_PATH}/fabricmods"):
+        if not is_dir or name in known_dirs:
+            continue
+        orphans = [n for n, _, d, _ in ftp_list_files(ftp, f"{SERVER_REMOTE_PATH}/fabricmods/{name}")
+                   if not d and n.endswith(".jar")]
+        if orphans:
+            raise SystemExit(f"ERROR: fabricmods/{name}/ contient {len(orphans)} mod(s) mais n'est pas un dossier connu "
+                             f"({', '.join(orphans)}). Range-les dans {' / '.join(known_dirs)} puis supprime le dossier. "
+                             f"Rien n'a ete publie.")
+
+    mod_metas = []
+    for folder in CONFIG["modFolders"]["folders"]:
+        subdir = f"fabricmods/{folder['dir']}"
+        print(f"[2/3] Scan {subdir}/")
+        remote = f"{SERVER_REMOTE_PATH}/{subdir}"
+        for name, size, is_dir, modify in sorted(ftp_list_files(ftp, remote, required=folder["dir"] == "required")):
             if is_dir or not name.endswith(".jar"):
                 continue
             if name in EXCLUDED_MODS:
                 print(f"  [SKIP] {name} (excluded version)")
                 continue
-            modules.append(build_mod_entry(hasher, name, subdir, size, modify, required=required))
+            entry = build_mod_entry(hasher, name, subdir, size, modify,
+                                    required=folder.get("required"), preset=folder.get("preset"))
+            modules.append(entry)
+            mod_metas.append((folder["dir"], name, hasher.new_cache[entry["artifact"]["url"]].get("fabric")))
 
-    print("[5/5] Scan files/ (recursif)")
+    print("[2/3] Controle des dependances entre dossiers")
+    check_dependencies(mod_metas, args.force)
+
+    print("[3/3] Scan files/ (recursif)")
     file_count = 0
     for rel, size, modify in sorted(ftp_list_recursive(ftp, f"{SERVER_REMOTE_PATH}/files")):
         if should_exclude(rel):
