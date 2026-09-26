@@ -12,6 +12,8 @@ Un clic pour jouer : Java, Minecraft, Fabric, les mods et les configs s'installe
   <a href="https://discord.gg/dtvMfS69hU"><img src="https://img.shields.io/badge/Discord-Nerysia-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord"></a>
 </p>
 
+<p align="center"><a href="https://discord.gg/dtvMfS69hU"><img src="https://img.shields.io/badge/Rejoindre%20le%20Discord-Nerysia-5865F2?style=for-the-badge&logo=discord&logoColor=white" height="45" alt="Rejoindre le Discord Nerysia"></a></p>
+
 ---
 
 ## 📑 Sommaire
@@ -20,6 +22,7 @@ Un clic pour jouer : Java, Minecraft, Fabric, les mods et les configs s'installe
 - [Fonctionnalités](#-fonctionnalités)
 - [Préréglages de performance](#-préréglages-de-performance)
 - [Configuration conseillée](#-configuration-conseillée)
+- [Rejoindre le Discord](#-rejoindre-le-discord)
 - [Besoin d'aide ?](#-besoin-daide-)
 - [Pour les développeurs](#-pour-les-développeurs)
 - [Gérer le modpack (admins)](#-gérer-le-modpack-admins)
@@ -92,6 +95,16 @@ Tu peux toujours activer ou désactiver un mod à la main juste en dessous. Le l
 | **Compte** | Compte Microsoft **possédant Minecraft Java Edition** | |
 
 **Le serveur** : Minecraft **1.21.1**, Fabric, environ **120 mods** (Cobblemon et ses addons, meubles, décoration, quêtes, factions, chat vocal Plasmo Voice…).
+
+---
+
+## 💬 Rejoindre le Discord
+
+Annonces, événements, entraide, signalement de bugs, discussions entre dresseurs : tout se passe sur le Discord de Nerysia.
+
+<p align="center"><a href="https://discord.gg/dtvMfS69hU"><img src="https://img.shields.io/badge/Rejoindre%20le%20Discord-Nerysia-5865F2?style=for-the-badge&logo=discord&logoColor=white" height="45" alt="Rejoindre le Discord Nerysia"></a></p>
+
+👉 **https://discord.gg/dtvMfS69hU**
 
 ---
 

@@ -2,6 +2,8 @@
 
 Le launcher installe tout seul Java, Minecraft, Fabric et les mods du serveur. Tu n'as rien d'autre à installer.
 
+💬 Un souci pendant l'installation ? Viens demander sur le **[Discord Nerysia](https://discord.gg/dtvMfS69hU)**.
+
 **Téléchargement** : https://github.com/Lightshadow02/Nerysia-LAUCHER/releases/latest
 (tout en bas de la page, rubrique **Assets**)
 
