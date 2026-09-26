@@ -60,7 +60,7 @@ La version `servers[0].version` est affichée aux joueurs dans le launcher (over
 - **Distribution** : `docs/distribution.json` (local) + `Y:\apk\nerysia-laucher\distribution.json` (web)
 - **News RSS** : `docs/feed.xml` → upload manuel vers `apk.nerysia.fr/nerysia-laucher/feed.xml`
 - **Auth Microsoft** : Client ID Helios partagé (`1ce6e35a-...`) en attendant whitelist Nerysia (`4979ff0d-...`). Procédure dans `docs/AUTH_AZURE.md`
-- **Build** : push tag `v*` → GitHub Actions build Win + Linux + release publique automatique. **Le tag doit être égal à `package.json` version** (sinon le build échoue volontairement)
+- **Build** : push tag `v*` → GitHub Actions build Windows (.exe) + macOS Intel/Apple Silicon (.dmg, signé ad-hoc via `build/mac-adhoc-sign.js`) + Linux (.AppImage, .deb, .pacman pour Arch) + release publique automatique. Doc joueurs : `docs/INSTALLATION.md`. **Le tag doit être égal à `package.json` version** (sinon le build échoue volontairement)
 - **Config du modpack** : `tools/distribution-config.json` = source unique (exclusions, bloc Fabric, infos serveur) lue par `generate-distribution.ps1` (local, via `Y:`) ET `generate-distribution-from-ftp.py` (GitHub Actions). Ne jamais dupliquer ces infos dans les scripts
 - **Presets de performance** (onglet Mods du launcher) : Faible = `fabricmods/required/` seul, Moyen = + `moyen/`, Ultra = + `moyen/` + `ultra/`, case Builder = + `builder/`. Le dossier d'un jar donne le champ `"preset"` dans `distribution.json` (liste des dossiers dans `distribution-config.json` → `modFolders`). Nouveau joueur = Moyen par défaut. `optionalon/`/`optionaloff/` sont supprimés : tout dossier inconnu contenant des jars **bloque** la publication (les deux scripts)
 - **Theme launcher** : auto jour/nuit selon l'heure (7h-19h = clair, sinon sombre). Fichiers dans `app/assets/images/backgrounds/clair/` et `sombre/`
@@ -127,6 +127,6 @@ npm run dist -- -w -p never
 
 - Microsoft whitelist du Client ID Nerysia : **demandé le 2026-05-02**, toujours sans réponse au 2026-09-25 (délai annoncé 24-72h largement dépassé → relancer)
 - Audit du 2026-09-25 : configs serveur (DB, Redis, anti-triche, raids, crates, quêtes) retirées du modpack et déplacées dans `Y:\_backup_hors_web\` (mots de passe vérifiés vides par Hugo)
-- Build v1.0.3 : **publiée** sur GitHub Releases le 2026-09-26 (Win .exe + Linux AppImage + latest.yml → MAJ auto des joueurs en 1.0.2). Prochaine version : v1.0.4 (tag Helios existant → `git push origin v1.0.4 --force`)
+- Build v1.0.3 : **publiée** sur GitHub Releases le 2026-09-26 (Win .exe + Linux AppImage + latest.yml → MAJ auto des joueurs en 1.0.2). v1.0.4 publiée le 2026-09-26 (presets de performance). v1.0.5 = 1re version Mac + .deb + .pacman (tag Helios existant → `--force`). Tags Helios existants jusqu'à v1.0.5 ; à partir de v1.0.6 plus besoin de `--force`
 - Mod DefaultOptions + `config/defaultoptions/options.txt` : ajoutés au modpack pour fixer le pb de GUI scale auto
 - Bug fix critique gardé : `decodeURI → decodeURIComponent` dans `index.js:155` (parsing OAuth code)
