@@ -226,7 +226,7 @@
   "modify": "20260502012106",
   "size": 2336960
  },
- "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/Cobblemon-fabric-1.7.3%2B1.21.1.jar": {
+ "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/Cobblemon-fabric-1.8.1%2B1.21.1.jar": {
   "fabric": {
    "depends": [
     "fabric-api",
@@ -237,9 +237,9 @@
    "id": "cobblemon",
    "provides": []
   },
-  "md5": "1de64f280372ec94e4376976fb579d52",
-  "modify": "20260502012117",
-  "size": 135801550
+  "md5": "508e825d834c4ad354ff12cdf2b3a76c",
+  "modify": "20260926085407",
+  "size": 137391338
  },
  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/CobblemonMoveDex-1.2.jar": {
   "fabric": {
@@ -465,9 +465,9 @@
    "id": "nerysia_mod",
    "provides": []
   },
-  "md5": "e16b40a4b2a76f46765c5df4217b111f",
-  "modify": "20260514105439",
-  "size": 149467168
+  "md5": "400238eeee643dadb504c1dc584363c8",
+  "modify": "20260926085510",
+  "size": 5232467
  },
  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/NerysiaQuest-1.0.0.jar": {
   "fabric": {
@@ -1326,7 +1326,7 @@
   "modify": "20260502012109",
   "size": 1411200
  },
- "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/mega_showdown-fabric-1.8.2%2B1.7.3%2B1.21.1-hotfix.jar": {
+ "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/mega_showdown-fabric-1.2.0%2B1.8.1%2B1.21.1-release.jar": {
   "fabric": {
    "depends": [
     "accessories",
@@ -1339,9 +1339,9 @@
    "id": "mega_showdown",
    "provides": []
   },
-  "md5": "940a87a5a521436377bcf3f6b4e68d91",
-  "modify": "20260502012108",
-  "size": 17101047
+  "md5": "f51a99a2f7b7ad3e18e4bd73f2bafa0d",
+  "modify": "20260926085511",
+  "size": 20152218
  },
  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/melody_fabric_1.0.10_MC_1.21.jar": {
   "fabric": {
@@ -1428,6 +1428,48 @@
   "md5": "d810f4a5dfccf6a140867ca4a401d23a",
   "modify": "20260524183119",
   "size": 3915997
+ },
+ "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/nerylib-0.14.0.jar": {
+  "fabric": {
+   "depends": [
+    "fabric-api",
+    "fabricloader",
+    "java",
+    "minecraft"
+   ],
+   "id": "nerylib",
+   "provides": []
+  },
+  "md5": "5f9509a2e9bc587b80dd9728e55ba5b2",
+  "modify": "20260926085511",
+  "size": 1338474
+ },
+ "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/nerysia-assets-1.7.1.jar": {
+  "fabric": {
+   "depends": [
+    "fabricloader",
+    "minecraft"
+   ],
+   "id": "nerysia_assets",
+   "provides": []
+  },
+  "md5": "0a1de4c4fbcc15e66d0997dbf5129a56",
+  "modify": "20260926085509",
+  "size": 144522011
+ },
+ "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/nerysia-cosmetics-1.7.1.jar": {
+  "fabric": {
+   "depends": [
+    "fabricloader",
+    "java",
+    "minecraft"
+   ],
+   "id": "nerysia_cosmetics",
+   "provides": []
+  },
+  "md5": "ac7419465f2bf4f602ca502c216e4f00",
+  "modify": "20260926085509",
+  "size": 100909
  },
  "https://apk.nerysia.fr/nerysia-laucher/servers/Nerysia-1.21.1/fabricmods/required/owo-lib-0.12.15.4%2B1.21.jar": {
   "fabric": {
