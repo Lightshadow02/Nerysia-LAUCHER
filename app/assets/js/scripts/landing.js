@@ -153,6 +153,7 @@ function updateSelectedAccount(authUser){
         }
     }
     user_text.innerHTML = username
+    onSelectedAccountChanged()
 }
 updateSelectedAccount(ConfigManager.getSelectedAccount())
 

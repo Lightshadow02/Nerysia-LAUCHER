@@ -63,6 +63,7 @@ La version `servers[0].version` est affichée aux joueurs dans le launcher (over
 - **Build** : push tag `v*` → GitHub Actions build Windows (.exe) + macOS Intel/Apple Silicon (.dmg, signé ad-hoc via `build/mac-adhoc-sign.js`) + Linux (.AppImage, .deb, .pacman pour Arch) + release publique automatique. Doc joueurs : `docs/INSTALLATION.md`. **Le tag doit être égal à `package.json` version** (sinon le build échoue volontairement)
 - **Config du modpack** : `tools/distribution-config.json` = source unique (exclusions, bloc Fabric, infos serveur) lue par `generate-distribution.ps1` (local, via `Y:`) ET `generate-distribution-from-ftp.py` (GitHub Actions). Ne jamais dupliquer ces infos dans les scripts
 - **Presets de performance** (onglet Mods du launcher) : Faible = `fabricmods/required/` seul, Moyen = + `moyen/`, Ultra = + `moyen/` + `ultra/`, case Builder = + `builder/`. Le dossier d'un jar donne le champ `"preset"` dans `distribution.json` (liste des dossiers dans `distribution-config.json` → `modFolders`). Nouveau joueur = Moyen par défaut. `optionalon/`/`optionaloff/` sont supprimés : tout dossier inconnu contenant des jars **bloque** la publication (les deux scripts)
+- **Instance ADMIN secrète** (doc : `docs/INSTANCE_ADMIN.md`) : modpack séparé dans `Y:\_nerysia_admin\` (HORS site web : `config.php` clé secrète, `admins.json`, `admin-server.json`, `servers/<id>/`). Servi uniquement par `tools/admin-gate/api.php` (déployé sur `apk.nerysia.fr/nerysia-laucher/admin/`) après preuve d'identité via Mojang `join`/`hasJoined` (le jeton du joueur ne va QUE chez Mojang). Côté launcher : `app/assets/js/adminaccess.js`, injecté dans le distribution.json par `distromanager.js`. Gestion des admins : `& "tools/admin.ps1" add|remove|list|init|test`. Les deux scripts de génération produisent aussi le modpack admin (version patch auto si contenu changé)
 - **Theme launcher** : auto jour/nuit selon l'heure (7h-19h = clair, sinon sombre). Fichiers dans `app/assets/images/backgrounds/clair/` et `sombre/`
 
 ---
@@ -85,6 +86,7 @@ La version `servers[0].version` est affichée aux joueurs dans le launcher (over
 - Le **Client ID Azure est public** par design (cf `docs/AUTH_AZURE.md` ligne 30)
 - Ne pas écrire `dist/`, `node_modules/`, `.claude/` dans git (déjà dans `.gitignore`)
 - En général : ne JAMAIS demander à Hugo de copier-coller la valeur d'un secret Azure dans le chat
+- **Instance admin** : ne JAMAIS commiter `admins.json`, `config.php`, `admin-server.json`, `distribution-admin.json` ni `tools/.admin-build/` (gitignoré). Le script GitHub masque les noms du modpack admin dans ses logs (logs publics) : garder ce comportement (`quiet=True`)
 - **Tout ce qui est dans `files/` sur le FTP est public** (URL sans auth). Ne jamais y laisser de config serveur avec identifiants (DB, Redis…). Exclusions dans `tools/distribution-config.json` → `excludePatterns`
 
 ---

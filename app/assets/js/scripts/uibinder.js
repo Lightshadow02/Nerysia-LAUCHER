@@ -9,9 +9,12 @@ const { Type }      = require('helios-distribution-types')
 const AuthManager   = require('./assets/js/authmanager')
 const ConfigManager = require('./assets/js/configmanager')
 const { DistroAPI } = require('./assets/js/distromanager')
+const AdminAccess   = require('./assets/js/adminaccess')
 
 let rscShouldLoad = false
 let fatalStartupError = false
+// Passe a true une fois l'interface principale affichee (cf onSelectedAccountChanged).
+let adminAccessReady = false
 
 // Mapping of each view to their container IDs.
 const VIEWS = {
@@ -58,6 +61,8 @@ function getCurrentView(){
 }
 
 async function showMainUI(data){
+
+    adminAccessReady = true
 
     if(!isDev){
         loggerAutoUpdater.info('Initializing..')
@@ -138,6 +143,27 @@ function onDistroRefresh(data){
     initNews()
     syncModConfigurations(data)
     ensureJavaSettings(data)
+}
+
+/**
+ * Appele a chaque changement de compte (connexion, changement, suppression) :
+ * recharge la distribution pour afficher ou cacher l'instance ADMIN.
+ */
+async function onSelectedAccountChanged(){
+    if(!adminAccessReady || !AdminAccess.needsRefresh()){
+        return
+    }
+    try {
+        const data = await DistroAPI.refreshDistributionOrFallback()
+        syncModConfigurations(data)
+        ensureJavaSettings(data)
+        // L'instance selectionnee a disparu (ex : instance admin et compte non admin) -> serveur principal
+        if(data.getServerById(ConfigManager.getSelectedServer()) == null){
+            updateSelectedServer(data.getMainServer())
+        }
+    } catch(err) {
+        console.warn('Rechargement de la distribution apres changement de compte impossible', err)
+    }
 }
 
 /**
