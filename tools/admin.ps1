@@ -45,8 +45,9 @@ function Save-Admins($admins) {
 function Test-Gate {
     try {
         $r = Invoke-RestMethod "$($gateUrl)?action=ping" -TimeoutSec 15
-        Write-Host "  api.php repond : PHP $($r.php), curl=$($r.curl), dossier prive trouve=$($r.private)" -ForegroundColor Green
+        Write-Host "  api.php repond : PHP $($r.php), curl=$($r.curl), Mojang joignable=$($r.mojang), dossier prive trouve=$($r.private)" -ForegroundColor Green
         if (-not $r.private) { Write-Host "  ATTENTION : api.php ne trouve pas le dossier prive (chemin a verifier)" -ForegroundColor Red }
+        if (-not $r.mojang) { Write-Host "  ATTENTION : l'hebergement n'arrive pas a joindre Mojang : les admins ne pourront pas etre verifies" -ForegroundColor Red }
     } catch {
         Write-Host "  ERREUR : api.php ne repond pas ($($_.Exception.Message))" -ForegroundColor Red
         Write-Host "  -> PHP est-il active sur l'hebergement ? (OVH : Multisite / version PHP)" -ForegroundColor Yellow
@@ -96,6 +97,8 @@ switch ($Action) {
         $gateTarget = $config.admin.gateLocalTarget -replace "/", "\"
         New-Item -ItemType Directory -Force (Split-Path $gateTarget) | Out-Null
         Copy-Item (Join-Path $PSScriptRoot "admin-gate\api.php") $gateTarget -Force
+        # Page vide : evite que le serveur web affiche la liste des fichiers du dossier
+        Write-NoBom (Join-Path (Split-Path $gateTarget) "index.html") ""
         Write-Host "  api.php deploye : $gateTarget" -ForegroundColor Green
 
         Write-Host ""
