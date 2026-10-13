@@ -131,10 +131,20 @@ $action = $_GET['action'] ?? '';
 switch ($action) {
 
     case 'ping':
+        // L'hebergement peut-il joindre Mojang ? (requete hasJoined bidon : 204 attendu)
+        $mojang = false;
+        if (function_exists('curl_init')) {
+            $ch = curl_init(MOJANG_HAS_JOINED . '?username=ping&serverId=ping');
+            curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 10, CURLOPT_CONNECTTIMEOUT => 5]);
+            curl_exec($ch);
+            $mojang = in_array((int)curl_getinfo($ch, CURLINFO_HTTP_CODE), [200, 204], true);
+            curl_close($ch);
+        }
         reply(200, [
             'ok' => true,
             'php' => PHP_VERSION,
             'curl' => function_exists('curl_init'),
+            'mojang' => $mojang,
             'private' => is_dir(PRIVATE_DIR),
         ]);
 
