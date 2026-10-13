@@ -20,6 +20,13 @@
         "_comment": "Le script refuse de publier si le nombre de modules chute sous ce ratio par rapport a la version precedente (protection contre un scan vide/incomplet). Contournable avec -Force / --force.",
         "minModuleRatio": 0.8
     },
+    "admin": {
+        "_comment": "Instance ADMIN secrete (cf tools/admin-gate/api.php et docs/INSTANCE_ADMIN.md). Tout est dans un dossier PRIVE hors du site web : admin-server.json (infos serveur), admins.json, config.php (cle secrete), servers/<id>/ (modpack, memes sous-dossiers que le modpack joueur). Rien de l'instance admin n'est publie sur GitHub. Dossier absent = instance admin ignoree.",
+        "localRoot": "Y:/_nerysia_admin",
+        "ftpRoot": "/_nerysia_admin",
+        "gateLocalTarget": "Y:/apk/nerysia-laucher/admin/api.php",
+        "gateFtpTarget": "/apk/nerysia-laucher/admin/api.php"
+    },
     "modFolders": {
         "_comment": "Dossiers scannes dans fabricmods/, dans cet ordre. Un autre dossier contenant des jars bloque la publication (sinon ses mods disparaitraient du modpack sans prevenir). 'preset' = palier utilise par le selecteur Faible/Moyen/Ultra/Builder du launcher (Faible = required seul, Moyen = + moyen, Ultra = + moyen + ultra, Builder = case a cocher independante). 'required' absent = mod obligatoire. 'def' = etat par defaut pour un nouveau joueur (profil Moyen). 'loadedWith' = dossiers forcement actifs quand un mod de ce dossier l'est : un mod ne peut dependre que d'un mod de ces dossiers (controle fait par les deux scripts).",
         "folders": [

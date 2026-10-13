@@ -50,6 +50,13 @@ EXCLUDE_PATTERNS = [
 ]
 MIN_MODULE_RATIO = CONFIG["safety"]["minModuleRatio"]
 
+# Instance ADMIN secrete : tout est dans un dossier FTP prive (hors site web). Rien n'est
+# commite ni affiche en detail (les logs GitHub Actions d'un repo public sont publics).
+ADMIN_FTP_ROOT = CONFIG["admin"]["ftpRoot"]
+ADMIN_GATE_REMOTE = CONFIG["admin"]["gateFtpTarget"]
+ADMIN_GATE_SOURCE = ROOT / "tools" / "admin-gate" / "api.php"
+ADMIN_BUILD_DIR = ROOT / "tools" / ".admin-build"  # ignore par git
+
 # Sans date de modif FTP connue, on ne fait confiance a la taille seule que pour les
 # gros fichiers (jars, zips). Les petites configs sont toujours re-hashees.
 TRUST_SIZE_ONLY_ABOVE = 1024 * 1024
@@ -142,7 +149,8 @@ def ftp_list_files(ftp: ftplib.FTP, remote_dir: str, required: bool = True) -> l
     except ftplib.error_perm as e:
         if required:
             raise SystemExit(f"ERROR: dossier FTP introuvable : {remote_dir} ({e}). Rien n'a ete publie.")
-        print(f"  [SKIP] {remote_dir} does not exist ({e})")
+        # Nom du dossier seul : pas de chemin du modpack admin dans les logs publics
+        print(f"  [SKIP] {remote_dir.rsplit('/', 1)[-1]}/ absent")
         return []
 
     entries = []
@@ -235,9 +243,10 @@ def ftp_upload_atomic(ftp: ftplib.FTP, local_path: Path, remote_path: str) -> No
 # Module builders
 # ----------------------------------------------------------------
 class Hasher:
-    def __init__(self, ftp, cache):
+    def __init__(self, ftp, cache, quiet=False):
         self.ftp = ftp
         self.cache = cache
+        self.quiet = quiet  # True pour le modpack admin : aucun nom de fichier dans les logs
         self.new_cache = {}
         # Stats pour voir le gain du cache (affichees en fin de script + resume GitHub)
         self.hits = 0
@@ -256,14 +265,17 @@ class Hasher:
                 reuse = size > TRUST_SIZE_ONLY_ABOVE
         if reuse:
             md5 = cached["md5"]
-            print(f"  [CACHE] {label} -> {md5}")
+            if not self.quiet:
+                print(f"  [CACHE] {label} -> {md5}")
             self.hits += 1
             self.hits_bytes += size
         else:
-            print(f"  [DL]    {label} (downloading to compute MD5)...", end=" ", flush=True)
+            if not self.quiet:
+                print(f"  [DL]    {label} (downloading to compute MD5)...", end=" ", flush=True)
             t0 = time.time()
             md5, content = ftp_download_md5(self.ftp, remote_path, keep=fabric)
-            print(f"-> {md5} ({time.time()-t0:.1f}s)")
+            if not self.quiet:
+                print(f"-> {md5} ({time.time()-t0:.1f}s)")
             self.downloads += 1
             self.download_bytes += size
         entry = {"size": size, "modify": modify, "md5": md5}
@@ -273,10 +285,12 @@ class Hasher:
         return md5
 
 
-def build_mod_entry(hasher, jar_name, subdir, size, modify, required=None, preset=None):
+def build_mod_entry(hasher, jar_name, subdir, size, modify, required=None, preset=None,
+                    base_url=BASE_URL, remote_root=SERVER_REMOTE_PATH, encode=True):
+    """base_url/remote_root/encode : cf build_modules (modpack joueur par defaut)."""
     base_id = jar_name[:-4] if jar_name.lower().endswith(".jar") else jar_name
-    full_url = f"{BASE_URL}/{subdir}/{url_encode_path(jar_name)}"
-    md5 = hasher.md5(full_url, f"{SERVER_REMOTE_PATH}/{subdir}/{jar_name}", jar_name, size, modify, fabric=True)
+    full_url = f"{base_url}/{subdir}/{url_encode_path(jar_name) if encode else jar_name}"
+    md5 = hasher.md5(full_url, f"{remote_root}/{subdir}/{jar_name}", jar_name, size, modify, fabric=True)
     entry = {
         "id": f"generated.fabricmod:{base_id}:1.0.0@jar",
         "name": base_id,
@@ -290,9 +304,10 @@ def build_mod_entry(hasher, jar_name, subdir, size, modify, required=None, prese
     return entry
 
 
-def build_file_entry(hasher, relative_path, size, modify):
-    full_url = f"{BASE_URL}/files/{url_encode_path(relative_path)}"
-    md5 = hasher.md5(full_url, f"{SERVER_REMOTE_PATH}/files/{relative_path}", relative_path, size, modify)
+def build_file_entry(hasher, relative_path, size, modify,
+                     base_url=BASE_URL, remote_root=SERVER_REMOTE_PATH, encode=True):
+    full_url = f"{base_url}/files/{url_encode_path(relative_path) if encode else relative_path}"
+    md5 = hasher.md5(full_url, f"{remote_root}/files/{relative_path}", relative_path, size, modify)
     return {
         "id": f"generated.file:{safe_id(relative_path)}:1.0.0",
         "name": os.path.basename(relative_path),
@@ -317,7 +332,7 @@ def check_sanity(distribution: dict, previous: dict, force: bool) -> None:
             raise SystemExit(f"ERROR: {msg} Scan incomplet ? Relance avec --force si c'est voulu. Rien n'a ete publie.")
 
 
-def check_dependencies(mod_metas: list, force: bool) -> None:
+def check_dependencies(mod_metas: list, force: bool, quiet: bool = False) -> None:
     """Un mod ne doit pas dependre d'un mod qui peut etre desactive alors que lui reste actif
     (sinon crash au lancement). Regle : cf loadedWith dans distribution-config.json.
     mod_metas = [(dossier, nom du jar, meta fabric ou None), ...]"""
@@ -337,8 +352,11 @@ def check_dependencies(mod_metas: list, force: bool) -> None:
     if not problems:
         print("  -> dependances OK")
         return
-    for p in problems:
-        print(f"  [DEP] {p}")
+    if quiet:
+        print("  [DEP] details masques (modpack admin) : lance tools/generate-distribution.ps1 en local pour les voir")
+    else:
+        for p in problems:
+            print(f"  [DEP] {p}")
     msg = (f"{len(problems)} probleme(s) de dependance : deplace le mod dans le meme dossier que sa "
            f"dependance (ou la dependance dans required/).")
     if force:
@@ -355,6 +373,138 @@ def upload(ftp) -> None:
     print("Upload distribution.json sur le FTP...")
     ftp_upload_atomic(ftp, OUTPUT_FILE, DIST_REMOTE)
     print(f"  Upload OK : {DIST_REMOTE}")
+
+    admin_dist = ADMIN_BUILD_DIR / "distribution-admin.json"
+    if admin_dist.exists():
+        print("Upload du modpack admin (dossier prive)...")
+        ftp_upload_atomic(ftp, admin_dist, f"{ADMIN_FTP_ROOT}/distribution-admin.json")
+        ftp_upload_atomic(ftp, ADMIN_BUILD_DIR / "md5-cache-admin.json", f"{ADMIN_FTP_ROOT}/md5-cache-admin.json")
+        try:
+            ftp.mkd(ADMIN_GATE_REMOTE.rsplit("/", 1)[0])
+        except ftplib.error_perm:
+            pass  # existe deja
+        ftp_upload_atomic(ftp, ADMIN_GATE_SOURCE, ADMIN_GATE_REMOTE)
+        print("  Upload admin OK")
+
+
+def ftp_read_json(ftp: ftplib.FTP, remote_path: str):
+    """Lit un JSON sur le FTP (None s'il n'existe pas ou est illisible)."""
+    buf = io.BytesIO()
+    try:
+        ftp.voidcmd("TYPE I")
+        ftp.retrbinary(f"RETR {remote_path}", buf.write)
+        return json.loads(buf.getvalue().decode("utf-8-sig"))
+    except (ftplib.error_perm, ValueError):
+        return None
+
+
+def build_modules(ftp, hasher, remote_root, base_url, encode, fabric_core, force, quiet=False) -> list:
+    """Construit les modules d'un modpack (joueur ou admin) a partir de son dossier FTP.
+    remote_root : dossier du serveur (fabricmods/ + files/). base_url : debut des URLs
+    (URL publique, ou chemin relatif pour l'admin, signe ensuite par api.php)."""
+    say = (lambda *a, **k: None) if quiet else print
+    modules = [fabric_core]
+
+    # Un dossier inconnu avec des jars = mods qui disparaitraient du modpack sans prevenir
+    known_dirs = [f["dir"] for f in CONFIG["modFolders"]["folders"]]
+    for name, _, is_dir, _ in ftp_list_files(ftp, f"{remote_root}/fabricmods"):
+        if not is_dir or name in known_dirs:
+            continue
+        orphans = [n for n, _, d, _ in ftp_list_files(ftp, f"{remote_root}/fabricmods/{name}")
+                   if not d and n.endswith(".jar")]
+        if orphans:
+            detail = "details masques" if quiet else ", ".join(orphans)
+            raise SystemExit(f"ERROR: fabricmods/{name}/ contient {len(orphans)} mod(s) mais n'est pas un dossier connu "
+                             f"({detail}). Range-les dans {' / '.join(known_dirs)} puis supprime le dossier. "
+                             f"Rien n'a ete publie.")
+
+    # Dossiers de mods (required, presets moyen/ultra/builder) : cf distribution-config.json
+    mod_metas = []
+    for folder in CONFIG["modFolders"]["folders"]:
+        subdir = f"fabricmods/{folder['dir']}"
+        say(f"[2/3] Scan {subdir}/")
+        remote = f"{remote_root}/{subdir}"
+        for name, size, is_dir, modify in sorted(ftp_list_files(ftp, remote, required=folder["dir"] == "required")):
+            if is_dir or not name.endswith(".jar"):
+                continue
+            if name in EXCLUDED_MODS:
+                say(f"  [SKIP] {name} (excluded version)")
+                continue
+            entry = build_mod_entry(hasher, name, subdir, size, modify,
+                                    required=folder.get("required"), preset=folder.get("preset"),
+                                    base_url=base_url, remote_root=remote_root, encode=encode)
+            modules.append(entry)
+            mod_metas.append((folder["dir"], name, hasher.new_cache[entry["artifact"]["url"]].get("fabric")))
+
+    print("[2/3] Controle des dependances entre dossiers")
+    check_dependencies(mod_metas, force, quiet)
+
+    say("[3/3] Scan files/ (recursif)")
+    file_count = 0
+    for rel, size, modify in sorted(ftp_list_recursive(ftp, f"{remote_root}/files")):
+        if should_exclude(rel):
+            say(f"  [SKIP] {rel}")
+            continue
+        modules.append(build_file_entry(hasher, rel, size, modify,
+                                        base_url=base_url, remote_root=remote_root, encode=encode))
+        file_count += 1
+    say(f"  -> {file_count} fichiers ajoutes")
+    return modules
+
+
+def modules_signature(modules: list) -> str:
+    return "\n".join(sorted(f"{m['artifact']['url']}|{m['artifact']['MD5']}" for m in modules))
+
+
+def generate_admin(ftp, force) -> None:
+    """Modpack ADMIN secret : genere dans tools/.admin-build/ (jamais commite), publie par upload()."""
+    # Jamais republier un ancien build admin par erreur
+    for old in ADMIN_BUILD_DIR.glob("*.json"):
+        old.unlink()
+    server = ftp_read_json(ftp, f"{ADMIN_FTP_ROOT}/admin-server.json")
+    if server is None:
+        print("Instance admin : non configuree sur le FTP, ignoree.")
+        return
+    print()
+    print("=== Modpack ADMIN (details masques : logs publics) ===")
+    previous = ftp_read_json(ftp, f"{ADMIN_FTP_ROOT}/distribution-admin.json") or {}
+    cache = ftp_read_json(ftp, f"{ADMIN_FTP_ROOT}/md5-cache-admin.json") or {}
+    hasher = Hasher(ftp, cache, quiet=True)
+    fabric_core = server.get("fabricCore")
+    if not isinstance(fabric_core, dict):  # "same" ou absent -> meme Fabric que le modpack joueur
+        fabric_core = CONFIG["fabricCore"]
+    modules = build_modules(ftp, hasher, f"{ADMIN_FTP_ROOT}/servers/{server['id']}", f"servers/{server['id']}",
+                            encode=False, fabric_core=fabric_core, force=force, quiet=True)
+
+    # Version du modpack admin : +1 (patch) automatiquement quand son contenu change
+    prev_server = (previous.get("servers") or [None])[0]
+    if prev_server is None:
+        version = "1.0.0"
+    elif modules_signature(prev_server.get("modules", [])) != modules_signature(modules):
+        version = bump_version(prev_server.get("version", "1.0.0"), "patch")
+    else:
+        version = prev_server.get("version", "1.0.0")
+
+    distribution = {
+        "version": "1.0.0",
+        "servers": [{
+            "id": server["id"],
+            "name": server["name"],
+            "description": server.get("description", ""),
+            "icon": server.get("icon", ""),
+            "version": version,
+            "address": server["address"],
+            "minecraftVersion": server["minecraftVersion"],
+            "mainServer": False,
+            "autoconnect": False,
+            "modules": modules,
+        }],
+    }
+    check_sanity(distribution, previous, force)
+    ADMIN_BUILD_DIR.mkdir(parents=True, exist_ok=True)
+    (ADMIN_BUILD_DIR / "distribution-admin.json").write_text(json.dumps(distribution, indent=4, ensure_ascii=False), encoding="utf-8")
+    (ADMIN_BUILD_DIR / "md5-cache-admin.json").write_text(json.dumps(hasher.new_cache, indent=1, sort_keys=True), encoding="utf-8")
+    print(f"  -> modpack admin v{version} : {len(modules)} modules ({hasher.downloads} fichiers telecharges)")
 
 
 # ----------------------------------------------------------------
@@ -391,52 +541,10 @@ def main():
 
     ftp = ftp_connect()
     hasher = Hasher(ftp, cache)
-    modules = []
 
     print("[1/3] Ajout du bloc Fabric Core (statique)")
-    modules.append(CONFIG["fabricCore"])
-
-    # Dossiers de mods (required, presets moyen/ultra/builder, optionalon/off) : cf distribution-config.json
-    # Un dossier inconnu avec des jars = mods qui disparaitraient du modpack sans prevenir
-    known_dirs = [f["dir"] for f in CONFIG["modFolders"]["folders"]]
-    for name, _, is_dir, _ in ftp_list_files(ftp, f"{SERVER_REMOTE_PATH}/fabricmods"):
-        if not is_dir or name in known_dirs:
-            continue
-        orphans = [n for n, _, d, _ in ftp_list_files(ftp, f"{SERVER_REMOTE_PATH}/fabricmods/{name}")
-                   if not d and n.endswith(".jar")]
-        if orphans:
-            raise SystemExit(f"ERROR: fabricmods/{name}/ contient {len(orphans)} mod(s) mais n'est pas un dossier connu "
-                             f"({', '.join(orphans)}). Range-les dans {' / '.join(known_dirs)} puis supprime le dossier. "
-                             f"Rien n'a ete publie.")
-
-    mod_metas = []
-    for folder in CONFIG["modFolders"]["folders"]:
-        subdir = f"fabricmods/{folder['dir']}"
-        print(f"[2/3] Scan {subdir}/")
-        remote = f"{SERVER_REMOTE_PATH}/{subdir}"
-        for name, size, is_dir, modify in sorted(ftp_list_files(ftp, remote, required=folder["dir"] == "required")):
-            if is_dir or not name.endswith(".jar"):
-                continue
-            if name in EXCLUDED_MODS:
-                print(f"  [SKIP] {name} (excluded version)")
-                continue
-            entry = build_mod_entry(hasher, name, subdir, size, modify,
-                                    required=folder.get("required"), preset=folder.get("preset"))
-            modules.append(entry)
-            mod_metas.append((folder["dir"], name, hasher.new_cache[entry["artifact"]["url"]].get("fabric")))
-
-    print("[2/3] Controle des dependances entre dossiers")
-    check_dependencies(mod_metas, args.force)
-
-    print("[3/3] Scan files/ (recursif)")
-    file_count = 0
-    for rel, size, modify in sorted(ftp_list_recursive(ftp, f"{SERVER_REMOTE_PATH}/files")):
-        if should_exclude(rel):
-            print(f"  [SKIP] {rel}")
-            continue
-        modules.append(build_file_entry(hasher, rel, size, modify))
-        file_count += 1
-    print(f"  -> {file_count} fichiers ajoutes")
+    modules = build_modules(ftp, hasher, SERVER_REMOTE_PATH, BASE_URL, encode=True,
+                            fabric_core=CONFIG["fabricCore"], force=args.force)
 
     print()
     print("Assemblage du JSON...")
@@ -467,6 +575,8 @@ def main():
     print(f"Fichier ecrit : {OUTPUT_FILE}")
     MD5_CACHE_FILE.write_text(json.dumps(hasher.new_cache, indent=1, sort_keys=True), encoding="utf-8")
     print(f"Cache MD5 ecrit : {MD5_CACHE_FILE}")
+
+    generate_admin(ftp, args.force)
 
     try:
         if not args.no_upload:

@@ -7,3 +7,6 @@
 /.claude/
 __pycache__/
 *.tmp
+
+# Modpack admin genere en local (-NoUpload) : JAMAIS dans git (repo public)
+/tools/.admin-build/
