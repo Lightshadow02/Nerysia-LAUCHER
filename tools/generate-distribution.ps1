@@ -148,13 +148,14 @@ function Sort-Ordinal($items, [scriptblock]$key) {
 #   $urlPrefix     : debut des URLs (URL publique, ou chemin relatif pour l'admin, signe par api.php)
 #   $encodeUrls    : encoder les chemins dans l'URL (non pour l'admin : api.php s'en charge)
 #   $previousCount : nombre de modules de la version precedente (garde anti-scan-vide)
+#   $allowNoMods   : accepter 0 mod (modpack admin pas encore rempli). Jamais pour le modpack joueur
 # ----------------------------------------------------------------
 function Format-UrlPath($relativePath, $encode) {
     if ($encode) { return ConvertTo-UrlPath $relativePath }
     return $relativePath
 }
 
-function Build-Modules($root, $urlPrefix, $encodeUrls, $fabricCore, $previousCount) {
+function Build-Modules($root, $urlPrefix, $encodeUrls, $fabricCore, $previousCount, $allowNoMods = $false) {
     $modules = [System.Collections.Generic.List[object]]::new()
 
 
@@ -320,7 +321,7 @@ function Build-Modules($root, $urlPrefix, $encodeUrls, $fabricCore, $previousCou
     # GARDE-FOU : refuse de publier un modpack vide ou ampute
     # ----------------------------------------------------------------
     $ratio = [double]$config.safety.minModuleRatio
-    if ($modCount -eq 0) {
+    if ($modCount -eq 0 -and -not $allowNoMods) {
         Write-Host "  ERREUR : 0 mod trouve. Rien n'a ete publie." -ForegroundColor Red
         exit 1
     }
@@ -416,7 +417,7 @@ if (Test-Path $adminServerFile) {
     $prevAdminCount = if ($prevAdmin) { @($prevAdmin.modules).Count } else { 0 }
     $adminFabric = if ($adminSrv.fabricCore -and $adminSrv.fabricCore -ne "same") { $adminSrv.fabricCore } else { $config.fabricCore }
 
-    $adminModules = Build-Modules $adminServerRoot "servers/$($adminSrv.id)" $false $adminFabric $prevAdminCount
+    $adminModules = Build-Modules $adminServerRoot "servers/$($adminSrv.id)" $false $adminFabric $prevAdminCount $true
 
     # Version du modpack admin : +1 (patch) automatiquement quand son contenu change
     $signature = { param($mods) (@($mods) | ForEach-Object { "$($_.artifact.url)|$($_.artifact.MD5)" } | Sort-Object) -join "`n" }

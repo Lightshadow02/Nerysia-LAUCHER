@@ -316,11 +316,12 @@ def build_file_entry(hasher, relative_path, size, modify,
     }
 
 
-def check_sanity(distribution: dict, previous: dict, force: bool) -> None:
-    """Refuse de publier un modpack vide ou qui a perdu une grosse partie de ses modules."""
+def check_sanity(distribution: dict, previous: dict, force: bool, allow_no_mods: bool = False) -> None:
+    """Refuse de publier un modpack vide ou qui a perdu une grosse partie de ses modules.
+    allow_no_mods : modpack admin pas encore rempli (jamais pour le modpack joueur)."""
     modules = distribution["servers"][0]["modules"]
     mods = [m for m in modules if m["type"] == "FabricMod"]
-    if not mods:
+    if not mods and not allow_no_mods:
         raise SystemExit("ERROR: 0 mod trouve. Rien n'a ete publie.")
     prev_modules = (previous.get("servers") or [{}])[0].get("modules", [])
     if prev_modules and len(modules) < len(prev_modules) * MIN_MODULE_RATIO:
@@ -500,7 +501,7 @@ def generate_admin(ftp, force) -> None:
             "modules": modules,
         }],
     }
-    check_sanity(distribution, previous, force)
+    check_sanity(distribution, previous, force, allow_no_mods=True)
     ADMIN_BUILD_DIR.mkdir(parents=True, exist_ok=True)
     (ADMIN_BUILD_DIR / "distribution-admin.json").write_text(json.dumps(distribution, indent=4, ensure_ascii=False), encoding="utf-8")
     (ADMIN_BUILD_DIR / "md5-cache-admin.json").write_text(json.dumps(hasher.new_cache, indent=1, sort_keys=True), encoding="utf-8")
@@ -576,7 +577,16 @@ def main():
     MD5_CACHE_FILE.write_text(json.dumps(hasher.new_cache, indent=1, sort_keys=True), encoding="utf-8")
     print(f"Cache MD5 ecrit : {MD5_CACHE_FILE}")
 
-    generate_admin(ftp, args.force)
+    try:
+        generate_admin(ftp, args.force)
+    except SystemExit as e:
+        for old in ADMIN_BUILD_DIR.glob("*.json"):
+            old.unlink()  # rien de l'admin ne sera publie (l'ancienne version reste en ligne)
+        print(f"::warning::Modpack admin NON publie (le modpack joueur l'est quand meme) : {e}")
+    except Exception as e:  # erreur FTP... : message masque (il pourrait contenir un chemin admin)
+        for old in ADMIN_BUILD_DIR.glob("*.json"):
+            old.unlink()
+        print(f"::warning::Modpack admin NON publie (erreur {type(e).__name__}, details masques)")
 
     try:
         if not args.no_upload:
