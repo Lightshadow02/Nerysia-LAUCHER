@@ -60,6 +60,8 @@ Le drive `Y:` doit être monté.
    }
    ```
    `fabricCore: "same"` = même version de Fabric que le modpack joueur.
+   Pour une **autre version de Fabric** (ex : un mod admin exige un loader plus récent), `fabricCore` contient un bloc Fabric complet (même format que `fabricCore` dans `tools/distribution-config.json`), avec les fichiers hébergés dans `Y:pk
+erysia-laucherepo\` (fichiers Fabric publics). Demande à Claude : « mets le Fabric X.Y.Z sur l'instance admin ».
 3. Ajoute les admins par pseudo (le script récupère l'UUID chez Mojang) :
    ```powershell
    & "tools/admin.ps1" add PseudoAdmin1
