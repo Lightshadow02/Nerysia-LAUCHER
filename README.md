@@ -197,7 +197,7 @@ servers/Nerysia-1.21.1/
 
 | Méthode | Comment |
 |---|---|
-| Depuis GitHub | Onglet **Actions** → **Update Modpack** → **Run workflow** (choisir `patch` / `minor` / `major`) |
+| Depuis GitHub | Onglet **Actions** → **Update Modpack** → **Run workflow** (choisir la cible `tout` / `joueur` / `admin` et le bump `patch` / `minor` / `major`) |
 | En local (drive FTP monté sur `Y:`) | `& "tools/generate-distribution.ps1" -Bump patch` |
 
 Les scripts vérifient avant de publier :

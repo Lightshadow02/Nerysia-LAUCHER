@@ -366,17 +366,21 @@ def check_dependencies(mod_metas: list, force: bool, quiet: bool = False) -> Non
         raise SystemExit(f"ERROR: {msg} Rien n'a ete publie (--force pour ignorer).")
 
 
-def upload(ftp) -> None:
-    # Re-valide le JSON local avant de l'envoyer
-    data = json.loads(OUTPUT_FILE.read_text(encoding="utf-8"))
-    if not data["servers"][0]["modules"]:
-        raise SystemExit("ERROR: distribution.json local sans modules, upload annule.")
-    print("Upload distribution.json sur le FTP...")
-    ftp_upload_atomic(ftp, OUTPUT_FILE, DIST_REMOTE)
-    print(f"  Upload OK : {DIST_REMOTE}")
+def upload(ftp, target="tout") -> None:
+    """target : 'tout' (joueur + admin), 'joueur' ou 'admin'."""
+    if target != "admin":
+        # Re-valide le JSON local avant de l'envoyer
+        data = json.loads(OUTPUT_FILE.read_text(encoding="utf-8"))
+        if not data["servers"][0]["modules"]:
+            raise SystemExit("ERROR: distribution.json local sans modules, upload annule.")
+        print("Upload distribution.json sur le FTP...")
+        ftp_upload_atomic(ftp, OUTPUT_FILE, DIST_REMOTE)
+        print(f"  Upload OK : {DIST_REMOTE}")
 
     admin_dist = ADMIN_BUILD_DIR / "distribution-admin.json"
-    if admin_dist.exists():
+    if target == "admin" and not admin_dist.exists():
+        raise SystemExit("ERROR: aucun modpack admin genere, rien a publier.")
+    if target != "joueur" and admin_dist.exists():
         print("Upload du modpack admin (dossier prive)...")
         ftp_upload_atomic(ftp, admin_dist, f"{ADMIN_FTP_ROOT}/distribution-admin.json")
         ftp_upload_atomic(ftp, ADMIN_BUILD_DIR / "md5-cache-admin.json", f"{ADMIN_FTP_ROOT}/md5-cache-admin.json")
@@ -457,13 +461,15 @@ def modules_signature(modules: list) -> str:
     return "\n".join(sorted(f"{m['artifact']['url']}|{m['artifact']['MD5']}" for m in modules))
 
 
-def generate_admin(ftp, force) -> None:
+def generate_admin(ftp, force, required=False) -> None:
     """Modpack ADMIN secret : genere dans tools/.admin-build/ (jamais commite), publie par upload()."""
     # Jamais republier un ancien build admin par erreur
     for old in ADMIN_BUILD_DIR.glob("*.json"):
         old.unlink()
     server = ftp_read_json(ftp, f"{ADMIN_FTP_ROOT}/admin-server.json")
     if server is None:
+        if required:
+            raise SystemExit("ERROR: instance admin non configuree sur le FTP (admin-server.json introuvable).")
         print("Instance admin : non configuree sur le FTP, ignoree.")
         return
     print()
@@ -518,14 +524,20 @@ def main():
     parser.add_argument("--no-upload", action="store_true", help="Generate locally but do not upload to FTP")
     parser.add_argument("--upload-only", action="store_true", help="Only upload the existing docs/distribution.json")
     parser.add_argument("--force", action="store_true", help="Ignore la garde anti-scan-vide")
+    parser.add_argument("--target", choices=["tout", "joueur", "admin"], default="tout",
+                        help="Modpack(s) a mettre a jour : tout (defaut), joueur seulement, admin seulement")
     args = parser.parse_args()
 
     if args.upload_only:
         ftp = ftp_connect()
         try:
-            upload(ftp)
+            upload(ftp, args.target)
         finally:
             ftp.close()
+        return
+
+    if args.target == "admin":
+        main_admin_only(args)
         return
 
     previous = load_existing_distribution()
@@ -577,8 +589,36 @@ def main():
     MD5_CACHE_FILE.write_text(json.dumps(hasher.new_cache, indent=1, sort_keys=True), encoding="utf-8")
     print(f"Cache MD5 ecrit : {MD5_CACHE_FILE}")
 
+    if args.target == "joueur":
+        clear_admin_build()  # modpack admin non touche : rien d'ancien ne doit etre republie
+        print()
+        print("Modpack admin : non touche (cible = joueur).")
+    else:
+        try_generate_admin(ftp, args.force)
+
     try:
-        generate_admin(ftp, args.force)
+        if not args.no_upload:
+            print()
+            upload(ftp, args.target)
+    finally:
+        ftp.close()
+
+    print()
+    print("=== TERMINE ===")
+    print(f"Version modpack: {new_version}")
+    print(f"Total modules  : {len(modules)}")
+    print_cache_stats(hasher)
+
+
+def clear_admin_build() -> None:
+    for old in ADMIN_BUILD_DIR.glob("*.json"):
+        old.unlink()
+
+
+def try_generate_admin(ftp, force) -> None:
+    """Modpack admin en complement du joueur : une erreur ne bloque pas le modpack joueur."""
+    try:
+        generate_admin(ftp, force)
     except SystemExit as e:
         for old in ADMIN_BUILD_DIR.glob("*.json"):
             old.unlink()  # rien de l'admin ne sera publie (l'ancienne version reste en ligne)
@@ -588,18 +628,27 @@ def main():
             old.unlink()
         print(f"::warning::Modpack admin NON publie (erreur {type(e).__name__}, details masques)")
 
+
+def main_admin_only(args) -> None:
+    """Met a jour UNIQUEMENT le modpack admin : distribution.json joueur et sa version intacts."""
+    print("Cible : modpack ADMIN seulement (le modpack joueur n'est pas touche)")
+    ftp = ftp_connect()
     try:
+        try:
+            generate_admin(ftp, args.force, required=True)
+        except SystemExit:
+            clear_admin_build()
+            raise
+        except Exception as e:  # message masque (il pourrait contenir un chemin admin)
+            clear_admin_build()
+            raise SystemExit(f"ERROR: modpack admin NON publie (erreur {type(e).__name__}, details masques)")
         if not args.no_upload:
             print()
-            upload(ftp)
+            upload(ftp, "admin")
     finally:
         ftp.close()
-
     print()
     print("=== TERMINE ===")
-    print(f"Version modpack: {new_version}")
-    print(f"Total modules  : {len(modules)}")
-    print_cache_stats(hasher)
 
 
 def print_cache_stats(hasher) -> None:

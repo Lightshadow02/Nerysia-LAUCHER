@@ -83,7 +83,15 @@ Les **mêmes commandes** que pour le modpack joueur publient les deux modpacks d
 | Méthode | Commande |
 |---|---|
 | En local (`Y:` monté) | `& "tools/generate-distribution.ps1" -Bump patch` |
-| Depuis GitHub | Actions → **Update Modpack** → Run workflow |
+| Depuis GitHub | Actions → **Update Modpack** → Run workflow → champ **cible** |
+
+Sur GitHub, le champ **cible** choisit ce qui est mis à jour :
+
+| Cible | Effet |
+|---|---|
+| `tout` (défaut) | Modpack joueur (avec le bump choisi) **+** modpack admin |
+| `joueur` | Modpack joueur seulement, l'admin n'est pas touché |
+| `admin` | Modpack admin seulement : le modpack joueur et sa version **ne bougent pas** (le bump est ignoré) |
 
 - La version du modpack admin augmente **toute seule** (+0.0.1) dès que son contenu change.
 - Les mêmes contrôles s'appliquent (dépendances, dossiers inconnus, chute du nombre de modules).
