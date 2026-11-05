@@ -10,6 +10,7 @@ const AuthManager   = require('./assets/js/authmanager')
 const ConfigManager = require('./assets/js/configmanager')
 const { DistroAPI } = require('./assets/js/distromanager')
 const AdminAccess   = require('./assets/js/adminaccess')
+const SkinUtil      = require('./assets/js/skinutil')
 
 let rscShouldLoad = false
 let fatalStartupError = false

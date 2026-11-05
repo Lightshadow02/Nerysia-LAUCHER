@@ -640,7 +640,7 @@ function populateAuthAccounts(){
 
         const accHtml = `<div class="settingsAuthAccount" uuid="${acc.uuid}">
             <div class="settingsAuthAccountLeft">
-                <img class="settingsAuthAccountImage" alt="${acc.displayName}" src="https://mc-heads.net/body/${acc.uuid}/60">
+                <img class="settingsAuthAccountImage" alt="${acc.displayName}" data-skin="${acc.uuid}">
             </div>
             <div class="settingsAuthAccountRight">
                 <div class="settingsAuthAccountDetails">
@@ -672,6 +672,7 @@ function populateAuthAccounts(){
 
     settingsCurrentMicrosoftAccounts.innerHTML = microsoftAuthAccountStr
     settingsCurrentMojangAccounts.innerHTML = mojangAuthAccountStr
+    document.querySelectorAll('.settingsAuthAccountImage[data-skin]').forEach(img => SkinUtil.applySkin(img, img.getAttribute('data-skin'), 'body', 60))
 }
 
 /**
@@ -935,6 +936,9 @@ let CACHE_DROPIN_MODS
  */
 async function resolveDropinModsForUI(){
     const serv = (await DistroAPI.getDistribution()).getServerById(ConfigManager.getSelectedServer())
+    // Anti-triche : pas d'ajout de mods perso sur les instances joueurs (cf launchguard.js),
+    // seulement sur l'instance admin.
+    document.getElementById('settingsDropinModsContainer').style.display = AdminAccess.isAdminServer(serv.rawServer) ? '' : 'none'
     CACHE_SETTINGS_MODS_DIR = path.join(ConfigManager.getInstanceDirectory(), serv.rawServer.id, 'mods')
     CACHE_DROPIN_MODS = DropinModUtil.scanForDropinMods(CACHE_SETTINGS_MODS_DIR, serv.rawServer.minecraftVersion)
 
