@@ -857,7 +857,7 @@ async function initNews(){
         const lN = newsArr[0]
         const cached = ConfigManager.getNewsCache()
         let newHash = await digestMessage(lN.content)
-        let newDate = new Date(lN.date)
+        let newDate = new Date(lN.timestamp)
         let isNew = false
 
         if(cached.date != null && cached.content != null){
@@ -903,6 +903,7 @@ async function initNews(){
 
         document.getElementById('newsNavigateRight').onclick = () => { switchHandler(true) }
         document.getElementById('newsNavigateLeft').onclick = () => { switchHandler(false) }
+        renderNewsList()
         await $('#newsErrorContainer').fadeOut(250).promise()
         displayArticle(newsArr[0], 1)
         await $('#newsContent').fadeIn(250).promise()
@@ -944,10 +945,17 @@ document.addEventListener('keydown', (e) => {
 function displayArticle(articleObject, index){
     newsArticleTitle.innerHTML = articleObject.title
     newsArticleTitle.href = articleObject.link
-    newsArticleAuthor.innerHTML = 'by ' + articleObject.author
+    newsArticleAuthor.innerHTML = articleObject.author ? 'par ' + articleObject.author : ''
+    newsArticleAuthor.style.display = articleObject.author ? '' : 'none'
     newsArticleDate.innerHTML = articleObject.date
     newsArticleComments.innerHTML = articleObject.comments
     newsArticleComments.href = articleObject.commentsLink
+    newsArticleContentScrollable.scrollTop = 0
+    newsContent.removeAttribute('scrolled')
+    for(const item of document.querySelectorAll('.newsListItem')){
+        if(Number(item.getAttribute('article')) === index - 1) item.setAttribute('selected', '')
+        else item.removeAttribute('selected')
+    }
     newsArticleContentScrollable.innerHTML = '<div id="newsArticleContentWrapper"><div class="newsArticleSpacerTop"></div>' + articleObject.content + '<div class="newsArticleSpacerBot"></div></div>'
     Array.from(newsArticleContentScrollable.getElementsByClassName('bbCodeSpoilerButton')).forEach(v => {
         v.onclick = () => {
@@ -957,6 +965,28 @@ function displayArticle(articleObject, index){
     })
     newsNavigationStatus.innerHTML = Lang.query('ejs.landing.newsNavigationStatus', {currentPage: index, totalPages: newsArr.length})
     newsContent.setAttribute('article', index-1)
+}
+
+/**
+ * Liste des articles (colonne de gauche des news) : titre + date, cliquable.
+ */
+function renderNewsList(){
+    const list = document.getElementById('newsList')
+    list.innerHTML = ''
+    newsArr.forEach((article, i) => {
+        const item = document.createElement('button')
+        item.className = 'newsListItem'
+        item.setAttribute('article', i)
+        const title = document.createElement('span')
+        title.className = 'newsListItemTitle'
+        title.textContent = article.title
+        const date = document.createElement('span')
+        date.className = 'newsListItemDate'
+        date.textContent = article.date
+        item.append(title, date)
+        item.onclick = () => displayArticle(newsArr[i], i + 1)
+        list.appendChild(item)
+    })
 }
 
 /**
@@ -986,7 +1016,9 @@ async function loadNews(){
                     const el = $(items[i])
 
                     // Resolve date.
-                    const date = new Date(el.find('pubDate').text()).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric'})
+                    // date : affichee en francais ; timestamp : pour la detection "nouvel article" (initNews)
+                    const timestamp = new Date(el.find('pubDate').text()).getTime()
+                    const date = new Date(timestamp).toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', year: 'numeric'})
 
                     // Resolve comments.
                     let comments = el.find('slash\\:comments').text() || '0'
@@ -1010,6 +1042,7 @@ async function loadNews(){
                             link,
                             title,
                             date,
+                            timestamp,
                             author,
                             content,
                             comments,
