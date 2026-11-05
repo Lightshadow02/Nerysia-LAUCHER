@@ -24,7 +24,12 @@ const log = LoggerUtil.getLogger('AdminAccess')
 
 const ADMIN_API = 'https://apk.nerysia.fr/nerysia-laucher/admin/api.php'
 const MOJANG_JOIN = 'https://sessionserver.mojang.com/session/minecraft/join'
-const TIMEOUT = { request: 10000 }
+// Court : ces requetes retardent l'affichage de la distribution (demarrage, clic sur Jouer)
+const TIMEOUT = { request: 4000 }
+// Resultat reutilise pendant 1 h : evite de redemander a chaque clic sur Jouer
+// (les liens de telechargement admin restent valables 24 h)
+const CACHE_MS = 3600000
+const cache = new Map() // uuid -> { at, server (null = pas admin) }
 
 // Marque l'instance injectee : uuid du compte admin pour qui elle a ete recuperee.
 const ADMIN_FLAG = 'nerysiaAdminFor'
@@ -59,6 +64,15 @@ async function fetchAdminServer(){
     }
     const uuid = normalizeUuid(account.uuid)
 
+    const cached = cache.get(uuid)
+    if(cached != null && Date.now() - cached.at < CACHE_MS){
+        return cached.server == null ? null : JSON.parse(JSON.stringify(cached.server))
+    }
+    const remember = (server) => {
+        cache.set(uuid, { at: Date.now(), server })
+        return server == null ? null : JSON.parse(JSON.stringify(server))
+    }
+
     try {
         // 1. Ce compte est-il admin ? (404 pour tous les joueurs normaux : une seule petite requete)
         const challenge = await got.get(ADMIN_API, {
@@ -67,6 +81,9 @@ async function fetchAdminServer(){
             throwHttpErrors: false,
             responseType: 'json'
         })
+        if(challenge.statusCode === 404){
+            return remember(null) // joueur normal : on ne redemande pas avant 1 h
+        }
         if(challenge.statusCode !== 200){
             return null
         }
@@ -104,7 +121,7 @@ async function fetchAdminServer(){
         const server = res.body.server
         server[ADMIN_FLAG] = uuid
         log.info(`Instance admin chargee : ${server.name}`)
-        return server
+        return remember(server)
     } catch(err) {
         log.warn('Instance admin indisponible :', err.message)
         return null

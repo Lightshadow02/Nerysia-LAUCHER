@@ -63,9 +63,13 @@ function resolveSelectedRAM(ram) {
     if(ram?.recommended != null) {
         return `${ram.recommended}M`
     } else {
-        // Legacy behavior
-        const mem = os.totalmem()
-        return mem >= (8*1073741824) ? '4G' : (mem >= (6*1073741824) ? '3G' : '2G')
+        // RAM par defaut d'un nouveau joueur, selon la memoire du PC (modpack ~120 mods + Cobblemon :
+        // 4G est juste). Ne touche pas les joueurs existants (cf ensureJavaConfig).
+        const gb = os.totalmem() / 1073741824
+        if(gb >= 15.5) return '6G'
+        if(gb >= 11.5) return '5G'
+        if(gb >= 7.5) return '4G'
+        return gb >= 5.5 ? '3G' : '2G'
     }
 }
 
