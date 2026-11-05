@@ -23,6 +23,7 @@
     "url": "git+https://github.com/Lightshadow02/Nerysia-LAUCHER.git"
   },
   "scripts": {
+    "postinstall": "patch-package",
     "start": "electron .",
     "dist": "electron-builder build",
     "dist:win": "npm run dist -- -w",
@@ -50,6 +51,7 @@
   "devDependencies": {
     "electron": "^39.0.0",
     "electron-builder": "^25.1.8",
-    "eslint": "^8.57.1"
+    "eslint": "^8.57.1",
+    "patch-package": "^8.0.1"
   }
 }

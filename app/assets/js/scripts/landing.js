@@ -487,7 +487,11 @@ async function dlAsync(login = true) {
         DistroAPI.isDevMode()
     )
 
-    fullRepairModule.spawnReceiver()
+    // Cache des empreintes (patches/helios-core+2.2.4.patch) : un fichier dont la taille et la
+    // date n'ont pas change depuis sa derniere verification n'est pas relu (~680 Mo par lancement avant).
+    fullRepairModule.spawnReceiver({
+        NERYSIA_HASH_CACHE: path.join(ConfigManager.getLauncherDirectory(), 'hash-cache.json')
+    })
 
     fullRepairModule.childProcess.on('error', (err) => {
         loggerLaunchSuite.error('Error during launch', err)

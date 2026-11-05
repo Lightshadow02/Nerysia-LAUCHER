@@ -36,10 +36,7 @@
             { "dir": "builder",     "label": "[BLD]", "color": "Yellow",   "preset": "builder", "required": { "value": false, "def": false }, "loadedWith": ["required", "builder"] }
         ]
     },
-    "excludedMods": [
-        "Cobblemon-fabric-1.6.1+1.21.1.jar",
-        "fabric-api-0.116.7+1.21.1.jar"
-    ],
+    "excludedMods": [],
     "excludePatterns": {
         "_comment": "Regex (insensible a la casse) testees sur le chemin relatif dans files/ avec des /",
         "donnees perso joueur": [
