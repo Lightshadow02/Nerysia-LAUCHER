@@ -10,3 +10,6 @@ __pycache__/
 
 # Modpack admin genere en local (-NoUpload) : JAMAIS dans git (repo public)
 /tools/.admin-build/
+
+# Photos sources des fonds d ecran (lourdes) : seules les versions optimisees de app/assets/images/backgrounds/ sont versionnees
+/photos launcher/

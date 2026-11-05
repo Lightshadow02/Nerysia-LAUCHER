@@ -13,6 +13,28 @@
             background-size: cover;
             -webkit-user-select: none;
         }
+        /* Fonds d'ecran en diaporama (cf startBackgroundSlideshow dans uibinder.js) */
+        .bgLayer {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 2s ease;
+            animation: bgZoom 45s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+        .bgLayer[shown] {
+            opacity: 1;
+        }
+        @keyframes bgZoom {
+            from { transform: scale(1); }
+            to { transform: scale(1.06); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .bgLayer { animation: none; transition: none; }
+        }
         #main {
             display: none;
             height: calc(100% - 22px);
@@ -27,6 +49,8 @@
     </style>
 </head>
 <body bkid="<%=bkid%>">
+    <div class="bgLayer" id="bgLayerA"></div>
+    <div class="bgLayer" id="bgLayerB"></div>
     <%- include('frame') %>
     <div id="main">
         <%- include('welcome') %>

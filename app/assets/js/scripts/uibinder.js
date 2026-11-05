@@ -74,7 +74,7 @@ async function showMainUI(data){
     refreshServerStatus()
     setTimeout(() => {
         document.getElementById('frameBar').style.backgroundColor = 'rgba(0, 0, 0, 0.5)'
-        document.body.style.backgroundImage = `url('assets/images/backgrounds/${document.body.getAttribute('bkid')}')`
+        startBackgroundSlideshow(document.body.getAttribute('bkid'))
         $('#main').show()
 
         const isLoggedIn = Object.keys(ConfigManager.getAuthAccounts()).length > 0
@@ -143,6 +143,57 @@ function onDistroRefresh(data){
     initNews()
     syncModConfigurations(data)
     ensureJavaSettings(data)
+}
+
+/**
+ * Diaporama des fonds d'ecran : fondu entre deux calques (#bgLayerA / #bgLayerB) toutes les
+ * BG_INTERVAL ms. Le theme (clair 7h-19h, sombre sinon) est reevalue a chaque image, comme
+ * pickBackground() dans index.js qui choisit la premiere.
+ */
+const BG_INTERVAL = 45000
+
+function startBackgroundSlideshow(first){
+    const fs = require('fs')
+    const layers = [document.getElementById('bgLayerA'), document.getElementById('bgLayerB')]
+    let current = 0
+    let shown = first
+
+    const show = (bkid) => {
+        const img = new Image()
+        img.onload = () => {
+            current = 1 - current
+            layers[current].style.backgroundImage = `url('assets/images/backgrounds/${bkid}')`
+            layers[current].setAttribute('shown', '')
+            layers[1 - current].removeAttribute('shown')
+            shown = bkid
+        }
+        img.src = `assets/images/backgrounds/${bkid}`
+    }
+
+    const next = () => {
+        if(document.hidden) return // launcher reduit ou jeu lance : inutile de changer
+        const hour = new Date().getHours()
+        const theme = (hour >= 7 && hour < 19) ? 'clair' : 'sombre'
+        let files = []
+        try {
+            // Dossier calcule depuis l'URL de la page (fiable en dev comme dans l'app installee / asar)
+            const dir = require('url').fileURLToPath(new URL(`assets/images/backgrounds/${theme}/`, window.location.href))
+            files = fs.readdirSync(dir)
+                .filter(f => /\.(jpe?g|png|webp)$/i.test(f))
+                .map(f => `${theme}/${f}`)
+                .filter(f => f !== shown)
+        } catch(err) {
+            return
+        }
+        if(files.length > 0){
+            show(files[Math.floor(Math.random() * files.length)])
+        }
+    }
+
+    if(first){
+        show(first)
+    }
+    setInterval(next, BG_INTERVAL)
 }
 
 /**
