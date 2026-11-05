@@ -1,0 +1,3 @@
+# Rustines patch-package : toujours en LF (helios-core dans node_modules est en LF ;
+# une rustine convertie en CRLF par git sous Windows ne s applique plus -> build Windows casse)
+*.patch text eol=lf
