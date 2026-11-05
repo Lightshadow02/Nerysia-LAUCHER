@@ -5,8 +5,16 @@ name: Update Modpack
 on:
   workflow_dispatch:
     inputs:
+      cible:
+        description: 'Modpack a mettre a jour : tout (joueur + admin), joueur seulement, ou admin seulement'
+        type: choice
+        options:
+          - tout
+          - joueur
+          - admin
+        default: tout
       bump:
-        description: 'Type de bump version (default: minor)'
+        description: 'Bump de la version du modpack JOUEUR (ignore si cible = admin : la version admin monte toute seule)'
         type: choice
         options:
           - minor
@@ -56,11 +64,12 @@ jobs:
         run: |
           FORCE_FLAG=""
           if [ "${{ inputs.force }}" = "true" ]; then FORCE_FLAG="--force"; fi
-          python3 tools/generate-distribution-from-ftp.py --bump "${{ inputs.bump }}" --no-upload $FORCE_FLAG
+          python3 tools/generate-distribution-from-ftp.py --target "${{ inputs.cible }}" --bump "${{ inputs.bump }}" --no-upload $FORCE_FLAG
 
       # 2. Commit + push. Si le push echoue (quelqu'un a commite entre-temps),
       #    le job s'arrete ici et RIEN n'est publie sur le FTP -> pas de desync.
       - name: Commit and push distribution.json
+        if: inputs.cible != 'admin'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -77,14 +86,21 @@ jobs:
 
       # 3. Publication sur le FTP (upload .tmp + renommage)
       - name: Upload distribution.json to FTP
-        run: python3 tools/generate-distribution-from-ftp.py --upload-only
+        run: python3 tools/generate-distribution-from-ftp.py --upload-only --target "${{ inputs.cible }}"
 
       - name: Summary
         run: |
+          echo "## Modpack regenere :rocket: (cible : \`${{ inputs.cible }}\`)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          # Modpack admin : seulement "publie / non publie" (logs publics, aucun detail)
+          if [ "${{ inputs.cible }}" != "joueur" ]; then
+            if [ -f tools/.admin-build/distribution-admin.json ]; then ADMIN="publie"; else ADMIN="NON publie (voir les avertissements)"; fi
+            echo "**Modpack admin :** ${ADMIN}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ inputs.cible }}" = "admin" ]; then exit 0; fi
           VERSION=$(python3 -c "import json; print(json.load(open('docs/distribution.json'))['servers'][0]['version'])")
           COUNT=$(python3 -c "import json; print(len(json.load(open('docs/distribution.json'))['servers'][0]['modules']))")
-          echo "## Modpack regenere :rocket:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Champ | Valeur |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
           echo "| Version | \`${VERSION}\` |" >> $GITHUB_STEP_SUMMARY
