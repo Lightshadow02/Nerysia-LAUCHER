@@ -1,0 +1,81 @@
+diff --git a/node_modules/helios-core/dist/common/util/FileUtils.js b/node_modules/helios-core/dist/common/util/FileUtils.js
+--- a/node_modules/helios-core/dist/common/util/FileUtils.js
++++ b/node_modules/helios-core/dist/common/util/FileUtils.js
+@@ -31,13 +31,76 @@
+         input.on('close', () => resolve(hash.digest('hex')));
+     });
+ }
++// ---------------------------------------------------------------------------
++// Nerysia (patch-package) : cache des empreintes.
++// Avant, CHAQUE fichier (~680 Mo de mods + assets Minecraft) etait relu et hashe a
++// chaque lancement. Si la taille et la date de modification d'un fichier n'ont pas
++// change depuis une verification reussie avec la meme empreinte attendue, on ne le
++// relit pas. Actif seulement si le launcher fournit NERYSIA_HASH_CACHE (chemin du cache).
++// ---------------------------------------------------------------------------
++const HASH_CACHE_FILE = process.env.NERYSIA_HASH_CACHE;
++let hashCache = null;
++let hashCacheDirty = false;
++let hashCacheTimer = null;
++function loadHashCache() {
++    if (hashCache == null) {
++        try {
++            hashCache = JSON.parse((0, fs_extra_1.readFileSync)(HASH_CACHE_FILE, 'utf-8')) || {};
++        }
++        catch (err) {
++            hashCache = {};
++        }
++    }
++    return hashCache;
++}
++function saveHashCache() {
++    if (!HASH_CACHE_FILE || !hashCacheDirty) {
++        return;
++    }
++    try {
++        const tmp = HASH_CACHE_FILE + '.tmp';
++        (0, fs_extra_1.writeFileSync)(tmp, JSON.stringify(hashCache));
++        (0, fs_extra_1.renameSync)(tmp, HASH_CACHE_FILE);
++        hashCacheDirty = false;
++    }
++    catch (err) {
++        log.warn('Cache des empreintes non enregistre.', err);
++    }
++}
++function rememberHash(path, stat, algo, hash) {
++    loadHashCache()[path] = { s: stat.size, m: stat.mtimeMs, a: algo, h: hash };
++    hashCacheDirty = true;
++    if (hashCacheTimer == null) {
++        hashCacheTimer = setTimeout(() => { hashCacheTimer = null; saveHashCache(); }, 500);
++    }
++}
++if (HASH_CACHE_FILE) {
++    process.on('exit', saveHashCache);
++}
+ async function validateLocalFile(path, algo, hash) {
+     if (await (0, fs_extra_1.pathExists)(path)) {
+         if (hash == null) {
+             return true;
+         }
++        let stat = null;
++        if (HASH_CACHE_FILE) {
++            try {
++                stat = await (0, fs_extra_1.stat)(path);
++                const known = loadHashCache()[path];
++                if (known != null && known.s === stat.size && known.m === stat.mtimeMs && known.a === algo && known.h === hash) {
++                    return true;
++                }
++            }
++            catch (err) {
++                stat = null;
++            }
++        }
+         try {
+-            return (await calculateHash(path, algo)) === hash;
++            const valid = (await calculateHash(path, algo)) === hash;
++            if (valid && stat != null) {
++                rememberHash(path, stat, algo, hash);
++            }
++            return valid;
+         }
+         catch (err) {
+             log.error('Failed to calculate hash.', err);
