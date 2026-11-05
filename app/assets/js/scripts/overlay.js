@@ -305,11 +305,12 @@ function populateAccountListings(){
     let htmlString = ''
     for(let i=0; i<accounts.length; i++){
         htmlString += `<button class="accountListing" uuid="${accounts[i].uuid}" ${i===0 ? 'selected' : ''}>
-            <img src="https://mc-heads.net/head/${accounts[i].uuid}/40">
+            <img data-skin="${accounts[i].uuid}">
             <div class="accountListingName">${accounts[i].displayName}</div>
         </button>`
     }
     document.getElementById('accountSelectListScrollable').innerHTML = htmlString
+    document.querySelectorAll('#accountSelectListScrollable img[data-skin]').forEach(img => SkinUtil.applySkin(img, img.getAttribute('data-skin'), 'head', 40))
 
 }
 

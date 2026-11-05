@@ -9,6 +9,8 @@ const os                    = require('os')
 const path                  = require('path')
 
 const ConfigManager            = require('./configmanager')
+const AdminAccess              = require('./adminaccess')
+const LaunchGuard              = require('./launchguard')
 
 const logger = LoggerUtil.getLogger('ProcessBuilder')
 
@@ -46,6 +48,11 @@ class ProcessBuilder {
      */
     build(){
         fs.ensureDirSync(this.gameDir)
+        // Anti-triche (cf launchguard.js) : pas sur l'instance admin (les admins peuvent y tester des mods)
+        this.guarded = !AdminAccess.isAdminServer(this.server.rawServer)
+        if(this.guarded){
+            LaunchGuard.quarantineInstanceMods(this.gameDir)
+        }
         const tempNativePath = path.join(os.tmpdir(), ConfigManager.getTempNativeFolder(), crypto.pseudoRandomBytes(16).toString('hex'))
         process.throwDeprecation = true
         this.setupLiteLoader()
@@ -79,7 +86,8 @@ class ProcessBuilder {
 
         const child = child_process.spawn(ConfigManager.getJavaExecutable(this.server.rawServer.id), args, {
             cwd: this.gameDir,
-            detached: ConfigManager.getLaunchDetached()
+            detached: ConfigManager.getLaunchDetached(),
+            env: this.guarded ? LaunchGuard.cleanEnv(process.env) : process.env
         })
 
         if(ConfigManager.getLaunchDetached()){
@@ -108,6 +116,14 @@ class ProcessBuilder {
         })
 
         return child
+    }
+
+    /**
+     * Options JVM du joueur : filtrees + durcies sur les instances joueurs (cf launchguard.js).
+     */
+    userJvmOptions(){
+        const options = ConfigManager.getJVMOptions(this.server.rawServer.id)
+        return this.guarded ? LaunchGuard.sanitizeJvmOptions(options).concat(LaunchGuard.HARDENING_ARGS) : options
     }
 
     /**
@@ -377,7 +393,7 @@ class ProcessBuilder {
         }
         args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
         args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
-        args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+        args = args.concat(this.userJvmOptions())
         args.push('-Djava.library.path=' + tempNativePath)
 
         // Main Java Class
@@ -428,7 +444,7 @@ class ProcessBuilder {
         }
         args.push('-Xmx' + ConfigManager.getMaxRAM(this.server.rawServer.id))
         args.push('-Xms' + ConfigManager.getMinRAM(this.server.rawServer.id))
-        args = args.concat(ConfigManager.getJVMOptions(this.server.rawServer.id))
+        args = args.concat(this.userJvmOptions())
 
         // Main Java Class
         args.push(this.modManifest.mainClass)

@@ -1,14 +1,14 @@
 diff --git a/node_modules/helios-core/dist/common/util/FileUtils.js b/node_modules/helios-core/dist/common/util/FileUtils.js
 --- a/node_modules/helios-core/dist/common/util/FileUtils.js
 +++ b/node_modules/helios-core/dist/common/util/FileUtils.js
-@@ -31,13 +31,76 @@
+@@ -31,13 +31,79 @@
          input.on('close', () => resolve(hash.digest('hex')));
      });
  }
 +// ---------------------------------------------------------------------------
 +// Nerysia (patch-package) : cache des empreintes.
 +// Avant, CHAQUE fichier (~680 Mo de mods + assets Minecraft) etait relu et hashe a
-+// chaque lancement. Si la taille et la date de modification d'un fichier n'ont pas
++// chaque lancement. Si la taille et la date de modification d'un asset n'ont pas
 +// change depuis une verification reussie avec la meme empreinte attendue, on ne le
 +// relit pas. Actif seulement si le launcher fournit NERYSIA_HASH_CACHE (chemin du cache).
 +// ---------------------------------------------------------------------------
@@ -57,7 +57,10 @@ diff --git a/node_modules/helios-core/dist/common/util/FileUtils.js b/node_modul
              return true;
          }
 +        let stat = null;
-+        if (HASH_CACHE_FILE) {
++        // Anti-triche : cache UNIQUEMENT pour les assets Minecraft (sons, langues : des milliers de
++        // petits fichiers sans interet pour tricher). Mods, configs, librairies et jar du jeu
++        // (textures -> x-ray) restent integralement verifies a chaque lancement.
++        if (HASH_CACHE_FILE && /[\\/]assets[\\/]objects[\\/]/.test(path)) {
 +            try {
 +                stat = await (0, fs_extra_1.stat)(path);
 +                const known = loadHashCache()[path];

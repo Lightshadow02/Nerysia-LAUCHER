@@ -16,6 +16,7 @@ newsErrorRetryButton = "Réessayer"
 newsErrorNoneSpan = "Aucune actualité pour le moment"
 
 [ejs.settings]
+jvmOptsDesc = "Options avancées passées à Java (réglages de performance <em>-XX:…</em>). Par sécurité anti-triche, seules les options de performance sont prises en compte : <em>-javaagent</em>, <em>-D…</em> et assimilées sont ignorées. <em>-Xms</em> et <em>-Xmx</em> se règlent avec les curseurs ci-dessus."
 sourceGithubLink = "https://github.com/Lightshadow02/Nerysia-LAUCHER"
 supportLink = "https://github.com/Lightshadow02/Nerysia-LAUCHER/issues"
 presetTitle = "Préréglage de performance"
