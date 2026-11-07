@@ -428,6 +428,10 @@ if (Test-Path $adminServerFile) {
     } else {
         $adminVersion = $prevAdmin.version
     }
+    # "version" dans admin-server.json : version imposee si elle est plus haute (ex : 1.28.0)
+    if ($adminSrv.version -and ($null -eq $prevAdmin -or [version]$adminSrv.version -gt [version]$prevAdmin.version)) {
+        $adminVersion = $adminSrv.version
+    }
     Write-Host "Version modpack admin : $adminVersion" -ForegroundColor Magenta
 
     $adminDist = [ordered]@{

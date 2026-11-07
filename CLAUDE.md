@@ -131,4 +131,5 @@ npm run dist -- -w -p never
 - Audit du 2026-09-25 : configs serveur (DB, Redis, anti-triche, raids, crates, quêtes) retirées du modpack et déplacées dans `Y:\_backup_hors_web\` (mots de passe vérifiés vides par Hugo)
 - Build v1.0.3 : **publiée** sur GitHub Releases le 2026-09-26 (Win .exe + Linux AppImage + latest.yml → MAJ auto des joueurs en 1.0.2). v1.0.4 publiée le 2026-09-26 (presets de performance). v1.0.5 = 1re version Mac + .deb + .pacman (tag Helios existant → `--force`). Tags Helios existants jusqu'à v1.0.5 ; à partir de v1.0.6 plus besoin de `--force`
 - Mod DefaultOptions + `config/defaultoptions/options.txt` : ajoutés au modpack pour fixer le pb de GUI scale auto
+- Modpack **admin** passé en 1.28.0 le 2026-11-08 (pack de la réunion : Cobblemon 1.8.4, Fabric 0.20.1, paliers required/moyen/ultra + builder = litematica/worldedit). Le modpack **joueur** reste en 1.26.0 (Cobblemon 1.8.1, Fabric 0.19.2) : ne pas le toucher sans demande explicite de Hugo
 - Bug fix critique gardé : `decodeURI → decodeURIComponent` dans `index.js:155` (parsing OAuth code)

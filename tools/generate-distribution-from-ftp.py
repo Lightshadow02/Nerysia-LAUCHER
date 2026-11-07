@@ -491,6 +491,11 @@ def generate_admin(ftp, force, required=False) -> None:
         version = bump_version(prev_server.get("version", "1.0.0"), "patch")
     else:
         version = prev_server.get("version", "1.0.0")
+    # "version" dans admin-server.json : version imposee si elle est plus haute (ex : 1.28.0)
+    forced = server.get("version")
+    vt = lambda v: tuple(int(x) for x in str(v).split("."))
+    if forced and (prev_server is None or vt(forced) > vt(prev_server.get("version", "0.0.0"))):
+        version = forced
 
     distribution = {
         "version": "1.0.0",
