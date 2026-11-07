@@ -94,6 +94,7 @@ Sur GitHub, le champ **cible** choisit ce qui est mis à jour :
 | `admin` | Modpack admin seulement : le modpack joueur et sa version **ne bougent pas** (le bump est ignoré) |
 
 - La version du modpack admin augmente **toute seule** (+0.0.1) dès que son contenu change.
+- Pour imposer un numéro (ex : passer à `1.28.0`), ajouter `"version": "1.28.0"` dans `admin-server.json`. Il n'est utilisé que s'il est plus haut que la version en ligne ; ensuite le +0.0.1 automatique reprend (1.28.1, 1.28.2…).
 - Les mêmes contrôles s'appliquent (dépendances, dossiers inconnus, chute du nombre de modules).
 - Sur GitHub, les détails du modpack admin sont **masqués** dans les logs. En cas d'erreur de dépendance, lance le script local pour voir les noms.
 - Si `admin-server.json` n'existe pas, l'instance admin est simplement ignorée.
