@@ -104,9 +104,24 @@ ipcMain.handle(SHELL_OPCODE.TRASH_ITEM, async (event, ...args) => {
     }
 })
 
-// Disable hardware acceleration.
-// https://electronjs.org/docs/tutorial/offscreen-rendering
-app.disableHardwareAcceleration()
+// Carte graphique (acceleration materielle) : ACTIVEE.
+// Avant (heritage Helios 2018), tout etait dessine par le processeur : fluide en petite fenetre,
+// mais l'animation des actualites tombait a ~25 images/s en plein ecran.
+// Secours : si la carte graphique fait planter le launcher (vieux pilote...), on note le
+// probleme et on relance sans elle (comme avant). Fichier : <donnees du launcher>/no-gpu
+const NO_GPU_FLAG = path.join(app.getPath('userData'), 'no-gpu')
+if(fs.existsSync(NO_GPU_FLAG) || process.env.NERYSIA_NO_GPU === '1'){
+    app.disableHardwareAcceleration()
+} else {
+    let gpuCrashes = 0
+    app.on('child-process-gone', (event, details) => {
+        if(details.type === 'GPU' && details.reason !== 'clean-exit' && ++gpuCrashes >= 2){
+            try { fs.writeFileSync(NO_GPU_FLAG, `Carte graphique desactivee apres plantage (${details.reason}) le ${new Date().toISOString()}\n`) } catch(err) { /* tant pis */ }
+            app.relaunch()
+            app.exit(0)
+        }
+    })
+}
 
 
 const REDIRECT_URI_PREFIX = 'https://login.microsoftonline.com/common/oauth2/nativeclient?'
@@ -231,6 +246,9 @@ function createWindow() {
     win = new BrowserWindow({
         width: 980,
         height: 552,
+        // L'interface se zoome avec la fenetre (uicore.js) : en dessous des 3/4, texte illisible
+        minWidth: 735,
+        minHeight: 414,
         icon: getPlatformIcon('SealCircle'),
         frame: false,
         webPreferences: {

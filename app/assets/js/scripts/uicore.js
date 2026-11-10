@@ -36,6 +36,38 @@ remote.getCurrentWebContents().on('devtools-opened', () => {
 webFrame.setZoomLevel(0)
 webFrame.setVisualZoomLevelLimits(1, 1)
 
+/**
+ * Interface adaptative : tout le launcher est dessine pour une fenetre de 980 x 552.
+ * Quand on agrandit / reduit la fenetre, toute l'interface est zoomee (comme Ctrl +/-)
+ * pour garder exactement la meme mise en page, quelle que soit la taille de la fenetre.
+ */
+const UI_BASE_WIDTH = 980
+const UI_BASE_HEIGHT = 552
+const UI_ZOOM_MIN = 0.75
+const UI_ZOOM_MAX = 1.5 // plafond : au-dela, l'interface parait trop grosse en plein ecran
+// Fenetre agrandie : on zoome 0,5 de moins que "la fenetre entiere" (sinon tout parait trop gros).
+// Ex : plein ecran 2,5 -> 2,0. Taille normale (x1) inchangee, fenetre plus petite : zoom normal.
+const UI_ZOOM_OFFSET = 0.5
+let uiZoomFrame = null
+function fitUIZoomToWindow(){
+    // innerWidth est en pixels "CSS" (deja zoomes) : x zoom actuel = taille reelle de la fenetre
+    const zoom = webFrame.getZoomFactor()
+    const width = window.innerWidth * zoom
+    const height = window.innerHeight * zoom
+    const fit = Math.min(width / UI_BASE_WIDTH, height / UI_BASE_HEIGHT)
+    // jusqu'a x1,5 la page garde x1 (elle prend juste plus de place), au-dela : fit - 0,5
+    const wanted = fit < 1 ? fit : Math.max(1, fit - UI_ZOOM_OFFSET)
+    const target = Math.min(Math.max(wanted, UI_ZOOM_MIN), UI_ZOOM_MAX)
+    if(Math.abs(zoom - target) > 0.005){
+        webFrame.setZoomFactor(target)
+    }
+}
+window.addEventListener('resize', () => {
+    cancelAnimationFrame(uiZoomFrame)
+    uiZoomFrame = requestAnimationFrame(fitUIZoomToWindow)
+})
+fitUIZoomToWindow()
+
 // Initialize auto updates in production environments.
 let updateCheckListener
 if(!isDev){

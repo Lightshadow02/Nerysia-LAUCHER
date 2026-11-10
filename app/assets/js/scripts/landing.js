@@ -709,6 +709,9 @@ const nELoadSpan                    = document.getElementById('nELoadSpan')
 // News slide caches.
 let newsActive = false
 let newsGlideCount = 0
+// Duree du glissement des actualites : doit correspondre a --news-slide-time dans launcher.css
+const NEWS_SLIDE_MS = 1400
+let newsSlideEndTimer = null
 
 /**
  * Show the news UI via a slide animation.
@@ -726,36 +729,41 @@ function slide_(up){
 
     newsGlideCount++
 
+    // Fluidite : on deplace avec transform (calcule par la carte graphique) au lieu de "top"
+    // (toute la page recalculee a chaque image), et le flou des panneaux des actualites est
+    // coupe pendant le glissement (recalcule a chaque image = la grosse saccade).
+    newsContainer.setAttribute('sliding', '')
+    clearTimeout(newsSlideEndTimer)
+    newsSlideEndTimer = setTimeout(() => newsContainer.removeAttribute('sliding'), NEWS_SLIDE_MS)
+
     if(up){
-        lCUpper.style.top = '-200vh'
-        lCLLeft.style.top = '-200vh'
-        lCLCenter.style.top = '-200vh'
-        lCLRight.style.top = '-200vh'
-        newsBtn.style.top = '130vh'
-        newsContainer.style.top = '0px'
-        //date.toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric'})
-        //landingContainer.style.background = 'rgba(29, 29, 29, 0.55)'
-        landingContainer.style.background = 'rgba(0, 0, 0, 0.50)'
+        lCUpper.style.transform = 'translateY(-200vh)'
+        lCLLeft.style.transform = 'translateY(-200vh)'
+        lCLCenter.style.transform = 'translateY(-200vh)'
+        lCLRight.style.transform = 'translateY(-200vh)'
+        newsBtn.style.transform = 'translateY(calc(130vh - 42px))'
+        newsContainer.style.transform = 'translateY(0)'
+        landingContainer.setAttribute('news', '') // assombrit le fond (cf launcher.css)
         setTimeout(() => {
             if(newsGlideCount === 1){
                 lCLCenter.style.transition = 'none'
                 newsBtn.style.transition = 'none'
             }
             newsGlideCount--
-        }, 2000)
+        }, NEWS_SLIDE_MS)
     } else {
         setTimeout(() => {
             newsGlideCount--
-        }, 2000)
-        landingContainer.style.background = null
+        }, NEWS_SLIDE_MS)
+        landingContainer.removeAttribute('news')
         lCLCenter.style.transition = null
         newsBtn.style.transition = null
-        newsContainer.style.top = '100%'
-        lCUpper.style.top = '0px'
-        lCLLeft.style.top = '0px'
-        lCLCenter.style.top = '0px'
-        lCLRight.style.top = '0px'
-        newsBtn.style.top = '10px'
+        newsContainer.style.transform = null
+        lCUpper.style.transform = null
+        lCLLeft.style.transform = null
+        lCLCenter.style.transform = null
+        lCLRight.style.transform = null
+        newsBtn.style.transform = null
     }
 }
 
@@ -777,7 +785,47 @@ document.getElementById('newsButton').onclick = () => {
     }
     slide_(!newsActive)
     newsActive = !newsActive
+    updateNewsBackButton()
 }
+
+/**
+ * Actualites en plein ecran : la fleche de retour est cachee une fois le panneau en place,
+ * et reapparait quand la souris s'approche du haut de la fenetre.
+ */
+const NEWS_BACK_ZONE_PX = 90 // hauteur de la zone du haut qui fait reapparaitre la fleche
+let newsMouseNearTop = false
+let newsBackTimer = null
+
+function updateNewsBackButton(){
+    const landing = document.getElementById('landingContainer')
+    clearTimeout(newsBackTimer)
+    if(!newsActive){
+        landing.removeAttribute('newsbtnhidden')
+        return
+    }
+    // pendant le glissement, la fleche reste visible (elle monte avec le panneau)
+    newsBackTimer = setTimeout(() => {
+        landing.toggleAttribute('newsbtnhidden', newsActive && !newsMouseNearTop)
+    }, newsGlideCount > 0 ? NEWS_SLIDE_MS : 0)
+}
+
+document.addEventListener('mousemove', e => {
+    if(!newsActive) return
+    const near = e.clientY < NEWS_BACK_ZONE_PX
+    if(near !== newsMouseNearTop){
+        newsMouseNearTop = near
+        if(newsGlideCount === 0){
+            document.getElementById('landingContainer').toggleAttribute('newsbtnhidden', !near)
+        }
+    }
+})
+// La souris quitte la fenetre : on recache la fleche
+document.addEventListener('mouseleave', () => {
+    newsMouseNearTop = false
+    if(newsActive && newsGlideCount === 0){
+        document.getElementById('landingContainer').setAttribute('newsbtnhidden', '')
+    }
+})
 
 // Array to store article meta.
 let newsArr = null
@@ -968,6 +1016,11 @@ async function initNews(){
  */
 document.addEventListener('keydown', (e) => {
     if(newsActive){
+        // Echap : retour a la page principale (sauf si une fenetre par-dessus est ouverte)
+        if(e.key === 'Escape' && !isOverlayVisible() && getCurrentView() === VIEWS.landing){
+            document.getElementById('newsButton').click()
+            return
+        }
         if(e.key === 'ArrowRight' || e.key === 'ArrowLeft'){
             document.getElementById(e.key === 'ArrowRight' ? 'newsNavigateRight' : 'newsNavigateLeft').click()
         }
