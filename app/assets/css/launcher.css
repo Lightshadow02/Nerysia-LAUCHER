@@ -2500,14 +2500,31 @@ input:checked + .toggleSwitchSlider:before {
 #landingContainer {
     height: 100%;
     position: relative;
-    transition: background 2s ease;
     overflow-y: hidden;
+    /* Glissement des actualites (cf slide_ dans landing.js : NEWS_SLIDE_MS) */
+    --news-slide-time: 1.4s;
+    --news-slide-ease: cubic-bezier(0.65, 0, 0.35, 1);
+}
+/* Fond assombri quand les actualites sont ouvertes : calque dont on anime l'opacite
+   (bien plus leger que d'animer la couleur de fond de toute la page). */
+#landingContainer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.50);
+    opacity: 0;
+    transition: opacity var(--news-slide-time) var(--news-slide-ease);
+    pointer-events: none;
+}
+#landingContainer[news]::before {
+    opacity: 1;
 }
 
 /* Upper content container. */
 #landingContainer > #upper {
     position: relative;
-    transition: top 2s ease;
+    transition: transform var(--news-slide-time) var(--news-slide-ease);
+    will-change: transform;
     top: 0px;
     height: 77%;
     display: flex;
@@ -2532,7 +2549,7 @@ input:checked + .toggleSwitchSlider:before {
     pointer-events: none;
 }
 #nerysiaTitle {
-    height: 90px;
+    height: 115px; /* image recadree sans marges transparentes (nov. 2026) */
     width: auto;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));
 }
@@ -2550,7 +2567,8 @@ input:checked + .toggleSwitchSlider:before {
 }
 #landingContainer > #lower > #left {
     position: relative;
-    transition: top 2s ease;
+    transition: transform var(--news-slide-time) var(--news-slide-ease);
+    will-change: transform;
     top: 0px;
     height: 100%;
     width: 33%;
@@ -2566,7 +2584,8 @@ input:checked + .toggleSwitchSlider:before {
 }
 #landingContainer > #lower > #center {
     position: relative;
-    transition: top 2s ease;
+    transition: transform var(--news-slide-time) var(--news-slide-ease);
+    will-change: transform;
     top: 0px;
     height: 100%;
     width: 34%;
@@ -2576,12 +2595,14 @@ input:checked + .toggleSwitchSlider:before {
 #landingContainer > #lower > #center #content {
     position: relative;
     z-index: 500;
-    transition: top 2s ease;
+    transition: transform var(--news-slide-time) var(--news-slide-ease);
+    will-change: transform;
     top: 10px;
 }
 #landingContainer > #lower > #right {
     position: relative;
-    transition: top 2s ease;
+    transition: transform var(--news-slide-time) var(--news-slide-ease);
+    will-change: transform;
     top: 0px;
     height: 100%;
     width: 33%;
@@ -2597,10 +2618,12 @@ input:checked + .toggleSwitchSlider:before {
 /* Main container (glisse depuis le bas, cf slide_ dans landing.js). */
 #newsContainer {
     position: absolute;
-    top: 100%;
+    top: 0px;
+    transform: translateY(100%);
     height: 100%;
     width: 100%;
-    transition: top 2s ease;
+    transition: transform var(--news-slide-time) var(--news-slide-ease);
+    will-change: transform;
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -2608,11 +2631,11 @@ input:checked + .toggleSwitchSlider:before {
 
 /* Contenu : liste des articles a gauche + article a droite. */
 #newsContent {
-    height: 82vh;
+    height: 100%; /* plein ecran (nov. 2026) */
     width: 100%;
     display: flex;
     gap: 16px;
-    padding: 0px 28px 22px 28px;
+    padding: 16px 20px 18px 20px;
     box-sizing: border-box;
     -webkit-user-select: initial;
     position: relative;
@@ -2626,6 +2649,12 @@ input:checked + .toggleSwitchSlider:before {
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.35);
+}
+/* Pendant le glissement : pas de flou (recalcule a chaque image = saccades), fond plus opaque a la place. */
+#newsContainer[sliding] #newsSidebar,
+#newsContainer[sliding] #newsArticleContainer {
+    backdrop-filter: none;
+    background: rgba(12, 12, 16, 0.86);
 }
 
 /* Liste des articles. */
@@ -3392,6 +3421,27 @@ input:checked + .toggleSwitchSlider:before {
     border: none;
     cursor: pointer;
     outline: none;
+    border-radius: 10px;
+    transition: opacity 0.25s ease, background 0.25s ease;
+}
+/* Actualites ouvertes : la fleche de retour est cachee, elle reapparait quand la souris
+   s'approche du haut de la fenetre (cf landing.js). Echap fait aussi revenir. */
+/* Actualites ouvertes : juste la fleche, sans fond ni texte (ombre legere pour rester lisible). */
+#landingContainer[news] #newsButtonText {
+    display: none;
+}
+#landingContainer[news] #newsButtonSVG {
+    filter: drop-shadow(0px 0px 4px rgba(0, 0, 0, 0.9));
+}
+#landingContainer[newsbtnhidden] #newsButton {
+    opacity: 0;
+    pointer-events: none;
+}
+#newsButtonSVG {
+    transition: transform 0.3s ease;
+}
+#landingContainer[news] #newsButtonSVG {
+    transform: rotate(180deg); /* fleche vers le bas = revenir */
 }
 #newsButton:hover #newsButtonText,
 #newsButton:focus #newsButtonText {
@@ -3503,6 +3553,37 @@ input:checked + .toggleSwitchSlider:before {
     position: relative;
     top: 25px;
     display: none;
+}
+
+/* Barre du bas (statuts, actualites, Jouer) agrandie x1.2 et descendue d'environ 15 px.
+   zoom agrandit tout le bloc d'un coup (textes, icones, espacements).
+   Si on change le top du bloc du centre, changer aussi slide_() dans landing.js. */
+#landingContainer > #lower > #left #content {
+    zoom: 1.2;
+    top: 35px;
+    left: 42px;
+}
+#landingContainer > #lower > #center #content {
+    top: 22px;
+}
+/* Le deplacement (transform) cree un "calque" : sans z-index, le z-index 500 du bouton News
+   reste enferme dedans et le panneau des actualites passe PAR-DESSUS le bouton (fermeture impossible). */
+#landingContainer > #lower > #center {
+    z-index: 500;
+}
+#newsButton {
+    zoom: 1.2;
+}
+#landingContainer > #lower > #right #launch_content {
+    zoom: 1.2;
+    top: 35px;
+}
+/* La barre de progression du lancement garde sa taille (sinon elle deborde a droite). */
+#launch_details {
+    top: 42px;
+}
+#modpackUpdateStatus {
+    top: 80px;
 }
  
 /* Left side of launch details container, displays percentage and a divider. */
