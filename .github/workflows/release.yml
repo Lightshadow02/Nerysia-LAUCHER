@@ -2,9 +2,23 @@ name: Build & Release
 
 # Un seul tag vX.Y.Z pousse = build + publication automatique pour TOUTES les plateformes :
 #   Windows (.exe) / macOS Intel + Apple Silicon (.dmg) / Linux (.AppImage, .deb, .pacman pour Arch)
+#
+# Rattrapage (un systeme a echoue) : Actions -> Build & Release -> Run workflow,
+# avec le tag (ex : v1.0.7) et le systeme a refaire. Le code construit est celui du tag.
+# Attention : electron-builder n'ajoute des fichiers a une release publiee que pendant 2 h.
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag a reconstruire (ex : v1.0.7)"
+        required: true
+      systeme:
+        description: "Systeme a reconstruire"
+        type: choice
+        options: [mac, windows, linux, tout]
+        default: mac
 
 permissions:
   contents: write
@@ -14,11 +28,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        # macos-15 et pas macos-latest : en nov. 2026, macos-latest restait en attente
+        # 15 min puis etait annule (aucune machine attribuee).
+        os: ${{ fromJSON(
+          github.event_name != 'workflow_dispatch' && '["windows-latest","macos-15","ubuntu-latest"]' ||
+          inputs.systeme == 'mac' && '["macos-15"]' ||
+          inputs.systeme == 'windows' && '["windows-latest"]' ||
+          inputs.systeme == 'linux' && '["ubuntu-latest"]' ||
+          '["windows-latest","macos-15","ubuntu-latest"]') }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref }}
 
       # electron-builder publie avec la version de package.json, pas celle du tag.
       # On bloque si les deux ne correspondent pas (sinon on republie l'ancienne version).
@@ -26,8 +53,8 @@ jobs:
         shell: bash
         run: |
           PKG_VERSION=$(node -p "require('./package.json').version")
-          if [ "v${PKG_VERSION}" != "${GITHUB_REF_NAME}" ]; then
-            echo "::error::Le tag ${GITHUB_REF_NAME} ne correspond pas a package.json (v${PKG_VERSION}). Mets a jour la version dans package.json avant de tagger."
+          if [ "v${PKG_VERSION}" != "${RELEASE_TAG}" ]; then
+            echo "::error::Le tag ${RELEASE_TAG} ne correspond pas a package.json (v${PKG_VERSION}). Mets a jour la version dans package.json avant de tagger."
             exit 1
           fi
 
