@@ -31,6 +31,7 @@ const {
 const DiscordWrapper          = require('./assets/js/discordwrapper')
 const ProcessBuilder          = require('./assets/js/processbuilder')
 const ModpackUpdater          = require('./assets/js/modpackupdater')
+const GameInstances           = require('./assets/js/gameinstances')
 
 // Launch Elements
 const launch_content          = document.getElementById('launch_content')
@@ -99,8 +100,46 @@ function setLaunchEnabled(val){
     document.getElementById('launch_button').disabled = !val
 }
 
+/**
+ * Un Minecraft lance par le launcher est-il deja en train de demarrer / ouvert ?
+ * Si oui, on demande au joueur s'il veut vraiment en lancer un deuxieme.
+ *
+ * @returns {Promise<boolean>} Vrai si on peut lancer.
+ */
+function confirmIfGameRunning(){
+    const running = GameInstances.list()
+    if(running.length === 0){
+        return Promise.resolve(true)
+    }
+    const game = running[0]
+    const launching = game.state !== 'running'
+    const minutes = Math.max(1, Math.round((Date.now() - game.startedAt) / 60000))
+    const key = launching ? 'landing.alreadyRunning.launching' : 'landing.alreadyRunning.running'
+    return new Promise(resolve => {
+        setOverlayContent(
+            Lang.queryJS(key + 'Title'),
+            Lang.queryJS(key + 'Text', { name: game.name, minutes }),
+            Lang.queryJS('landing.alreadyRunning.confirm'),
+            Lang.queryJS('landing.alreadyRunning.cancel')
+        )
+        setOverlayHandler(() => {
+            toggleOverlay(false)
+            resolve(true)
+        })
+        setDismissHandler(() => {
+            toggleOverlay(false)
+            resolve(false)
+        })
+        toggleOverlay(true, true)
+    })
+}
+
 // Bind launch button
 document.getElementById('launch_button').addEventListener('click', async e => {
+    if(!(await confirmIfGameRunning())){
+        loggerLanding.info('Launch cancelled: a game is already running.')
+        return
+    }
     loggerLanding.info('Launching game..')
     try {
         const server = (await DistroAPI.getDistribution()).getServerById(ConfigManager.getSelectedServer())
@@ -446,7 +485,17 @@ let hasRPC = false
 // Change this if your server uses something different.
 const GAME_JOINED_REGEX = /\[.+\]: Sound engine started/
 const GAME_LAUNCH_REGEX = /^\[.+\]: (?:MinecraftForge .+ Initialized|ModLauncher .+ starting: .+|Loading Minecraft .+ with Fabric Loader .+)$/
-const MIN_LINGER = 5000
+// Etapes du demarrage de Minecraft (lues dans sa sortie) : la barre de chargement reste
+// affichee jusqu'au menu du jeu (avant : cachee 5 s apres le lancement, alors que la
+// fenetre met ~1 min a s'ouvrir avec les mods -> les joueurs recliquaient sur "Jouer").
+// cap = jusqu'ou la barre avance doucement en attendant l'etape suivante
+const GAME_START_STEPS = [
+    { regex: GAME_LAUNCH_REGEX,                        percent: 5,  cap: 45, text: 'landing.gameStart.loadingMods' },
+    { regex: /^\[.+\]: Setting user: /,                percent: 45, cap: 75, text: 'landing.gameStart.initMods' },
+    { regex: /^\[.+\]: Backend library: LWJGL/,        percent: 75, cap: 98, text: 'landing.gameStart.openingWindow' }
+]
+// Si le menu n'est jamais detecte (sortie differente...), on rend la main quand meme
+const GAME_START_TIMEOUT = 5 * 60 * 1000
 
 /* Mise a jour automatique du modpack en arriere-plan (assets/js/modpackupdater.js). */
 let launchInProgress = false
@@ -474,7 +523,7 @@ function showModpackStatus(status){
 ModpackUpdater.start({
     onStatus: showModpackStatus,
     // Jamais pendant un lancement ou une partie (Minecraft verrouille ses fichiers)
-    isBusy: () => launchInProgress || (proc != null && proc.exitCode == null)
+    isBusy: () => launchInProgress || GameInstances.isAnyRunning()
 })
 
 async function dlAsync(login = true) {
@@ -614,30 +663,64 @@ async function dlAsyncInner(login = true) {
         // const SERVER_JOINED_REGEX = /\[.+\]: \[CHAT\] [a-zA-Z0-9_]{1,16} joined the game/
         const SERVER_JOINED_REGEX = new RegExp(`\\[.+\\]: \\[CHAT\\] ${authUser.displayName} joined the game`)
 
-        const onLoadComplete = () => {
-            toggleLaunchArea(false)
-            if(hasRPC){
-                DiscordWrapper.updateDetails(Lang.queryJS('landing.discord.loading'))
-                proc.stdout.on('data', gameStateChange)
-            }
-            proc.stdout.removeListener('data', tempListener)
-            proc.stderr.removeListener('data', gameErrorListener)
+        // Demarrage du jeu : on suit sa sortie etape par etape (cf GAME_START_STEPS)
+        let gameProc = null
+        let stepIndex = -1
+        let shownPercent = 0
+        let startFinished = false
+        let creepTimer = null
+        let startTimeout = null
+
+        const showPercent = (percent) => {
+            shownPercent = percent
+            setLaunchPercentage(Math.round(percent))
         }
-        const start = Date.now()
+
+        const finishStart = (ready) => {
+            if(startFinished){
+                return
+            }
+            startFinished = true
+            clearInterval(creepTimer)
+            clearTimeout(startTimeout)
+            gameProc.stdout.removeListener('data', tempListener)
+            gameProc.stderr.removeListener('data', gameErrorListener)
+            if(ready){
+                GameInstances.markRunning(gameProc.pid)
+                showPercent(100)
+                setLaunchDetails(Lang.queryJS('landing.dlAsync.doneEnjoyServer'))
+                setTimeout(() => toggleLaunchArea(false), 2000)
+            } else {
+                toggleLaunchArea(false)
+            }
+        }
+
+        const enterStep = (index) => {
+            stepIndex = index
+            const step = GAME_START_STEPS[index]
+            showPercent(Math.max(shownPercent, step.percent))
+            setLaunchDetails(Lang.queryJS(step.text))
+            if(index === 0 && hasRPC){
+                DiscordWrapper.updateDetails(Lang.queryJS('landing.discord.loading'))
+                gameProc.stdout.on('data', gameStateChange)
+            }
+        }
 
         // Attach a temporary listener to the client output.
-        // Will wait for a certain bit of text meaning that
-        // the client application has started, and we can hide
-        // the progress bar stuff.
         const tempListener = function(data){
             // La sortie arrive par paquets de plusieurs lignes : on teste chaque ligne
-            // (avant, un paquet multi-lignes ne correspondait jamais et l'ecran de chargement restait).
-            if(data.split('\n').some(line => GAME_LAUNCH_REGEX.test(line.trim()))){
-                const diff = Date.now()-start
-                if(diff < MIN_LINGER) {
-                    setTimeout(onLoadComplete, MIN_LINGER-diff)
-                } else {
-                    onLoadComplete()
+            for(const raw of data.split('\n')){
+                const line = raw.trim()
+                if(GAME_JOINED_REGEX.test(line)){
+                    // "Sound engine started" : fin du chargement, le menu du jeu s'affiche
+                    finishStart(true)
+                    return
+                }
+                for(let i = stepIndex + 1; i < GAME_START_STEPS.length; i++){
+                    if(GAME_START_STEPS[i].regex.test(line)){
+                        enterStep(i)
+                        break
+                    }
                 }
             }
         }
@@ -663,22 +746,49 @@ async function dlAsyncInner(login = true) {
         try {
             // Build Minecraft process.
             proc = pb.build()
+            gameProc = proc
+            GameInstances.register(gameProc, serv)
 
             // Bind listeners to stdout.
-            proc.stdout.on('data', tempListener)
-            proc.stderr.on('data', gameErrorListener)
+            gameProc.stdout.on('data', tempListener)
+            gameProc.stderr.on('data', gameErrorListener)
 
-            setLaunchDetails(Lang.queryJS('landing.dlAsync.doneEnjoyServer'))
+            setLaunchDetails(Lang.queryJS('landing.gameStart.starting'))
+            showPercent(0)
+
+            // La barre avance doucement entre deux etapes : on voit que ca travaille
+            creepTimer = setInterval(() => {
+                const cap = stepIndex < 0 ? 5 : GAME_START_STEPS[stepIndex].cap
+                if(shownPercent < cap - 0.5){
+                    showPercent(shownPercent + (cap - shownPercent) * 0.04)
+                }
+            }, 1000)
+            startTimeout = setTimeout(() => finishStart(false), GAME_START_TIMEOUT)
+
+            gameProc.on('close', (code, _signal) => {
+                if(proc === gameProc){
+                    proc = null
+                }
+                if(!startFinished){
+                    finishStart(false)
+                    if(code !== 0){
+                        loggerLaunchSuite.error(`Minecraft closed during startup (code ${code}).`)
+                        showLaunchFailure(
+                            Lang.queryJS('landing.gameStart.crashedTitle'),
+                            Lang.queryJS('landing.gameStart.crashedText', { code })
+                        )
+                    }
+                }
+            })
 
             // Init Discord Hook
             if(distro.rawDistribution.discord != null && serv.rawServer.discord != null){
                 DiscordWrapper.initRPC(distro.rawDistribution.discord, serv.rawServer.discord)
                 hasRPC = true
-                proc.on('close', (code, signal) => {
+                gameProc.on('close', (code, signal) => {
                     loggerLaunchSuite.info('Shutting down Discord Rich Presence..')
                     DiscordWrapper.shutdownRPC()
                     hasRPC = false
-                    proc = null
                 })
             }
 
