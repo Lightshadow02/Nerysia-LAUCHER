@@ -30,6 +30,7 @@ const {
 // Internal Requirements
 const DiscordWrapper          = require('./assets/js/discordwrapper')
 const ProcessBuilder          = require('./assets/js/processbuilder')
+const ModpackUpdater          = require('./assets/js/modpackupdater')
 
 // Launch Elements
 const launch_content          = document.getElementById('launch_content')
@@ -169,6 +170,7 @@ function updateSelectedServer(serv){
         animateSettingsTabRefresh()
     }
     setLaunchEnabled(serv != null)
+    ModpackUpdater.checkSoon()
 }
 // Real text is set in uibinder.js on distributionIndexDone.
 server_selection_button.innerHTML = '&#8226; ' + Lang.queryJS('landing.selectedServer.loading')
@@ -446,7 +448,52 @@ const GAME_JOINED_REGEX = /\[.+\]: Sound engine started/
 const GAME_LAUNCH_REGEX = /^\[.+\]: (?:MinecraftForge .+ Initialized|ModLauncher .+ starting: .+|Loading Minecraft .+ with Fabric Loader .+)$/
 const MIN_LINGER = 5000
 
+/* Mise a jour automatique du modpack en arriere-plan (assets/js/modpackupdater.js). */
+let launchInProgress = false
+const modpackUpdateStatus = document.getElementById('modpackUpdateStatus')
+let modpackStatusTimer = null
+
+function showModpackStatus(status){
+    clearTimeout(modpackStatusTimer)
+    const name = status.server?.rawServer.name ?? ''
+    if(status.state === 'downloading'){
+        modpackUpdateStatus.innerHTML = Lang.queryJS('landing.modpackUpdate.downloading', { percent: status.percent ?? 0 })
+        modpackUpdateStatus.title = name
+        modpackUpdateStatus.style.display = ''
+    } else if(status.state === 'done' && status.updated){
+        modpackUpdateStatus.innerHTML = Lang.queryJS('landing.modpackUpdate.done', { version: status.server.rawServer.version })
+        modpackUpdateStatus.title = name
+        modpackUpdateStatus.style.display = ''
+        modpackStatusTimer = setTimeout(() => { modpackUpdateStatus.style.display = 'none' }, 10000)
+    } else {
+        // verification sans rien a telecharger, ou echec (on reessaiera) : rien a montrer
+        modpackUpdateStatus.style.display = 'none'
+    }
+}
+
+ModpackUpdater.start({
+    onStatus: showModpackStatus,
+    // Jamais pendant un lancement ou une partie (Minecraft verrouille ses fichiers)
+    isBusy: () => launchInProgress || (proc != null && proc.exitCode == null)
+})
+
 async function dlAsync(login = true) {
+    launchInProgress = true
+    try {
+        if(ModpackUpdater.isRunning()){
+            // Mise a jour en arriere-plan en cours : on la laisse finir (elle a deja avance)
+            setLaunchDetails(Lang.queryJS('landing.modpackUpdate.finishing'))
+            toggleLaunchArea(true)
+            setLaunchPercentage(0, 100)
+            await ModpackUpdater.waitIdle()
+        }
+        return await dlAsyncInner(login)
+    } finally {
+        launchInProgress = false
+    }
+}
+
+async function dlAsyncInner(login = true) {
 
     // Login parameter is temporary for debug purposes. Allows testing the validation/downloads without
     // launching the game.
@@ -536,6 +583,8 @@ async function dlAsync(login = true) {
     } else {
         loggerLaunchSuite.info('No invalid files, skipping download.')
     }
+    // Tout est verifie et a jour : rien a refaire en arriere-plan pour ce modpack
+    ModpackUpdater.markSynced(serv)
 
     // Remove download bar.
     remote.getCurrentWindow().setProgressBar(-1)

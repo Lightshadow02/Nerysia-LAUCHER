@@ -3457,6 +3457,20 @@ input:checked + .toggleSwitchSlider:before {
     display: inline-flex;
 }
 
+/* Mise a jour automatique du modpack en arriere-plan (petit texte sous le bouton Jouer). */
+#modpackUpdateStatus {
+    position: absolute;
+    top: 55px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.85);
+    text-shadow: 0px 0px 6px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    white-space: nowrap;
+}
+
 /* The launch button. */
 #launch_button {
     background: none;
@@ -3904,6 +3918,70 @@ input:checked + .toggleSwitchSlider:before {
     visibility: visible;
     opacity: 1;
     transition-delay:0s;
+}
+
+/* Prereglage de performance du serveur surligne (Faible / Moyen / Ultra + Builder). */
+#serverSelectPreset {
+    width: 375px;
+    margin-top: 15px;
+    padding: 12px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 3px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+#serverSelectPresetTitle {
+    font-family: 'Avenir Medium';
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+#serverSelectPresetButtons {
+    display: flex;
+    gap: 8px;
+}
+.serverSelectPresetButton {
+    flex: 1;
+    height: 30px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(126, 126, 126, 0.57);
+    border-radius: 3px;
+    color: white;
+    font-family: 'Avenir Medium';
+    font-size: 12px;
+    cursor: pointer;
+    outline: none;
+    transition: 0.25s ease;
+}
+.serverSelectPresetButton:hover,
+.serverSelectPresetButton:focus {
+    background: rgba(255, 255, 255, 0.15);
+}
+.serverSelectPresetButton[selected] {
+    background: rgb(31, 140, 11);
+    border-color: rgb(31, 140, 11);
+    cursor: default;
+}
+#serverSelectPresetDesc {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.85);
+    margin-top: 8px;
+    min-height: 14px;
+}
+#serverSelectPresetBuilder {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    font-size: 12px;
+    cursor: pointer;
+}
+#serverSelectPresetBuilderBox {
+    cursor: pointer;
 }
 
 /* Content container which contains the server select actions. */

@@ -19,16 +19,17 @@ const api = new DistributionAPI(
 const AdminAccess = require('./adminaccess')
 
 const pullRemote = api.pullRemote.bind(api)
+const pullLocal = api.pullLocal.bind(api)
 api.pullRemote = async function(){
     const res = await pullRemote()
     if(res.data != null){
-        await AdminAccess.injectInto(res.data)
+        // pullLocal : copie de secours de l'instance admin si la verification echoue (reseau lent...)
+        await AdminAccess.injectInto(res.data, pullLocal)
     }
     return res
 }
 
 // Hors ligne : copie locale, en ne gardant l'instance admin que pour le compte qui l'a recue.
-const pullLocal = api.pullLocal.bind(api)
 api.pullLocal = async function(){
     const data = await pullLocal()
     if(data != null){

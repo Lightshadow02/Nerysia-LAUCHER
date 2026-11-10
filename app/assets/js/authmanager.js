@@ -413,13 +413,19 @@ async function validateSelectedMicrosoftAccount(){
  * @returns {Promise.<boolean>} Promise which resolves to true if the access token is valid,
  * otherwise false.
  */
-exports.validateSelected = async function(){
+// Verification en cours, par compte. Plusieurs parties du launcher verifient le compte en meme
+// temps (demarrage, instance admin, clic sur Jouer) : sans ca, chacune rafraichissait le jeton
+// Microsoft de son cote, et un rafraichissement concurrent pouvait echouer.
+const validating = new Map()
+
+exports.validateSelected = function(){
     const current = ConfigManager.getSelectedAccount()
 
-    if(current.type === 'microsoft') {
-        return await validateSelectedMicrosoftAccount()
-    } else {
-        return await validateSelectedMojangAccount()
+    if(!validating.has(current.uuid)){
+        const run = current.type === 'microsoft'
+            ? validateSelectedMicrosoftAccount()
+            : validateSelectedMojangAccount()
+        validating.set(current.uuid, run.finally(() => validating.delete(current.uuid)))
     }
-    
+    return validating.get(current.uuid)
 }
