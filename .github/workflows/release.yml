@@ -19,6 +19,11 @@ on:
         type: choice
         options: [mac, windows, linux, tout]
         default: mac
+      machine_mac:
+        description: "Machine Mac (si l'une reste bloquee en attente, essayer l'autre ; l'Intel fait aussi le .dmg Apple Silicon)"
+        type: choice
+        options: [macos-15, macos-15-intel]
+        default: macos-15
 
 permissions:
   contents: write
@@ -32,10 +37,10 @@ jobs:
         # 15 min puis etait annule (aucune machine attribuee).
         os: ${{ fromJSON(
           github.event_name != 'workflow_dispatch' && '["windows-latest","macos-15","ubuntu-latest"]' ||
-          inputs.systeme == 'mac' && '["macos-15"]' ||
+          inputs.systeme == 'mac' && format('["{0}"]', inputs.machine_mac) ||
           inputs.systeme == 'windows' && '["windows-latest"]' ||
           inputs.systeme == 'linux' && '["ubuntu-latest"]' ||
-          '["windows-latest","macos-15","ubuntu-latest"]') }}
+          format('["windows-latest","{0}","ubuntu-latest"]', inputs.machine_mac)) }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 40
 
