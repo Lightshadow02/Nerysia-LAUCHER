@@ -42,5 +42,21 @@ downloading = "&#10227; Mise à jour du modpack… {percent} %"
 done = "&#10003; Modpack à jour (v{version})"
 finishing = "Fin de la mise à jour du modpack…"
 
+[js.landing.gameStart]
+starting = "Démarrage de Minecraft…"
+loadingMods = "Chargement des mods…"
+initMods = "Démarrage des mods…"
+openingWindow = "Ouverture du jeu…"
+crashedTitle = "Minecraft s'est fermé"
+crashedText = "Minecraft s'est arrêté pendant son démarrage (code {code}).<br><br>Réessaie. Si ça recommence, envoie au staff le fichier <b>logs/latest.log</b> du jeu."
+
+[js.landing.alreadyRunning]
+launchingTitle = "Minecraft est déjà en train de se lancer"
+launchingText = "<b>{name}</b> démarre depuis {minutes} min.<br>Avec tous les mods, la fenêtre du jeu peut mettre 1 à 2 minutes à s'ouvrir : pas besoin de recliquer sur Jouer.<br><br>Es-tu sûr de vouloir lancer une deuxième instance ?"
+runningTitle = "Minecraft est déjà ouvert"
+runningText = "<b>{name}</b> est déjà ouvert.<br>Deux jeux en même temps utilisent deux fois plus de mémoire (RAM) et peuvent faire planter les deux.<br><br>Es-tu sûr de vouloir lancer une deuxième instance ?"
+confirm = "Lancer quand même"
+cancel = "Annuler"
+
 [js.landing.news]
 checking = "Chargement des actualités"
