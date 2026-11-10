@@ -724,9 +724,7 @@ async function resolveModsForUI(){
     document.getElementById('settingsOptModsContent').innerHTML = modStr.optMods
 
     // Mods optionnels rattaches a un preset (champ "preset" ajoute par tools/generate-distribution.ps1)
-    CACHE_PRESET_MODS = modules
-        .filter(mdl => mdl.rawModule.type === Type.FabricMod && !mdl.getRequired().value && mdl.rawModule.preset != null)
-        .map(mdl => ({ id: mdl.getVersionlessMavenIdentifier(), preset: mdl.rawModule.preset }))
+    CACHE_PRESET_MODS = PresetUtil.presetMods(distro.getServerById(serv))
     document.getElementById('settingsPresetContainer').style.display = CACHE_PRESET_MODS.length > 0 ? '' : 'none'
 }
 
@@ -737,8 +735,8 @@ async function resolveModsForUI(){
  * ci-dessous : l'enregistrement passe par saveModConfiguration() comme un reglage manuel.
  * Faible = mods obligatoires seuls, Moyen = + dossier moyen/, Ultra = + moyen/ + ultra/.
  * Builder est independant et s'ajoute a n'importe quel preset.
+ * Regles dans assets/js/presetutil.js (aussi utilisees par la fenetre de choix du serveur).
  */
-const PRESET_LEVELS = ['faible', 'moyen', 'ultra']
 let CACHE_PRESET_MODS = []
 
 function setModToggle(id, enabled){
@@ -756,11 +754,10 @@ function isModToggleOn(id){
 }
 
 function applyPerformancePreset(level){
-    const rank = PRESET_LEVELS.indexOf(level)
     for(const mod of CACHE_PRESET_MODS){
-        const modRank = PRESET_LEVELS.indexOf(mod.preset)
-        if(modRank !== -1){
-            setModToggle(mod.id, modRank <= rank)
+        const enabled = PresetUtil.enabledFor(mod, level)
+        if(enabled != null){
+            setModToggle(mod.id, enabled)
         }
     }
     refreshPresetUI()
@@ -771,9 +768,7 @@ function applyPerformancePreset(level){
  * (aucun si le joueur a modifie des mods a la main).
  */
 function refreshPresetUI(){
-    const leveled = CACHE_PRESET_MODS.filter(mod => PRESET_LEVELS.includes(mod.preset))
-    const active = PRESET_LEVELS.find((level, rank) =>
-        leveled.every(mod => isModToggleOn(mod.id) === (PRESET_LEVELS.indexOf(mod.preset) <= rank)))
+    const active = PresetUtil.detect(CACHE_PRESET_MODS, isModToggleOn)
 
     for(const btn of document.getElementsByClassName('settingsPresetButton')){
         if(btn.getAttribute('preset') === active) btn.setAttribute('selected', '')
@@ -781,7 +776,7 @@ function refreshPresetUI(){
     }
     document.getElementById('settingsPresetDesc').innerHTML = Lang.queryJS(`settings.presets.${active ?? 'custom'}`)
 
-    const builderMods = CACHE_PRESET_MODS.filter(mod => mod.preset === 'builder')
+    const builderMods = PresetUtil.builderMods(CACHE_PRESET_MODS)
     document.getElementById('settingsPresetBuilderRow').style.display = builderMods.length > 0 ? '' : 'none'
     document.getElementById('settingsPresetBuilder').checked = builderMods.length > 0 && builderMods.every(mod => isModToggleOn(mod.id))
 }
@@ -792,7 +787,7 @@ function bindPresetControls(){
     }
     const builder = document.getElementById('settingsPresetBuilder')
     builder.onchange = () => {
-        for(const mod of CACHE_PRESET_MODS.filter(mod => mod.preset === 'builder')){
+        for(const mod of PresetUtil.builderMods(CACHE_PRESET_MODS)){
             setModToggle(mod.id, builder.checked)
         }
         refreshPresetUI()

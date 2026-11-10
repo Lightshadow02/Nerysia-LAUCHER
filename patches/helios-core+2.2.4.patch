@@ -1,7 +1,35 @@
 diff --git a/node_modules/helios-core/dist/common/util/FileUtils.js b/node_modules/helios-core/dist/common/util/FileUtils.js
 --- a/node_modules/helios-core/dist/common/util/FileUtils.js
 +++ b/node_modules/helios-core/dist/common/util/FileUtils.js
-@@ -31,13 +31,79 @@
+@@ -11,6 +11,7 @@
+ exports.getLibraryDir = getLibraryDir;
+ exports.extractZip = extractZip;
+ exports.extractTarGz = extractTarGz;
++exports.forEachLimit = forEachLimit;
+ const crypto_1 = require("crypto");
+ const path_1 = require("path");
+ const fs_extra_1 = require("fs-extra");
+@@ -19,6 +20,19 @@
+ const zlib_1 = require("zlib");
+ const tar_fs_1 = __importDefault(require("tar-fs"));
+ const log = LoggerUtil_1.LoggerUtil.getLogger('FileUtils');
++// Nerysia (patch-package) : verification de plusieurs fichiers a la fois (au lieu de 1 par 1).
++// Mesure : 1,46 s -> 0,49 s pour le modpack. Chaque fichier reste integralement verifie.
++const VALIDATE_PARALLEL = 8;
++async function forEachLimit(items, fn, limit = VALIDATE_PARALLEL) {
++    let next = 0;
++    const worker = async () => {
++        while (next < items.length) {
++            const item = items[next++];
++            await fn(item);
++        }
++    };
++    await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
++}
+ function calculateHashByBuffer(buf, algo) {
+     return (0, crypto_1.createHash)(algo).update(buf).digest('hex');
+ }
+@@ -31,13 +45,79 @@
          input.on('close', () => resolve(hash.digest('hex')));
      });
  }
@@ -82,3 +110,77 @@ diff --git a/node_modules/helios-core/dist/common/util/FileUtils.js b/node_modul
          }
          catch (err) {
              log.error('Failed to calculate hash.', err);
+diff --git a/node_modules/helios-core/dist/dl/distribution/DistributionIndexProcessor.js b/node_modules/helios-core/dist/dl/distribution/DistributionIndexProcessor.js
+--- a/node_modules/helios-core/dist/dl/distribution/DistributionIndexProcessor.js
++++ b/node_modules/helios-core/dist/dl/distribution/DistributionIndexProcessor.js
+@@ -45,7 +45,18 @@
+         await this.loadModLoaderVersionJson();
+     }
+     async validateModules(modules, accumulator) {
+-        for (const module of modules) {
++        // Nerysia (patch-package) : tous les modules (et sous-modules) verifies en parallele.
++        const all = [];
++        const flatten = (list) => {
++            for (const module of list) {
++                all.push(module);
++                if (module.hasSubModules()) {
++                    flatten(module.subModules);
++                }
++            }
++        };
++        flatten(modules);
++        await (0, FileUtils_1.forEachLimit)(all, async (module) => {
+             const hash = module.rawModule.artifact.MD5;
+             if (!await (0, FileUtils_1.validateLocalFile)(module.getPath(), Asset_1.HashAlgo.MD5, hash)) {
+                 accumulator.push({
+@@ -57,10 +68,7 @@
+                     path: module.getPath()
+                 });
+             }
+-            if (module.hasSubModules()) {
+-                await this.validateModules(module.subModules, accumulator);
+-            }
+-        }
++        });
+     }
+     async loadModLoaderVersionJson() {
+         const server = this.distribution.getServerById(this.serverId);
+diff --git a/node_modules/helios-core/dist/dl/mojang/MojangIndexProcessor.js b/node_modules/helios-core/dist/dl/mojang/MojangIndexProcessor.js
+--- a/node_modules/helios-core/dist/dl/mojang/MojangIndexProcessor.js
++++ b/node_modules/helios-core/dist/dl/mojang/MojangIndexProcessor.js
+@@ -165,7 +165,8 @@
+     async validateAssets(assetIndex) {
+         const objectDir = (0, path_1.join)(this.assetPath, 'objects');
+         const notValid = [];
+-        for (const assetEntry of Object.entries(assetIndex.objects)) {
++        // Nerysia (patch-package) : assets verifies en parallele
++        await (0, FileUtils_1.forEachLimit)(Object.entries(assetIndex.objects), async (assetEntry) => {
+             const hash = assetEntry[1].hash;
+             const path = (0, path_1.join)(objectDir, hash.substring(0, 2), hash);
+             const url = `${MojangIndexProcessor.ASSET_RESOURCE_ENDPOINT}/${hash.substring(0, 2)}/${hash}`;
+@@ -179,13 +180,14 @@
+                     path
+                 });
+             }
+-        }
++        });
+         return notValid;
+     }
+     async validateLibraries(versionJson) {
+         const libDir = (0, FileUtils_1.getLibraryDir)(this.commonDir);
+         const notValid = [];
+-        for (const libEntry of versionJson.libraries) {
++        // Nerysia (patch-package) : librairies verifiees en parallele
++        await (0, FileUtils_1.forEachLimit)(versionJson.libraries, async (libEntry) => {
+             if ((0, MojangUtils_1.isLibraryCompatible)(libEntry.rules, libEntry.natives)) {
+                 let artifact;
+                 if (libEntry.natives == null) {
+@@ -212,7 +214,7 @@
+                     });
+                 }
+             }
+-        }
++        });
+         return notValid;
+     }
+     async validateClient(versionJson) {

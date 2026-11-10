@@ -177,6 +177,7 @@ document.getElementById('serverSelectConfirm').addEventListener('click', async (
         if(listings[i].hasAttribute('selected')){
             const serv = (await DistroAPI.getDistribution()).getServerById(listings[i].getAttribute('servid'))
             updateSelectedServer(serv)
+            applyServerSelectPreset(serv.rawServer.id)
             refreshServerStatus(true)
             toggleOverlay(false)
             return
@@ -184,11 +185,93 @@ document.getElementById('serverSelectConfirm').addEventListener('click', async (
     }
     // None are selected? Not possible right? Meh, handle it.
     if(listings.length > 0){
-        const serv = (await DistroAPI.getDistribution()).getServerById(listings[i].getAttribute('servid'))
+        const serv = (await DistroAPI.getDistribution()).getServerById(listings[0].getAttribute('servid'))
         updateSelectedServer(serv)
+        applyServerSelectPreset(serv.rawServer.id)
         toggleOverlay(false)
     }
 })
+
+/**
+ * Prereglage de performance (Faible / Moyen / Ultra + Builder) dans la fenetre de choix du serveur.
+ * Affiche celui du serveur surligne ; le choix n'est enregistre qu'au clic sur "Selectionner"
+ * (memes regles que l'onglet Mods des parametres : assets/js/presetutil.js).
+ */
+let serverSelectPreset = null // { serverId, mods, level, builder, hasBuilder, changed }
+
+async function loadServerSelectPreset(serverId){
+    const panel = document.getElementById('serverSelectPreset')
+    const server = (await DistroAPI.getDistribution()).getServerById(serverId)
+    const modConf = ConfigManager.getModConfiguration(serverId)
+    if(document.querySelector('.serverListing[selected]')?.getAttribute('servid') !== serverId){
+        return // le joueur a deja clique sur un autre serveur entre-temps
+    }
+    const mods = server != null && modConf != null ? PresetUtil.presetMods(server) : []
+    if(mods.length === 0){
+        serverSelectPreset = null
+        panel.style.display = 'none'
+        return
+    }
+    const isOn = id => PresetUtil.isOnInConfig(modConf, id)
+    const builder = PresetUtil.builderMods(mods)
+    serverSelectPreset = {
+        serverId,
+        mods,
+        level: PresetUtil.detect(mods, isOn),
+        builder: builder.length > 0 && builder.every(mod => isOn(mod.id)),
+        hasBuilder: builder.length > 0,
+        changed: false
+    }
+    panel.style.display = ''
+    renderServerSelectPreset()
+}
+
+function renderServerSelectPreset(){
+    const state = serverSelectPreset
+    if(state == null) return
+    for(const btn of document.getElementsByClassName('serverSelectPresetButton')){
+        if(btn.getAttribute('preset') === state.level) btn.setAttribute('selected', '')
+        else btn.removeAttribute('selected')
+    }
+    document.getElementById('serverSelectPresetDesc').innerHTML = Lang.queryJS(`settings.presets.${state.level ?? 'custom'}`)
+    document.getElementById('serverSelectPresetBuilder').style.display = state.hasBuilder ? '' : 'none'
+    document.getElementById('serverSelectPresetBuilderBox').checked = state.builder
+}
+
+for(const btn of document.getElementsByClassName('serverSelectPresetButton')){
+    btn.addEventListener('click', () => {
+        if(serverSelectPreset == null) return
+        serverSelectPreset.level = btn.getAttribute('preset')
+        serverSelectPreset.changed = true
+        renderServerSelectPreset()
+        btn.blur()
+    })
+}
+document.getElementById('serverSelectPresetBuilderBox').addEventListener('change', e => {
+    if(serverSelectPreset == null) return
+    serverSelectPreset.builder = e.target.checked
+    serverSelectPreset.changed = true
+    renderServerSelectPreset()
+})
+
+/** Enregistre le prereglage choisi pour ce serveur (s'il a ete modifie). */
+function applyServerSelectPreset(serverId){
+    const state = serverSelectPreset
+    if(state == null || !state.changed || state.serverId !== serverId) return
+    const modConf = ConfigManager.getModConfiguration(serverId)
+    if(modConf == null) return
+    for(const mod of state.mods){
+        const enabled = mod.preset === 'builder'
+            ? state.builder
+            : (state.level != null ? PresetUtil.enabledFor(mod, state.level) : null)
+        if(enabled != null){
+            PresetUtil.setInConfig(modConf, mod.id, enabled)
+        }
+    }
+    ConfigManager.setModConfiguration(serverId, modConf)
+    ConfigManager.save()
+    serverSelectPreset = null
+}
 
 document.getElementById('accountSelectConfirm').addEventListener('click', async () => {
     const listings = document.getElementsByClassName('accountListing')
@@ -244,6 +327,7 @@ function setServerListingHandlers(){
             }
             val.setAttribute('selected', '')
             document.activeElement.blur()
+            loadServerSelectPreset(val.getAttribute('servid'))
         }
     })
 }
@@ -317,6 +401,12 @@ function populateAccountListings(){
 async function prepareServerSelectionList(){
     await populateServerListings()
     setServerListingHandlers()
+    serverSelectPreset = null
+    document.getElementById('serverSelectPreset').style.display = 'none'
+    const selected = document.querySelector('.serverListing[selected]')
+    if(selected != null){
+        await loadServerSelectPreset(selected.getAttribute('servid'))
+    }
 }
 
 function prepareAccountSelectionList(){

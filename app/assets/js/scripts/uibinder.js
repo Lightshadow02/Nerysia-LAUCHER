@@ -11,6 +11,7 @@ const ConfigManager = require('./assets/js/configmanager')
 const { DistroAPI } = require('./assets/js/distromanager')
 const AdminAccess   = require('./assets/js/adminaccess')
 const SkinUtil      = require('./assets/js/skinutil')
+const PresetUtil    = require('./assets/js/presetutil')
 
 let rscShouldLoad = false
 let fatalStartupError = false
@@ -64,6 +65,7 @@ function getCurrentView(){
 async function showMainUI(data){
 
     adminAccessReady = true
+    scheduleAdminRetry()
 
     if(!isDev){
         loggerAutoUpdater.info('Initializing..')
@@ -216,6 +218,34 @@ async function onSelectedAccountChanged(){
     } catch(err) {
         console.warn('Rechargement de la distribution apres changement de compte impossible', err)
     }
+    scheduleAdminRetry()
+}
+
+/**
+ * Verification admin ratee (reseau lent, Mojang ou api.php trop long a repondre) :
+ * on reessaie en arriere-plan, au lieu d'obliger l'admin a relancer le launcher.
+ * Ne fait rien pour les joueurs normaux (leur verification ne "rate" pas : 404 = pas admin).
+ */
+const ADMIN_RETRY_DELAYS = [5000, 20000, 60000, 180000]
+let adminRetryTimer = null
+function scheduleAdminRetry(attempt = 0){
+    clearTimeout(adminRetryTimer)
+    if(attempt >= ADMIN_RETRY_DELAYS.length || !AdminAccess.retryPending()){
+        return
+    }
+    adminRetryTimer = setTimeout(async () => {
+        if(!AdminAccess.retryPending()){
+            return
+        }
+        try {
+            const data = await DistroAPI.refreshDistributionOrFallback()
+            syncModConfigurations(data)
+            ensureJavaSettings(data)
+        } catch(err) {
+            console.warn('Nouvel essai de la verification admin impossible', err)
+        }
+        scheduleAdminRetry(attempt + 1)
+    }, ADMIN_RETRY_DELAYS[attempt])
 }
 
 /**

@@ -24,8 +24,11 @@ const log = LoggerUtil.getLogger('AdminAccess')
 
 const ADMIN_API = 'https://apk.nerysia.fr/nerysia-laucher/admin/api.php'
 const MOJANG_JOIN = 'https://sessionserver.mojang.com/session/minecraft/join'
-// Court : ces requetes retardent l'affichage de la distribution (demarrage, clic sur Jouer)
-const TIMEOUT = { request: 4000 }
+// Court au 1er essai : ces requetes retardent l'affichage du launcher pour TOUT le monde.
+// Plus long ensuite (nouveaux essais en arriere-plan, clic sur Jouer).
+const TIMEOUT_FIRST = { request: 5000 }
+const TIMEOUT_RETRY = { request: 12000 }
+let attempts = 0
 // Resultat reutilise pendant 1 h : evite de redemander a chaque clic sur Jouer
 // (les liens de telechargement admin restent valables 24 h)
 const CACHE_MS = 3600000
@@ -36,6 +39,9 @@ const ADMIN_FLAG = 'nerysiaAdminFor'
 
 // Uuid du compte pour lequel l'acces admin a ete verifie en dernier (cf needsRefresh).
 let lastCheckedUuid
+// Vrai si la derniere verification a echoue pour une raison passagere (reseau lent, Mojang
+// ou api.php qui ne repond pas a temps...). Faux si elle a reussi ou si le compte n'est pas admin.
+let lastFailed = false
 
 function normalizeUuid(uuid){
     return uuid.replace(/-/g, '').toLowerCase()
@@ -59,6 +65,7 @@ function selectedAccountOrNull(){
 async function fetchAdminServer(){
     const account = selectedAccountOrNull()
     lastCheckedUuid = account?.uuid
+    lastFailed = false
     if(account == null || account.type !== 'microsoft'){
         return null
     }
@@ -72,6 +79,12 @@ async function fetchAdminServer(){
         cache.set(uuid, { at: Date.now(), server })
         return server == null ? null : JSON.parse(JSON.stringify(server))
     }
+    // Echec passager : rien n'est mis en cache, le launcher reessaiera (cf retryPending)
+    const failed = () => {
+        lastFailed = true
+        return null
+    }
+    const TIMEOUT = attempts++ === 0 ? TIMEOUT_FIRST : TIMEOUT_RETRY
 
     try {
         // 1. Ce compte est-il admin ? (404 pour tous les joueurs normaux : une seule petite requete)
@@ -85,14 +98,15 @@ async function fetchAdminServer(){
             return remember(null) // joueur normal : on ne redemande pas avant 1 h
         }
         if(challenge.statusCode !== 200){
-            return null
+            log.warn(`Verification admin : api.php a repondu HTTP ${challenge.statusCode}.`)
+            return failed()
         }
         const nonce = challenge.body.nonce
 
         // Jeton Minecraft expire (> 24h) : on le rafraichit avant de l'utiliser.
         if(!await AuthManager.validateSelected()){
             log.warn('Compte admin : jeton Minecraft invalide, instance admin ignoree.')
-            return null
+            return failed()
         }
         const fresh = ConfigManager.getSelectedAccount()
 
@@ -104,7 +118,7 @@ async function fetchAdminServer(){
         })
         if(join.statusCode !== 204){
             log.warn(`Compte admin : Mojang a refuse la verification (HTTP ${join.statusCode}).`)
-            return null
+            return failed()
         }
 
         // 3. Le serveur Nerysia verifie aupres de Mojang et renvoie l'instance.
@@ -116,7 +130,7 @@ async function fetchAdminServer(){
         })
         if(res.statusCode !== 200 || res.body?.server == null){
             log.warn(`Instance admin refusee par le serveur (HTTP ${res.statusCode}).`)
-            return null
+            return failed()
         }
         const server = res.body.server
         server[ADMIN_FLAG] = uuid
@@ -124,6 +138,29 @@ async function fetchAdminServer(){
         return remember(server)
     } catch(err) {
         log.warn('Instance admin indisponible :', err.message)
+        return failed()
+    }
+}
+
+/**
+ * Instance admin recue lors d'un lancement precedent par CE compte (copie sur le disque).
+ * Utilisee seulement si la verification vient d'echouer pour une raison passagere :
+ * l'instance reste visible au lieu de disparaitre jusqu'au prochain redemarrage.
+ * (Un compte retire des admins recoit un 404 -> pas de copie locale pour lui.)
+ */
+async function previousAdminServer(loadLocal){
+    const account = selectedAccountOrNull()
+    if(account == null || loadLocal == null){
+        return null
+    }
+    try {
+        const local = await loadLocal()
+        const server = local?.servers?.find(s => s[ADMIN_FLAG] === normalizeUuid(account.uuid))
+        if(server != null){
+            log.info('Verification admin impossible pour le moment : copie locale de l\'instance utilisee.')
+        }
+        return server ?? null
+    } catch(err) {
         return null
     }
 }
@@ -131,10 +168,16 @@ async function fetchAdminServer(){
 /**
  * Ajoute l'instance admin a un distribution.json brut (si le compte selectionne est admin).
  * Retire toujours une eventuelle ancienne instance admin avant.
+ *
+ * @param {Object} rawDistribution distribution.json qui vient d'etre telecharge
+ * @param {Function} loadLocal     lit la copie du distribution.json sur le disque (secours)
  */
-exports.injectInto = async function(rawDistribution){
+exports.injectInto = async function(rawDistribution, loadLocal){
     exports.stripFrom(rawDistribution)
-    const server = await fetchAdminServer()
+    let server = await fetchAdminServer()
+    if(server == null && lastFailed){
+        server = await previousAdminServer(loadLocal)
+    }
     if(server != null){
         rawDistribution.servers = rawDistribution.servers.filter(s => s.id !== server.id)
         rawDistribution.servers.push(server)
@@ -157,6 +200,14 @@ exports.stripFrom = function(rawDistribution, keepForSelected = false){
  */
 exports.needsRefresh = function(){
     return selectedAccountOrNull()?.uuid !== lastCheckedUuid
+}
+
+/**
+ * Vrai si la derniere verification admin du compte selectionne a echoue pour une raison
+ * passagere : le launcher doit reessayer en arriere-plan (cf uibinder.js scheduleAdminRetry).
+ */
+exports.retryPending = function(){
+    return lastFailed && selectedAccountOrNull()?.uuid === lastCheckedUuid
 }
 
 exports.isAdminServer = function(rawServer){
