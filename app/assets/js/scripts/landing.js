@@ -34,6 +34,7 @@ const ModpackUpdater          = require('./assets/js/modpackupdater')
 const GameInstances           = require('./assets/js/gameinstances')
 const SkinChanger             = require('./assets/js/skinchanger')
 const SkinViewer              = require('./assets/js/skinviewer')
+const SkinHistory             = require('./assets/js/skinhistory')
 
 // Launch Elements
 const launch_content          = document.getElementById('launch_content')
@@ -203,6 +204,10 @@ function initSkinChanger(){
         capeImages: new Map(),// id de cape -> image
         currentCapeId: null,  // cape portee chez Minecraft (null = aucune)
         capeId: null,         // cape choisie dans la fenetre
+        historyBox: document.getElementById('skinChangeHistory'),
+        currentPng: null,     // image du skin porte (Buffer)
+        currentHash: null,    // son empreinte dans "Mes skins"
+        historyId: null,      // skin de "Mes skins" affiche dans l'apercu
         session: 0            // ouverture en cours (ignore les reponses d'une ouverture precedente)
     }
 
@@ -219,6 +224,7 @@ function initSkinChanger(){
             SkinChanger.checkSkinFile(png)
             skinChange.image = await loadSkinImage('data:image/png;base64,' + png.toString('base64'))
             skinChange.newPng = png
+            skinChange.historyId = null
             skinChange.fileName.textContent = file.name
             skinChange.label.innerHTML = Lang.queryJS('skin.previewLabel')
             skinStatus('')
@@ -250,6 +256,95 @@ function skinStatus(text, type){
 
 function skinErrorText(err){
     return Lang.queryJS('skin.errors.' + (err?.code || 'network'))
+}
+
+function pngDataUrl(png){
+    return 'data:image/png;base64,' + png.toString('base64')
+}
+
+async function downloadPng(url){
+    return (await require('got').get(url, { responseType: 'buffer', timeout: { request: 10000 } })).body
+}
+
+function skinAccountUuid(){
+    return ConfigManager.getSelectedAccount()?.uuid
+}
+
+/** Miniature d'un skin : la tete vue de face (avec la 2e couche). */
+function skinHeadThumb(img){
+    const c = document.createElement('canvas')
+    c.width = 32
+    c.height = 32
+    c.className = 'skinChangeHistoryThumb'
+    const ctx = c.getContext('2d')
+    ctx.imageSmoothingEnabled = false
+    ctx.drawImage(img, 8, 8, 8, 8, 0, 0, 32, 32)
+    // ancien skin (64x32) au chapeau entierement opaque : Minecraft ne l'affiche pas
+    if(img.naturalHeight !== 32 || SkinViewer.hatHasTransparency(img)){
+        ctx.drawImage(img, 40, 8, 8, 8, 0, 0, 32, 32)
+    }
+    return c
+}
+
+/** "Mes skins" : un bouton par skin sauvegarde (clic = apercu, croix = retirer). */
+async function renderSkinHistory(){
+    const session = skinChange.session
+    const uuid = skinAccountUuid()
+    const box = skinChange.historyBox
+    const entries = uuid != null ? SkinHistory.list(uuid) : []
+    const items = []
+    for(const entry of entries){
+        try {
+            const png = SkinHistory.read(uuid, entry.id)
+            items.push({ entry, png, img: await loadSkinImage(pngDataUrl(png)) })
+        } catch(err) {
+            // image abimee : on l'ignore
+        }
+    }
+    if(session !== skinChange.session) return
+    box.innerHTML = ''
+    if(items.length === 0){
+        const none = document.createElement('span')
+        none.id = 'skinChangeNoHistory'
+        none.innerHTML = Lang.queryJS('skin.historyEmpty')
+        box.appendChild(none)
+        return
+    }
+    for(const { entry, png, img } of items){
+        const btn = document.createElement('button')
+        btn.className = 'skinChangeHistoryItem'
+        btn.setAttribute('skinid', entry.id)
+        btn.title = Lang.queryJS(entry.variant === 'slim' ? 'skin.modelSlim' : 'skin.modelClassic')
+        btn.appendChild(skinHeadThumb(img))
+        btn.onclick = () => pickSkinFromHistory(entry, png, img)
+        if(entry.id !== skinChange.currentHash){
+            const del = document.createElement('span')
+            del.className = 'skinChangeHistoryDelete'
+            del.innerHTML = '&#10005;'
+            del.title = Lang.queryJS('skin.historyDelete')
+            del.onclick = (e) => {
+                e.stopPropagation()
+                SkinHistory.remove(uuid, entry.id)
+                if(skinChange.historyId === entry.id) skinChange.historyId = null
+                btn.remove()
+            }
+            btn.appendChild(del)
+        }
+        box.appendChild(btn)
+    }
+    refreshSkinChangeForm()
+}
+
+function pickSkinFromHistory(entry, png, img){
+    const isCurrent = entry.id === skinChange.currentHash
+    skinChange.image = img
+    skinChange.variant = entry.variant
+    skinChange.newPng = isCurrent ? null : png
+    skinChange.historyId = entry.id
+    skinChange.fileName.textContent = Lang.queryJS(isCurrent ? 'skin.historyCurrent' : 'skin.historyPicked')
+    skinChange.label.innerHTML = Lang.queryJS(isCurrent ? 'skin.currentLabel' : 'skin.previewLabel')
+    skinStatus('')
+    refreshSkinChangeForm()
 }
 
 function loadSkinImage(src){
@@ -317,6 +412,13 @@ function refreshSkinChangeForm(){
         if(btn.getAttribute('variant') === skinChange.variant) btn.setAttribute('selected', '')
         else btn.removeAttribute('selected')
     }
+    for(const btn of skinChange.historyBox.getElementsByClassName('skinChangeHistoryItem')){
+        const id = btn.getAttribute('skinid')
+        if(id === skinChange.historyId) btn.setAttribute('selected', '')
+        else btn.removeAttribute('selected')
+        if(id === skinChange.currentHash) btn.setAttribute('current', '')
+        else btn.removeAttribute('current')
+    }
     for(const btn of skinChange.capesBox.getElementsByClassName('skinChangeCape')){
         if(btn.getAttribute('capeid') === (skinChange.capeId ?? '')) btn.setAttribute('selected', '')
         else btn.removeAttribute('selected')
@@ -335,12 +437,15 @@ async function openSkinChanger(){
     initSkinChanger()
     const session = ++skinChange.session
     Object.assign(skinChange, { image: null, newPng: null, currentUrl: null, currentVariant: 'classic', variant: 'classic',
-        capes: [], capeImages: new Map(), currentCapeId: null, capeId: null })
+        capes: [], capeImages: new Map(), currentCapeId: null, capeId: null,
+        currentPng: null, currentHash: null, historyId: null })
     document.getElementById('skinChangeHeader').innerHTML = Lang.queryJS('skin.title')
     document.getElementById('skinChangeChoose').innerHTML = Lang.queryJS('skin.choose')
     document.getElementById('skinChangeModelTitle').innerHTML = Lang.queryJS('skin.modelTitle')
     document.getElementById('skinChangeCapeTitle').innerHTML = Lang.queryJS('skin.capeTitle')
+    document.getElementById('skinChangeHistoryTitle').innerHTML = Lang.queryJS('skin.historyTitle')
     skinChange.capesBox.innerHTML = ''
+    skinChange.historyBox.innerHTML = ''
     skinChange.models[0].innerHTML = Lang.queryJS('skin.modelClassic')
     skinChange.models[1].innerHTML = Lang.queryJS('skin.modelSlim')
     document.getElementById('skinChangeFind').innerHTML = Lang.queryJS('skin.find')
@@ -363,15 +468,23 @@ async function openSkinChanger(){
         skinChange.capes = current.capes
         skinChange.currentCapeId = skinChange.capeId = current.capeId
         // Images du skin et des capes en parallele (une cape illisible est juste montree par son nom)
-        const [image] = await Promise.all([
-            current.url != null ? loadSkinImage(current.url) : null,
+        const [currentPng] = await Promise.all([
+            current.url != null ? downloadPng(current.url) : null,
             ...current.capes.map(cape => loadSkinImage(cape.url)
                 .then(img => skinChange.capeImages.set(cape.id, img))
                 .catch(() => {}))
         ])
         if(session !== skinChange.session) return
-        skinChange.image = image
+        if(currentPng != null){
+            skinChange.currentPng = currentPng
+            skinChange.image = await loadSkinImage(pngDataUrl(currentPng))
+            if(session !== skinChange.session) return
+            // Le skin porte rejoint "Mes skins" (meme s'il a ete change ailleurs, ex. minecraft.net)
+            skinChange.currentHash = SkinHistory.add(skinAccountUuid(), currentPng, current.variant)
+            skinChange.historyId = skinChange.currentHash
+        }
         renderSkinCapes()
+        renderSkinHistory()
         skinChange.label.innerHTML = Lang.queryJS('skin.currentLabel')
         skinStatus('')
     } catch(err) {
@@ -401,9 +514,14 @@ async function applySkinChange(action){
                 let png = skinChange.newPng
                 if(png == null){
                     // Seul le modele change : on renvoie l'image actuelle avec le nouveau modele
-                    png = (await require('got').get(skinChange.currentUrl, { responseType: 'buffer', timeout: { request: 10000 } })).body
+                    png = skinChange.currentPng ?? await downloadPng(skinChange.currentUrl)
                 }
                 await SkinChanger.uploadSkin(png, skinChange.variant)
+                // Le nouveau skin rejoint "Mes skins"
+                skinChange.currentPng = png
+                skinChange.currentHash = SkinHistory.add(skinAccountUuid(), png, skinChange.variant)
+                skinChange.currentVariant = skinChange.variant
+                skinChange.newPng = null
             }
             if(capeChanged()){
                 await SkinChanger.setCape(skinChange.capeId)
