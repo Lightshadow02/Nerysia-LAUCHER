@@ -34,7 +34,7 @@ jobs:
     timeout-minutes: 60
     defaults:
       run:
-        shell: powershell
+        shell: pwsh
         working-directory: C:\Users\Light\Documents\Projet\Nerysia-mod-admin
     env:
       CANAL: ${{ inputs.canal }}
