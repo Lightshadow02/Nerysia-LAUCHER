@@ -19,6 +19,10 @@ on:
         description: "Envoyer sur depot.nerysia.fr (décoché : fabriquer le pack sans l'envoyer)"
         type: boolean
         default: true
+      reprendre:
+        description: "Reprendre sur le banc les mods changés en ligne par Flerzken (le serveur du banc doit être arrêté)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -38,6 +42,7 @@ jobs:
         working-directory: C:\Users\Light\Documents\Projet\Nerysia-mod-admin
     env:
       CANAL: ${{ inputs.canal }}
+      REPRENDRE: ${{ inputs.reprendre }}
       PYTHONIOENCODING: utf-8
     steps:
       - name: Vérifier le dépôt OVH (lecteur Y:)
@@ -51,7 +56,8 @@ jobs:
 
       - name: Fabriquer le pack depuis le banc
         run: |
-          python src/ptero/publier.py $env:CANAL
+          $plus = @(); if ($env:REPRENDRE -eq 'true') { $plus += '--reprendre' }
+          python src/ptero/publier.py $env:CANAL @plus
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Envoyer sur depot.nerysia.fr
