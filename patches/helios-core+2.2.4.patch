@@ -1,7 +1,7 @@
 diff --git a/node_modules/helios-core/dist/common/util/FileUtils.js b/node_modules/helios-core/dist/common/util/FileUtils.js
 --- a/node_modules/helios-core/dist/common/util/FileUtils.js
 +++ b/node_modules/helios-core/dist/common/util/FileUtils.js
-@@ -11,6 +11,7 @@
+@@ -11,6 +11,7 @@ exports.getVersionJarPath = getVersionJarPath;
  exports.getLibraryDir = getLibraryDir;
  exports.extractZip = extractZip;
  exports.extractTarGz = extractTarGz;
@@ -9,7 +9,7 @@ diff --git a/node_modules/helios-core/dist/common/util/FileUtils.js b/node_modul
  const crypto_1 = require("crypto");
  const path_1 = require("path");
  const fs_extra_1 = require("fs-extra");
-@@ -19,6 +20,19 @@
+@@ -19,6 +20,19 @@ const node_stream_zip_1 = __importDefault(require("node-stream-zip"));
  const zlib_1 = require("zlib");
  const tar_fs_1 = __importDefault(require("tar-fs"));
  const log = LoggerUtil_1.LoggerUtil.getLogger('FileUtils');
@@ -29,7 +29,7 @@ diff --git a/node_modules/helios-core/dist/common/util/FileUtils.js b/node_modul
  function calculateHashByBuffer(buf, algo) {
      return (0, crypto_1.createHash)(algo).update(buf).digest('hex');
  }
-@@ -31,13 +45,79 @@
+@@ -31,13 +45,79 @@ function calculateHash(path, algo) {
          input.on('close', () => resolve(hash.digest('hex')));
      });
  }
@@ -113,7 +113,101 @@ diff --git a/node_modules/helios-core/dist/common/util/FileUtils.js b/node_modul
 diff --git a/node_modules/helios-core/dist/dl/distribution/DistributionIndexProcessor.js b/node_modules/helios-core/dist/dl/distribution/DistributionIndexProcessor.js
 --- a/node_modules/helios-core/dist/dl/distribution/DistributionIndexProcessor.js
 +++ b/node_modules/helios-core/dist/dl/distribution/DistributionIndexProcessor.js
-@@ -45,7 +45,18 @@
+@@ -14,6 +14,93 @@ const MojangUtils_1 = require("../../common/util/MojangUtils");
+ const fs_extra_1 = require("fs-extra");
+ const node_stream_zip_1 = __importDefault(require("node-stream-zip"));
+ const path_1 = require("path");
++const crypto_1 = require("crypto");
++/**
++ * Nerysia (patch-package) : configs "du joueur" (liste playerConfigs du distribution.json,
++ * expressions regulieres sur le chemin du fichier, ex. "^config/xaero").
++ * Pour ces fichiers : installes s'ils manquent, mis a jour si le modpack change ET que le joueur
++ * ne les a pas modifies, sinon on garde les reglages du joueur (touches, minimap, video...).
++ * On retient l'empreinte de la version installee par le launcher dans
++ * <commonDir>/nerysia-player-configs.json pour savoir si le joueur a modifie le fichier.
++ */
++function nerysiaPlayerConfigs(commonDir, patterns) {
++    const regexes = (Array.isArray(patterns) ? patterns : []).map(p => {
++        try {
++            return new RegExp(p, 'i');
++        }
++        catch (err) {
++            DistributionIndexProcessor.logger.warn(`playerConfigs : expression invalide ignoree (${p})`);
++            return null;
++        }
++    }).filter(r => r != null);
++    const statePath = (0, path_1.join)(commonDir, 'nerysia-player-configs.json');
++    let state = null;
++    let dirty = false;
++    let loading = null;
++    const load = () => {
++        if (loading == null) {
++            loading = (0, fs_extra_1.readJson)(statePath).catch(() => ({})).then(data => {
++                state = (data != null && typeof data === 'object') ? data : {};
++                return state;
++            });
++        }
++        return loading;
++    };
++    const md5Of = (file) => new Promise(resolve => {
++        const hash = (0, crypto_1.createHash)('md5');
++        const stream = (0, fs_extra_1.createReadStream)(file);
++        stream.on('error', () => resolve(null));
++        stream.on('data', chunk => hash.update(chunk));
++        stream.on('end', () => resolve(hash.digest('hex')));
++    });
++    return {
++        matches(module) {
++            if (regexes.length === 0 || module.rawModule.type !== helios_distribution_types_1.Type.File) {
++                return false;
++            }
++            const rel = String(module.rawModule.artifact.path || '').replace(/\\/g, '/');
++            return rel !== '' && regexes.some(r => r.test(rel));
++        },
++        /** true = garder le fichier du joueur tel quel (pas de telechargement). */
++        async keepLocal(file, hash) {
++            const st = await load();
++            const key = file.replace(/\\/g, '/');
++            const expected = String(hash).toLowerCase();
++            const local = await md5Of(file);
++            if (local == null) {
++                // absent : on installe la version du modpack
++                st[key] = expected;
++                dirty = true;
++                return false;
++            }
++            if (local === expected) {
++                if (st[key] !== expected) {
++                    st[key] = expected;
++                    dirty = true;
++                }
++                return true;
++            }
++            if (st[key] === local) {
++                // le joueur n'y a pas touche, le modpack a change : mise a jour
++                st[key] = expected;
++                dirty = true;
++                return false;
++            }
++            // modifie par le joueur : on garde ses reglages
++            return true;
++        },
++        async save() {
++            if (dirty) {
++                try {
++                    await (0, fs_extra_1.writeJson)(statePath, state);
++                }
++                catch (err) {
++                    DistributionIndexProcessor.logger.warn('playerConfigs : impossible d\'enregistrer l\'etat.', err);
++                }
++            }
++        }
++    };
++}
+ class DistributionIndexProcessor extends IndexProcessor_1.IndexProcessor {
+     distribution;
+     serverId;
+@@ -45,8 +132,23 @@ class DistributionIndexProcessor extends IndexProcessor_1.IndexProcessor {
          await this.loadModLoaderVersionJson();
      }
      async validateModules(modules, accumulator) {
@@ -129,11 +223,16 @@ diff --git a/node_modules/helios-core/dist/dl/distribution/DistributionIndexProc
 +            }
 +        };
 +        flatten(modules);
++        const playerConfigs = nerysiaPlayerConfigs(this.commonDir, this.distribution.rawDistribution.playerConfigs);
 +        await (0, FileUtils_1.forEachLimit)(all, async (module) => {
              const hash = module.rawModule.artifact.MD5;
++            if (playerConfigs.matches(module) && await playerConfigs.keepLocal(module.getPath(), hash)) {
++                return;
++            }
              if (!await (0, FileUtils_1.validateLocalFile)(module.getPath(), Asset_1.HashAlgo.MD5, hash)) {
                  accumulator.push({
-@@ -57,10 +68,7 @@
+                     id: module.rawModule.id,
+@@ -57,10 +159,8 @@ class DistributionIndexProcessor extends IndexProcessor_1.IndexProcessor {
                      path: module.getPath()
                  });
              }
@@ -142,13 +241,14 @@ diff --git a/node_modules/helios-core/dist/dl/distribution/DistributionIndexProc
 -            }
 -        }
 +        });
++        await playerConfigs.save();
      }
      async loadModLoaderVersionJson() {
          const server = this.distribution.getServerById(this.serverId);
 diff --git a/node_modules/helios-core/dist/dl/mojang/MojangIndexProcessor.js b/node_modules/helios-core/dist/dl/mojang/MojangIndexProcessor.js
 --- a/node_modules/helios-core/dist/dl/mojang/MojangIndexProcessor.js
 +++ b/node_modules/helios-core/dist/dl/mojang/MojangIndexProcessor.js
-@@ -165,7 +165,8 @@
+@@ -165,7 +165,8 @@ class MojangIndexProcessor extends IndexProcessor_1.IndexProcessor {
      async validateAssets(assetIndex) {
          const objectDir = (0, path_1.join)(this.assetPath, 'objects');
          const notValid = [];
@@ -158,7 +258,7 @@ diff --git a/node_modules/helios-core/dist/dl/mojang/MojangIndexProcessor.js b/n
              const hash = assetEntry[1].hash;
              const path = (0, path_1.join)(objectDir, hash.substring(0, 2), hash);
              const url = `${MojangIndexProcessor.ASSET_RESOURCE_ENDPOINT}/${hash.substring(0, 2)}/${hash}`;
-@@ -179,13 +180,14 @@
+@@ -179,13 +180,14 @@ class MojangIndexProcessor extends IndexProcessor_1.IndexProcessor {
                      path
                  });
              }
@@ -175,7 +275,7 @@ diff --git a/node_modules/helios-core/dist/dl/mojang/MojangIndexProcessor.js b/n
              if ((0, MojangUtils_1.isLibraryCompatible)(libEntry.rules, libEntry.natives)) {
                  let artifact;
                  if (libEntry.natives == null) {
-@@ -212,7 +214,7 @@
+@@ -212,7 +214,7 @@ class MojangIndexProcessor extends IndexProcessor_1.IndexProcessor {
                      });
                  }
              }

@@ -570,6 +570,8 @@ def main():
     distribution = {
         "version": "1.0.0",  # Schema version (do not touch)
         "rss": CONFIG["rss"],
+        # Configs que le joueur peut modifier sans qu'elles soient ecrasees (lu par le launcher)
+        "playerConfigs": CONFIG.get("playerConfigs", {}).get("patterns", []),
         "servers": [
             {
                 "id": server["id"],
