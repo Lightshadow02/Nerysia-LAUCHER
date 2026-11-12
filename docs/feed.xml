@@ -9,9 +9,6 @@
     <description>Actualités du serveur Nerysia</description>
     <language>fr-FR</language>
 
-    <!-- ============================================ -->
-    <!-- ARTICLE 1 — Le plus récent en premier        -->
-    <!-- ============================================ -->
     <item>
       <title>Mise à jour majeure — Mod Nerysia v1.0.6 + Factions V6.6</title>
       <link>https://apk.nerysia.fr</link>
@@ -97,9 +94,6 @@
       ]]></content:encoded>
     </item>
 
-    <!-- ============================================ -->
-    <!-- ARTICLE 2 — Bienvenue (premier post)         -->
-    <!-- ============================================ -->
     <item>
       <title>Bienvenue sur Nerysia !</title>
       <link>https://apk.nerysia.fr</link>
