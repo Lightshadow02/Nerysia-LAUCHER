@@ -351,6 +351,8 @@ $srv = $config.server
 $distribution = [ordered]@{
     version = "1.0.0"   # Schema version Helios (ne pas toucher)
     rss     = $config.rss
+    # Configs que le joueur peut modifier sans qu'elles soient ecrasees (lu par le launcher)
+    playerConfigs = @($config.playerConfigs.patterns)
     servers = @(
         [ordered]@{
             id               = $srv.id
