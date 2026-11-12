@@ -1,0 +1,68 @@
+# Mise à jour des serveurs Nerysia (eggs Pterodactyl, depot.nerysia.fr).
+#
+# Tourne sur le PC de Light (runner « nerysia-banc ») : le pack des serveurs se fabrique à partir du banc de test,
+# qui n'existe que là. Les serveurs prennent la nouvelle version à leur prochain redémarrage (NerysiaMaj).
+#
+# Sécurité (dépôt public) : déclenchement à la main uniquement, par Lightshadow02 seulement ; aucun déclencheur
+# pull_request ; l'approbation de Light est exigée pour tout workflow venant d'un contributeur extérieur.
+name: Mise à jour des serveurs
+
+on:
+  workflow_dispatch:
+    inputs:
+      canal:
+        description: "Canal : test (essais) ou stable (le vrai réseau)"
+        type: choice
+        options: [test, stable]
+        default: test
+      envoyer:
+        description: "Envoyer sur depot.nerysia.fr (décoché : fabriquer le pack sans l'envoyer)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maj-serveurs
+  cancel-in-progress: false
+
+jobs:
+  maj:
+    if: github.actor == 'Lightshadow02' && github.event_name == 'workflow_dispatch'
+    runs-on: [self-hosted, nerysia-banc]
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: powershell
+        working-directory: C:\Users\Light\Documents\Projet\Nerysia-mod-admin
+    env:
+      CANAL: ${{ inputs.canal }}
+      PYTHONIOENCODING: utf-8
+    steps:
+      - name: Vérifier le dépôt OVH (lecteur Y:)
+        if: inputs.envoyer
+        run: |
+          if (-not (Test-Path 'Y:\depot')) {
+            Write-Output "::error::Le lecteur Y: (RaiDrive, OVH) n'est pas monté sur le PC : monte-le puis relance."
+            exit 1
+          }
+          Write-Output "Y: est monté."
+
+      - name: Fabriquer le pack depuis le banc
+        run: |
+          python src/ptero/publier.py $env:CANAL
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Envoyer sur depot.nerysia.fr
+        if: inputs.envoyer
+        run: |
+          python src/ptero/envoyer.py $env:CANAL
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Résumé
+        if: always()
+        run: |
+          $v = Get-Content "ptero-depot\$env:CANAL\index.json" -Raw | ConvertFrom-Json
+          "## Mise à jour des serveurs : canal $env:CANAL" | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+          "Version : **$($v.version)**. Les serveurs la prennent à leur prochain redémarrage." | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
