@@ -41,6 +41,35 @@
             </div>
         </div>
     </div>
+    <!-- Changement de skin (landing.js -> openSkinChanger). Textes : _custom.toml [js.skin] -->
+    <div id="skinChangeContent" style="display: none;">
+        <span id="skinChangeHeader"></span>
+        <div id="skinChangeBody">
+            <div id="skinChangePreviewBox">
+                <div id="skinChangePreview"></div>
+                <span id="skinChangePreviewLabel"></span>
+            </div>
+            <div id="skinChangeForm">
+                <input type="file" id="skinChangeFile" accept="image/png" style="display: none;">
+                <button id="skinChangeChoose" class="skinChangeButton"></button>
+                <span id="skinChangeFileName"></span>
+                <span class="skinChangeLabel" id="skinChangeModelTitle"></span>
+                <div id="skinChangeModels">
+                    <button class="skinChangeModel" variant="classic"></button>
+                    <button class="skinChangeModel" variant="slim"></button>
+                </div>
+                <a id="skinChangeFind" href="https://namemc.com/minecraft-skins"></a>
+                <button id="skinChangeReset"></button>
+            </div>
+        </div>
+        <span id="skinChangeStatus"></span>
+        <div id="skinChangeActions">
+            <button id="skinChangeConfirm" class="overlayKeybindEnter" type="submit"></button>
+            <div id="skinChangeCancelWrapper">
+                <button id="skinChangeCancel" class="overlayKeybindEsc"></button>
+            </div>
+        </div>
+    </div>
     <div id="overlayContent">
         <span id="overlayTitle">Lorem Ipsum:<br>Finis Illud</span>
         <span id="overlayDesc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud..</span>

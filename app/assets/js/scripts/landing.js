@@ -32,6 +32,8 @@ const DiscordWrapper          = require('./assets/js/discordwrapper')
 const ProcessBuilder          = require('./assets/js/processbuilder')
 const ModpackUpdater          = require('./assets/js/modpackupdater')
 const GameInstances           = require('./assets/js/gameinstances')
+const SkinChanger             = require('./assets/js/skinchanger')
+const SkinViewer              = require('./assets/js/skinviewer')
 
 // Launch Elements
 const launch_content          = document.getElementById('launch_content')
@@ -173,13 +175,187 @@ document.getElementById('settingsMediaButton').onclick = async e => {
     switchView(getCurrentView(), VIEWS.settings)
 }
 
-// Bind avatar overlay button.
-document.getElementById('avatarOverlay').onclick = async e => {
-    await prepareSettings()
-    switchView(getCurrentView(), VIEWS.settings, 500, 500, () => {
-        settingsNavItemListener(document.getElementById('settingsNavAccount'), false)
+/* ---------- Changement de skin (bouton a droite + clic sur l'avatar) ---------- */
+
+// La fenetre (overlay.ejs) est ajoutee a la page APRES ce script : on la prepare au premier clic.
+let skinChange = null
+
+function initSkinChanger(){
+    if(skinChange != null){
+        return
+    }
+    skinChange = {
+        content:    document.getElementById('skinChangeContent'),
+        viewer:     new SkinViewer(document.getElementById('skinChangePreview')),
+        label:      document.getElementById('skinChangePreviewLabel'),
+        fileInput:  document.getElementById('skinChangeFile'),
+        fileName:   document.getElementById('skinChangeFileName'),
+        status:     document.getElementById('skinChangeStatus'),
+        confirm:    document.getElementById('skinChangeConfirm'),
+        models:     Array.from(document.getElementsByClassName('skinChangeModel')),
+        image: null,          // image affichee dans l'apercu
+        newPng: null,         // fichier choisi par le joueur (Buffer) ou null
+        currentUrl: null,     // skin actuel chez Minecraft
+        currentVariant: 'classic',
+        variant: 'classic',
+        session: 0            // ouverture en cours (ignore les reponses d'une ouverture precedente)
+    }
+
+    document.getElementById('skinChangeChoose').onclick = () => {
+        skinChange.fileInput.value = '' // pour pouvoir rechoisir le meme fichier
+        skinChange.fileInput.click()
+    }
+
+    skinChange.fileInput.onchange = async () => {
+        const file = skinChange.fileInput.files[0]
+        if(file == null) return
+        try {
+            const png = Buffer.from(await file.arrayBuffer())
+            SkinChanger.checkSkinFile(png)
+            skinChange.image = await loadSkinImage('data:image/png;base64,' + png.toString('base64'))
+            skinChange.newPng = png
+            skinChange.fileName.textContent = file.name
+            skinChange.label.innerHTML = Lang.queryJS('skin.previewLabel')
+            skinStatus('')
+        } catch(err) {
+            skinStatus(skinErrorText(err.code ? err : { code: 'notPng' }), 'error')
+        }
+        refreshSkinChangeForm()
+    }
+
+    for(const btn of skinChange.models){
+        btn.onclick = () => {
+            skinChange.variant = btn.getAttribute('variant')
+            refreshSkinChangeForm()
+        }
+    }
+
+    skinChange.confirm.onclick = () => {
+        if(!skinChange.confirm.disabled) applySkinChange('upload')
+    }
+    document.getElementById('skinChangeReset').onclick = () => applySkinChange('reset')
+    document.getElementById('skinChangeCancel').onclick = closeSkinChanger
+}
+
+function skinStatus(text, type){
+    skinChange.status.innerHTML = text || ''
+    if(type) skinChange.status.setAttribute('type', type)
+    else skinChange.status.removeAttribute('type')
+}
+
+function skinErrorText(err){
+    return Lang.queryJS('skin.errors.' + (err?.code || 'network'))
+}
+
+function loadSkinImage(src){
+    return new Promise((resolve, reject) => {
+        const img = new Image()
+        img.onload = () => resolve(img)
+        img.onerror = () => reject(new Error('Image illisible'))
+        img.src = src
     })
 }
+
+/** Affiche l'image du skin sur le personnage 3D qui tourne (assets/js/skinviewer.js). */
+function drawSkinPreview(){
+    skinChange.viewer.setSkin(skinChange.image, skinChange.variant === 'slim')
+}
+
+function refreshSkinChangeForm(){
+    for(const btn of skinChange.models){
+        if(btn.getAttribute('variant') === skinChange.variant) btn.setAttribute('selected', '')
+        else btn.removeAttribute('selected')
+    }
+    // Rien a envoyer tant qu'on n'a ni nouveau fichier ni nouveau modele
+    skinChange.confirm.disabled = skinChange.newPng == null && (skinChange.variant === skinChange.currentVariant || skinChange.currentUrl == null)
+    drawSkinPreview()
+}
+
+function setSkinBusy(busy){
+    if(busy) skinChange.content.setAttribute('busy', '')
+    else skinChange.content.removeAttribute('busy')
+}
+
+async function openSkinChanger(){
+    initSkinChanger()
+    const session = ++skinChange.session
+    Object.assign(skinChange, { image: null, newPng: null, currentUrl: null, currentVariant: 'classic', variant: 'classic' })
+    document.getElementById('skinChangeHeader').innerHTML = Lang.queryJS('skin.title')
+    document.getElementById('skinChangeChoose').innerHTML = Lang.queryJS('skin.choose')
+    document.getElementById('skinChangeModelTitle').innerHTML = Lang.queryJS('skin.modelTitle')
+    skinChange.models[0].innerHTML = Lang.queryJS('skin.modelClassic')
+    skinChange.models[1].innerHTML = Lang.queryJS('skin.modelSlim')
+    document.getElementById('skinChangeFind').innerHTML = Lang.queryJS('skin.find')
+    document.getElementById('skinChangeReset').innerHTML = Lang.queryJS('skin.reset')
+    skinChange.confirm.innerHTML = Lang.queryJS('skin.confirm')
+    document.getElementById('skinChangeCancel').innerHTML = Lang.queryJS('skin.cancel')
+    skinChange.label.innerHTML = ''
+    skinChange.fileName.textContent = Lang.queryJS('skin.fileHint')
+    setSkinBusy(true)
+    skinStatus(Lang.queryJS('skin.loading'))
+    refreshSkinChangeForm()
+    toggleOverlay(true, true, 'skinChangeContent')
+    skinChange.viewer.start()
+
+    try {
+        const current = await SkinChanger.getCurrentSkin()
+        if(session !== skinChange.session) return
+        skinChange.currentUrl = current.url
+        skinChange.currentVariant = skinChange.variant = current.variant
+        if(current.url != null){
+            skinChange.image = await loadSkinImage(current.url)
+            if(session !== skinChange.session) return
+        }
+        skinChange.label.innerHTML = Lang.queryJS('skin.currentLabel')
+        skinStatus('')
+    } catch(err) {
+        if(session !== skinChange.session) return
+        skinStatus(skinErrorText(err), 'error')
+    }
+    setSkinBusy(false)
+    refreshSkinChangeForm()
+}
+
+function closeSkinChanger(){
+    skinChange.session++
+    skinChange.viewer.stop()
+    setSkinBusy(false)
+    toggleOverlay(false)
+}
+
+async function applySkinChange(action){
+    const session = skinChange.session
+    setSkinBusy(true)
+    skinStatus(Lang.queryJS('skin.sending'))
+    try {
+        if(action === 'reset'){
+            await SkinChanger.resetSkin()
+        } else {
+            let png = skinChange.newPng
+            if(png == null){
+                // Seul le modele change : on renvoie l'image actuelle avec le nouveau modele
+                png = (await require('got').get(skinChange.currentUrl, { responseType: 'buffer', timeout: { request: 10000 } })).body
+            }
+            await SkinChanger.uploadSkin(png, skinChange.variant)
+        }
+        const account = ConfigManager.getSelectedAccount()
+        SkinUtil.applySkin(document.getElementById('avatarContainer'), account.uuid, 'body', 'right')
+        if(session !== skinChange.session) return
+        skinStatus(Lang.queryJS('skin.success'), 'success')
+        setTimeout(() => {
+            if(session === skinChange.session) closeSkinChanger()
+        }, 2500)
+    } catch(err) {
+        if(session !== skinChange.session) return
+        loggerLanding.warn('Skin change failed', err.code || err.message)
+        skinStatus(skinErrorText(err), 'error')
+        setSkinBusy(false)
+    }
+}
+
+// Bouton "Skin" a droite + clic sur l'avatar : ouvrent la fenetre de changement de skin
+document.getElementById('skinMediaButton').onclick = () => openSkinChanger()
+document.getElementById('avatarOverlay').onclick = () => openSkinChanger()
 
 // Bind selected account
 function updateSelectedAccount(authUser){
