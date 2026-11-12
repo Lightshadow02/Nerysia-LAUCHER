@@ -7,7 +7,7 @@
  */
 /* global document, requestAnimationFrame, cancelAnimationFrame */
 
-const S = 7                 // taille d'un pixel de skin a l'ecran
+const S = 6                 // taille d'un pixel de skin a l'ecran
 const TURN_SPEED = 40       // degres par seconde
 const TILT = -10            // vue legerement du dessus
 
@@ -179,5 +179,7 @@ class SkinViewer {
         }
     }
 }
+
+SkinViewer.hatHasTransparency = hatHasTransparency
 
 module.exports = SkinViewer
