@@ -4190,3 +4190,254 @@ input:checked + .toggleSwitchSlider:before {
 .rotating {
     animation: rotating 10s linear infinite;
 }
+
+/* ===== Changement de skin (bouton a droite + fenetre, cf landing.js -> openSkinChanger) ===== */
+
+#skinMediaContainer {
+    position: relative;
+    margin-top: 14px;
+}
+#skinSVG {
+    height: 26px;
+}
+.mediaButton:hover #skinSVG,
+.mediaButton:focus #skinSVG,
+.mediaButton:active #skinSVG {
+    height: 20px;
+}
+/* Meme bulle que "Parametres" */
+#skinTooltip {
+    visibility: hidden;
+    opacity: 0;
+    width: 75px;
+    height: 20px;
+    background-color: rgba(0, 0, 0, 0.75);
+    text-align: center;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 1;
+    right: 130%;
+    font-size: 12px;
+    line-height: 20px;
+    color: white;
+    transition: visibility 0s linear 0.25s, opacity 0.25s ease;
+}
+#skinTooltip::after {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent rgba(0, 0, 0, 0.75);
+}
+.mediaButton:hover #skinTooltip,
+.mediaButton:focus #skinTooltip,
+.mediaButton:active #skinTooltip {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 0s;
+}
+
+#skinChangeContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
+#skinChangeHeader {
+    font-family: 'Avenir Medium';
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+#skinChangeBody {
+    display: flex;
+    gap: 24px;
+    align-items: stretch;
+    width: 420px;
+    padding: 16px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.30);
+    border-radius: 3px;
+}
+#skinChangePreviewBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 130px;
+    flex-shrink: 0;
+    background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 70%);
+}
+/* Personnage 3D (assets/js/skinviewer.js). Pas de filter ici : il aplatirait la 3D. */
+#skinChangePreview {
+    position: relative;
+    width: 130px;
+    height: 250px;
+    perspective: 900px;
+    cursor: grab;
+    touch-action: none;
+}
+#skinChangePreview:active {
+    cursor: grabbing;
+}
+.skin3d-root {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform-style: preserve-3d;
+}
+.skin3d-pivot,
+.skin3d-box {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    transform-style: preserve-3d;
+}
+.skin3d-face {
+    position: absolute;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+}
+#skinChangePreviewLabel {
+    margin-top: 8px;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.7);
+}
+#skinChangeForm {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+.skinChangeButton,
+.skinChangeModel {
+    height: 30px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(126, 126, 126, 0.57);
+    border-radius: 3px;
+    color: white;
+    font-family: 'Avenir Medium';
+    font-size: 12px;
+    cursor: pointer;
+    outline: none;
+    transition: 0.25s ease;
+}
+.skinChangeButton:hover,
+.skinChangeButton:focus,
+.skinChangeModel:hover,
+.skinChangeModel:focus {
+    background: rgba(255, 255, 255, 0.15);
+}
+#skinChangeFileName {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.75);
+    margin-top: 5px;
+    min-height: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.skinChangeLabel {
+    font-family: 'Avenir Medium';
+    font-size: 13px;
+    font-weight: bold;
+    margin: 12px 0px 6px 0px;
+}
+#skinChangeModels {
+    display: flex;
+    gap: 8px;
+}
+.skinChangeModel {
+    flex: 1;
+}
+.skinChangeModel[selected] {
+    background: rgb(31, 140, 11);
+    border-color: rgb(31, 140, 11);
+    cursor: default;
+}
+#skinChangeFind {
+    margin-top: auto;
+    padding-top: 12px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.85);
+}
+#skinChangeReset {
+    align-self: flex-start;
+    margin-top: 6px;
+    padding: 0px;
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 11px;
+    color: rgba(202, 202, 202, 0.75);
+    text-decoration: underline;
+    cursor: pointer;
+}
+#skinChangeReset:hover,
+#skinChangeReset:focus {
+    color: white;
+}
+#skinChangeStatus {
+    min-height: 16px;
+    margin-top: 12px;
+    font-size: 12px;
+    text-align: center;
+    max-width: 420px;
+}
+#skinChangeStatus[type="error"] {
+    color: #ff8a80;
+}
+#skinChangeStatus[type="success"] {
+    color: #8eff7a;
+}
+#skinChangeActions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 12px;
+}
+#skinChangeConfirm {
+    background: none;
+    border: 1px solid #ffffff;
+    color: white;
+    font-family: 'Avenir Medium';
+    font-weight: bold;
+    border-radius: 2px;
+    padding: 0px 8.1px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    min-height: 20.67px;
+}
+#skinChangeConfirm:hover,
+#skinChangeConfirm:focus {
+    box-shadow: 0px 0px 10px 0px #fff;
+    outline: none;
+}
+#skinChangeConfirm:disabled {
+    opacity: 0.4;
+    box-shadow: none;
+    cursor: default;
+}
+#skinChangeCancel {
+    font-weight: bold;
+    font-size: 10px;
+    padding-top: 2.5px;
+    color: rgba(202, 202, 202, 0.75);
+    transition: 0.25s ease;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+#skinChangeCancel:hover,
+#skinChangeCancel:focus {
+    color: rgba(255, 255, 255, 0.75);
+}
+#skinChangeContent[busy] button,
+#skinChangeContent[busy] a {
+    pointer-events: none;
+    opacity: 0.5;
+}

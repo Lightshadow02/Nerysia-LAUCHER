@@ -127,3 +127,24 @@ exports.applySkin = function(el, uuid, kind, size){
         if(data != null && el.getAttribute('data-skin-uuid') === uuid) set(data)
     })
 }
+
+/**
+ * Le skin du compte vient de changer (depuis le launcher) : on oublie les images gardees
+ * et on retient directement la nouvelle texture (Mojang met parfois une minute a la donner).
+ * @param {string} uuid        uuid du compte
+ * @param {string|null} id     identifiant de la nouvelle texture (null = skin par defaut)
+ */
+exports.setTexture = function(uuid, id){
+    const texId = id || uuid
+    lsSet(TEX_KEY + uuid, texId)
+    textureIds.set(uuid, Promise.resolve({ id: texId, sure: true }))
+    for(const key of [...fresh.keys()]){
+        if(key.startsWith(uuid + '|')) fresh.delete(key)
+    }
+    try {
+        for(let i = localStorage.length - 1; i >= 0; i--){
+            const k = localStorage.key(i)
+            if(k && k.startsWith(IMG_KEY + uuid + '|')) localStorage.removeItem(k)
+        }
+    } catch(err) { /* stockage indisponible */ }
+}

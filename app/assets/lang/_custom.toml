@@ -14,6 +14,8 @@ newsErrorLoadSpan = "Chargement des actualités…"
 newsErrorFailedSpan = "Impossible de charger les actualités"
 newsErrorRetryButton = "Réessayer"
 newsErrorNoneSpan = "Aucune actualité pour le moment"
+usernameEditButton = "Skin"
+skinTooltip = "Skin"
 
 [ejs.settings]
 jvmOptsDesc = "Options avancées passées à Java (réglages de performance <em>-XX:…</em>). Par sécurité anti-triche, seules les options de performance sont prises en compte : <em>-javaagent</em>, <em>-D…</em> et assimilées sont ignorées. <em>-Xms</em> et <em>-Xmx</em> se règlent avec les curseurs ci-dessus."
@@ -57,6 +59,34 @@ runningTitle = "Minecraft est déjà ouvert"
 runningText = "<b>{name}</b> est déjà ouvert.<br>Deux jeux en même temps utilisent deux fois plus de mémoire (RAM) et peuvent faire planter les deux.<br><br>Es-tu sûr de vouloir lancer une deuxième instance ?"
 confirm = "Lancer quand même"
 cancel = "Annuler"
+
+[js.skin]
+title = "Changer de skin"
+choose = "Choisir une image (.png)"
+fileHint = "Image de skin 64 × 64 pixels"
+modelTitle = "Modèle"
+modelClassic = "Classique (Steve)"
+modelSlim = "Fin (Alex)"
+find = "Trouver des skins sur NameMC"
+reset = "Remettre le skin par défaut"
+confirm = "Appliquer"
+cancel = "Fermer"
+loading = "Chargement de ton skin…"
+currentLabel = "Skin actuel"
+previewLabel = "Aperçu"
+sending = "Envoi du skin…"
+success = "&#10003; Skin changé ! Il sera visible en jeu à ta prochaine connexion."
+
+[js.skin.errors]
+noAccount = "Connecte-toi d'abord à un compte Minecraft."
+notMicrosoft = "Le changement de skin n'est possible qu'avec un compte Microsoft."
+sessionExpired = "Ta connexion a expiré : reconnecte ton compte dans les paramètres, puis réessaie."
+rejected = "Minecraft a refusé cette image. Vérifie que c'est bien un skin 64 × 64 pixels."
+tooMany = "Trop de changements d'affilée : attends une minute puis réessaie."
+network = "Impossible de joindre les serveurs de Minecraft. Vérifie ta connexion et réessaie."
+notPng = "Ce fichier n'est pas une image PNG."
+badSize = "Un skin doit faire 64 × 64 pixels (ou 64 × 32 pour l'ancien format)."
+tooBig = "Ce fichier est trop lourd pour être un skin."
 
 [js.landing.news]
 checking = "Chargement des actualités"
