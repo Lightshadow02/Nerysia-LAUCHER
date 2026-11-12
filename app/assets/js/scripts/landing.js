@@ -198,6 +198,11 @@ function initSkinChanger(){
         currentUrl: null,     // skin actuel chez Minecraft
         currentVariant: 'classic',
         variant: 'classic',
+        capesBox:   document.getElementById('skinChangeCapes'),
+        capes: [],            // capes que possede le compte
+        capeImages: new Map(),// id de cape -> image
+        currentCapeId: null,  // cape portee chez Minecraft (null = aucune)
+        capeId: null,         // cape choisie dans la fenetre
         session: 0            // ouverture en cours (ignore les reponses d'une ouverture precedente)
     }
 
@@ -258,7 +263,53 @@ function loadSkinImage(src){
 
 /** Affiche l'image du skin sur le personnage 3D qui tourne (assets/js/skinviewer.js). */
 function drawSkinPreview(){
-    skinChange.viewer.setSkin(skinChange.image, skinChange.variant === 'slim')
+    const cape = skinChange.capeId != null ? skinChange.capeImages.get(skinChange.capeId) : null
+    skinChange.viewer.setSkin(skinChange.image, skinChange.variant === 'slim', cape)
+}
+
+function skinChanged(){
+    return skinChange.newPng != null || (skinChange.variant !== skinChange.currentVariant && skinChange.currentUrl != null)
+}
+
+function capeChanged(){
+    return skinChange.capeId !== skinChange.currentCapeId
+}
+
+/** Boutons des capes du compte (+ "Aucune"). Miniature = le devant de la cape. */
+function renderSkinCapes(){
+    const box = skinChange.capesBox
+    box.innerHTML = ''
+    if(skinChange.capes.length === 0){
+        const none = document.createElement('span')
+        none.id = 'skinChangeNoCape'
+        none.innerHTML = Lang.queryJS('skin.noCape')
+        box.appendChild(none)
+        return
+    }
+    const options = [{ id: null, alias: Lang.queryJS('skin.capeNone') }].concat(skinChange.capes)
+    for(const cape of options){
+        const btn = document.createElement('button')
+        btn.className = 'skinChangeCape'
+        btn.title = cape.alias
+        const img = cape.id != null ? skinChange.capeImages.get(cape.id) : null
+        if(img != null){
+            const thumb = document.createElement('div')
+            thumb.className = 'skinChangeCapeThumb'
+            const k = 64 / img.naturalWidth // capes plus grandes que 64x32 : meme decoupage
+            thumb.style.backgroundImage = `url("${img.src}")`
+            thumb.style.backgroundSize = `${64 * 3}px ${img.naturalHeight * k * 3}px`
+            thumb.style.backgroundPosition = '-3px -3px'
+            btn.appendChild(thumb)
+        } else {
+            btn.textContent = cape.id == null ? Lang.queryJS('skin.capeNone') : cape.alias
+        }
+        btn.onclick = () => {
+            skinChange.capeId = cape.id
+            refreshSkinChangeForm()
+        }
+        btn.setAttribute('capeid', cape.id ?? '')
+        box.appendChild(btn)
+    }
 }
 
 function refreshSkinChangeForm(){
@@ -266,8 +317,12 @@ function refreshSkinChangeForm(){
         if(btn.getAttribute('variant') === skinChange.variant) btn.setAttribute('selected', '')
         else btn.removeAttribute('selected')
     }
-    // Rien a envoyer tant qu'on n'a ni nouveau fichier ni nouveau modele
-    skinChange.confirm.disabled = skinChange.newPng == null && (skinChange.variant === skinChange.currentVariant || skinChange.currentUrl == null)
+    for(const btn of skinChange.capesBox.getElementsByClassName('skinChangeCape')){
+        if(btn.getAttribute('capeid') === (skinChange.capeId ?? '')) btn.setAttribute('selected', '')
+        else btn.removeAttribute('selected')
+    }
+    // Rien a envoyer tant que rien n'a change (fichier, modele ou cape)
+    skinChange.confirm.disabled = !skinChanged() && !capeChanged()
     drawSkinPreview()
 }
 
@@ -279,10 +334,13 @@ function setSkinBusy(busy){
 async function openSkinChanger(){
     initSkinChanger()
     const session = ++skinChange.session
-    Object.assign(skinChange, { image: null, newPng: null, currentUrl: null, currentVariant: 'classic', variant: 'classic' })
+    Object.assign(skinChange, { image: null, newPng: null, currentUrl: null, currentVariant: 'classic', variant: 'classic',
+        capes: [], capeImages: new Map(), currentCapeId: null, capeId: null })
     document.getElementById('skinChangeHeader').innerHTML = Lang.queryJS('skin.title')
     document.getElementById('skinChangeChoose').innerHTML = Lang.queryJS('skin.choose')
     document.getElementById('skinChangeModelTitle').innerHTML = Lang.queryJS('skin.modelTitle')
+    document.getElementById('skinChangeCapeTitle').innerHTML = Lang.queryJS('skin.capeTitle')
+    skinChange.capesBox.innerHTML = ''
     skinChange.models[0].innerHTML = Lang.queryJS('skin.modelClassic')
     skinChange.models[1].innerHTML = Lang.queryJS('skin.modelSlim')
     document.getElementById('skinChangeFind').innerHTML = Lang.queryJS('skin.find')
@@ -302,10 +360,18 @@ async function openSkinChanger(){
         if(session !== skinChange.session) return
         skinChange.currentUrl = current.url
         skinChange.currentVariant = skinChange.variant = current.variant
-        if(current.url != null){
-            skinChange.image = await loadSkinImage(current.url)
-            if(session !== skinChange.session) return
-        }
+        skinChange.capes = current.capes
+        skinChange.currentCapeId = skinChange.capeId = current.capeId
+        // Images du skin et des capes en parallele (une cape illisible est juste montree par son nom)
+        const [image] = await Promise.all([
+            current.url != null ? loadSkinImage(current.url) : null,
+            ...current.capes.map(cape => loadSkinImage(cape.url)
+                .then(img => skinChange.capeImages.set(cape.id, img))
+                .catch(() => {}))
+        ])
+        if(session !== skinChange.session) return
+        skinChange.image = image
+        renderSkinCapes()
         skinChange.label.innerHTML = Lang.queryJS('skin.currentLabel')
         skinStatus('')
     } catch(err) {
@@ -331,12 +397,18 @@ async function applySkinChange(action){
         if(action === 'reset'){
             await SkinChanger.resetSkin()
         } else {
-            let png = skinChange.newPng
-            if(png == null){
-                // Seul le modele change : on renvoie l'image actuelle avec le nouveau modele
-                png = (await require('got').get(skinChange.currentUrl, { responseType: 'buffer', timeout: { request: 10000 } })).body
+            if(skinChanged()){
+                let png = skinChange.newPng
+                if(png == null){
+                    // Seul le modele change : on renvoie l'image actuelle avec le nouveau modele
+                    png = (await require('got').get(skinChange.currentUrl, { responseType: 'buffer', timeout: { request: 10000 } })).body
+                }
+                await SkinChanger.uploadSkin(png, skinChange.variant)
             }
-            await SkinChanger.uploadSkin(png, skinChange.variant)
+            if(capeChanged()){
+                await SkinChanger.setCape(skinChange.capeId)
+                skinChange.currentCapeId = skinChange.capeId
+            }
         }
         const account = ConfigManager.getSelectedAccount()
         SkinUtil.applySkin(document.getElementById('avatarContainer'), account.uuid, 'body', 'right')

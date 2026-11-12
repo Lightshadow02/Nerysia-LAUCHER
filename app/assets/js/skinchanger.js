@@ -68,7 +68,10 @@ function textureIdOf(profile){
 /**
  * Skin actuel du compte selectionne.
  *
- * @returns {Promise<{name: string, url: string|null, variant: 'classic'|'slim'}>}
+ * capes = toutes les capes que possede le compte, capeId = celle portee (null = aucune).
+ *
+ * @returns {Promise<{name: string, url: string|null, variant: 'classic'|'slim',
+ *     capes: Array<{id: string, alias: string, url: string}>, capeId: string|null}>}
  */
 exports.getCurrentSkin = async function(){
     try {
@@ -79,11 +82,38 @@ exports.getCurrentSkin = async function(){
             timeout: { request: 10000 }
         })
         const active = (res.body.skins || []).find(s => s.state === 'ACTIVE')
+        const capes = res.body.capes || []
         return {
             name: res.body.name,
             url: active?.url ?? null,
-            variant: active?.variant?.toLowerCase() === 'slim' ? 'slim' : 'classic'
+            variant: active?.variant?.toLowerCase() === 'slim' ? 'slim' : 'classic',
+            capes: capes.map(c => ({ id: c.id, alias: c.alias || '', url: c.url })),
+            capeId: capes.find(c => c.state === 'ACTIVE')?.id ?? null
         }
+    } catch(err) {
+        throw toSkinError(err)
+    }
+}
+
+/**
+ * Choisit la cape portee par le compte selectionne (parmi celles qu'il possede).
+ *
+ * @param {string|null} capeId Identifiant de la cape, ou null pour ne porter aucune cape.
+ */
+exports.setCape = async function(capeId){
+    try {
+        const account = await selectedAccount()
+        const options = {
+            headers: { Authorization: `Bearer ${account.accessToken}` },
+            responseType: 'json',
+            timeout: { request: 20000 }
+        }
+        if(capeId == null){
+            await got.delete(`${API}/capes/active`, options)
+        } else {
+            await got.put(`${API}/capes/active`, { ...options, json: { capeId } })
+        }
+        log.info(capeId == null ? 'Cape retiree.' : 'Cape changee.')
     } catch(err) {
         throw toSkinError(err)
     }
