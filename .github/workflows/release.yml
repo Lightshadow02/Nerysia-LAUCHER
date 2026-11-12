@@ -20,10 +20,10 @@ on:
         options: [mac, windows, linux, tout]
         default: mac
       machine_mac:
-        description: "Machine Mac (si l'une reste bloquee en attente, essayer l'autre ; l'Intel fait aussi le .dmg Apple Silicon)"
+        description: "Machine Mac (l'Intel fait aussi le .dmg Apple Silicon ; macos-15 = Apple Silicon, souvent saturee)"
         type: choice
-        options: [macos-15, macos-15-intel]
-        default: macos-15
+        options: [macos-15-intel, macos-15]
+        default: macos-15-intel
 
 permissions:
   contents: write
@@ -33,10 +33,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # macos-15 et pas macos-latest : en nov. 2026, macos-latest restait en attente
-        # 15 min puis etait annule (aucune machine attribuee).
+        # Mac = macos-15-intel : les machines Mac Apple Silicon de GitHub (macos-15, macos-latest)
+        # sont saturees depuis nov. 2026 ("Due to capacity constraints...") et le build etait annule
+        # apres 15 min sans machine ("not acquired by Runner"). La machine Intel demarre tout de suite
+        # et fabrique aussi le .dmg Apple Silicon (arm64). Image Intel maintenue par GitHub jusqu'a
+        # aout 2027 environ : repasser alors sur macos-15 / macos-latest.
         os: ${{ fromJSON(
-          github.event_name != 'workflow_dispatch' && '["windows-latest","macos-15","ubuntu-latest"]' ||
+          github.event_name != 'workflow_dispatch' && '["windows-latest","macos-15-intel","ubuntu-latest"]' ||
           inputs.systeme == 'mac' && format('["{0}"]', inputs.machine_mac) ||
           inputs.systeme == 'windows' && '["windows-latest"]' ||
           inputs.systeme == 'linux' && '["ubuntu-latest"]' ||

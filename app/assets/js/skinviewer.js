@@ -83,8 +83,9 @@ class SkinViewer {
      * Affiche un skin.
      * @param {HTMLImageElement|null} img Image du skin deja chargee (64x64 ou 64x32), null = vide.
      * @param {boolean} slim Modele a bras fins (Alex).
+     * @param {HTMLImageElement|null} cape Image de la cape portee (64x32), null = pas de cape.
      */
-    setSkin(img, slim){
+    setSkin(img, slim, cape = null){
         this.container.innerHTML = ''
         this.limbs = []
         this.root = null
@@ -94,20 +95,21 @@ class SkinViewer {
         const legacy = img.naturalHeight === 32
         const texH = legacy ? 32 : 64
         const aw = slim ? 3 : 4
-        const bg = `url("${img.src}")`
+        const skinTex = { bg: `url("${img.src}")`, w: 64, h: texH }
 
         const root = el('skin3d-root', this.container)
         this.root = root
 
         // Une partie du corps : articulation (pivot) + boite(s) de base et 2e couche
-        const part = ({ x, y, offY, w, h, d, base, layer, mirror, swing }) => {
+        const part = ({ x, y, z = 0, offY, offZ = 0, w, h, d, base, layer, mirror, turn, swing, tex = skinTex }) => {
             const pivot = el('skin3d-pivot', root)
-            pivot.style.transform = `translate3d(${x * S}px, ${y * S}px, 0)`
+            pivot.style.transform = `translate3d(${x * S}px, ${y * S}px, ${z * S}px)`
             const boxes = [{ uv: base, grow: 0 }]
             if(layer) boxes.push({ uv: layer, grow: 1 })
             for(const box of boxes){
                 const cuboid = el('skin3d-box', pivot)
-                let tf = `translate3d(0, ${offY * S}px, 0)`
+                let tf = `translate3d(0, ${offY * S}px, ${offZ * S}px)`
+                if(turn) tf += ` rotateY(${turn}deg)`
                 if(box.grow) tf += ` scale3d(${(w + box.grow) / w}, ${(h + box.grow) / h}, ${(d + box.grow) / d})`
                 if(mirror) tf += ' scaleX(-1)'
                 cuboid.style.transform = tf
@@ -117,13 +119,13 @@ class SkinViewer {
                     face.style.height = `${f.fh * S}px`
                     face.style.left = `${-f.fw * S / 2}px`
                     face.style.top = `${-f.fh * S / 2}px`
-                    face.style.backgroundImage = bg
-                    face.style.backgroundSize = `${64 * S}px ${texH * S}px`
+                    face.style.backgroundImage = tex.bg
+                    face.style.backgroundSize = `${tex.w * S}px ${tex.h * S}px`
                     face.style.backgroundPosition = `${-f.fx * S}px ${-f.fy * S}px`
                     face.style.transform = f.tf
                 }
             }
-            if(swing) this.limbs.push({ pivot, x, y, swing })
+            if(swing) this.limbs.push({ pivot, x, y, z, swing })
         }
 
         // Le personnage fait 32 pixels de haut, centre au milieu du corps. Sa droite = gauche de l'ecran.
@@ -135,6 +137,12 @@ class SkinViewer {
         // jambes (articulation a la hanche)
         part({ x: -2, y: 6, offY: 6, w: 4, h: 12, d: 4, base: [0, 16], layer: legacy ? null : [0, 32], swing: -1.3 })
         part({ x: 2, y: 6, offY: 6, w: 4, h: 12, d: 4, base: legacy ? [0, 16] : [16, 48], layer: legacy ? null : [0, 48], mirror: legacy, swing: 1.3 })
+        // cape (texture 64x32, ou plus grande en gardant les proportions) : accrochee en haut du dos,
+        // retournee pour que l'exterieur de la cape soit vu de dos
+        if(cape != null){
+            const capeTex = { bg: `url("${cape.src}")`, w: 64, h: 64 * cape.naturalHeight / cape.naturalWidth }
+            part({ x: 0, y: -6, z: -2, offY: 8, offZ: -0.5, w: 10, h: 16, d: 1, base: [0, 0], turn: 180, swing: 'cape', tex: capeTex })
+        }
 
         this.render(performance.now())
     }
@@ -144,7 +152,9 @@ class SkinViewer {
         this.root.style.transform = `rotateX(${TILT}deg) rotateY(${this.angle}deg)`
         const walk = Math.sin(now / 1000 * 4) * 18 // degres
         for(const limb of this.limbs){
-            limb.pivot.style.transform = `translate3d(${limb.x * S}px, ${limb.y * S}px, 0) rotateX(${walk * limb.swing}deg)`
+            // la cape s'ecarte du dos et flotte un peu en marchant
+            const angle = limb.swing === 'cape' ? -(8 + Math.abs(walk) * 0.4) : walk * limb.swing
+            limb.pivot.style.transform = `translate3d(${limb.x * S}px, ${limb.y * S}px, ${limb.z * S}px) rotateX(${angle}deg)`
         }
     }
 
