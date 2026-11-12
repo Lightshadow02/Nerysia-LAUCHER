@@ -71,7 +71,11 @@ jobs:
           node-version: 20
           cache: npm
 
-      - run: npm ci
+      # 3 essais : les machines de GitHub perdent parfois le reseau un instant
+      # (nov. 2026 : "getaddrinfo ENOTFOUND github.com" en telechargeant Electron sur le Mac)
+      - name: Install dependencies
+        shell: bash
+        run: npm ci || (sleep 20 && npm ci) || (sleep 60 && npm ci)
 
       # Le paquet Arch (.pacman) a besoin de bsdtar
       - name: Install Linux packaging tools
