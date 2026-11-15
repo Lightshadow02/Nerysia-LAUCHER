@@ -7,7 +7,9 @@ const logger = LoggerUtil.getLogger('ConfigManager')
 
 const sysRoot = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Application Support' : process.env.HOME)
 
-const dataPath = path.join(sysRoot, '.helioslauncher')
+// Dossier du jeu (common, instances, java...). Avant : .helioslauncher (nom du launcher d'origine).
+const dataPath = path.join(sysRoot, '.Nerysia')
+const OLD_DATA_PATH = path.join(sysRoot, '.helioslauncher')
 
 const launcherDir = require('@electron/remote').app.getPath('userData')
 
@@ -40,7 +42,7 @@ exports.setDataDirectory = function(dataDirectory){
 }
 
 const configPath = path.join(exports.getLauncherDirectory(), 'config.json')
-const configPathLEGACY = path.join(dataPath, 'config.json')
+const configPathLEGACY = path.join(OLD_DATA_PATH, 'config.json')
 const firstLaunch = !fs.existsSync(configPath) && !fs.existsSync(configPathLEGACY)
 
 exports.getAbsoluteMinRAM = function(ram){
@@ -152,10 +154,31 @@ exports.load = function(){
         }
         if(doValidate){
             config = validateKeySet(DEFAULT_CONFIG, config)
+            switchFromOldDataDirectory()
             exports.save()
         }
     }
     logger.info('Successfully Loaded')
+}
+
+/**
+ * Ancien dossier par defaut (.helioslauncher) -> nouveau (.Nerysia). Les fichiers ne sont pas
+ * deplaces : le jeu est retelecharge dans le nouveau dossier (choix de Hugo, nov. 2026).
+ * Un dossier choisi a la main par le joueur n'est pas touche.
+ */
+function switchFromOldDataDirectory(){
+    const current = config.settings?.launcher?.dataDirectory
+    if(current == null || path.resolve(current).toLowerCase() !== OLD_DATA_PATH.toLowerCase()){
+        return
+    }
+    config.settings.launcher.dataDirectory = dataPath
+    // Java installe par le launcher dans l'ancien dossier : il sera reinstalle dans le nouveau
+    for(const java of Object.values(config.javaConfig || {})){
+        if(java?.executable != null && path.resolve(java.executable).toLowerCase().startsWith(OLD_DATA_PATH.toLowerCase() + path.sep)){
+            java.executable = null
+        }
+    }
+    logger.info(`Dossier du jeu : ${OLD_DATA_PATH} -> ${dataPath}`)
 }
 
 /**

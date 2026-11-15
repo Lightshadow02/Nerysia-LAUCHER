@@ -59,6 +59,11 @@ publish:
   # invisible pour la mise a jour automatique du launcher).
   releaseType: release
 
+# Notes de version (texte de la release GitHub) : affichees aux joueurs dans le launcher
+# (Parametres -> A propos / Mises a jour). A reecrire avant chaque nouvelle version.
+releaseInfo:
+  releaseNotesFile: 'build/release-notes.md'
+
 directories:
   buildResources: 'build'
   output: 'dist'
