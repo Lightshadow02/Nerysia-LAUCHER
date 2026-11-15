@@ -87,3 +87,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
         run: npm run dist -- -p always
+
+      # electron-builder ne remplit pas le texte de la release GitHub : on y met
+      # build/release-notes.md (affiche aux joueurs dans Parametres -> A propos)
+      - name: Release notes
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --notes-file build/release-notes.md
