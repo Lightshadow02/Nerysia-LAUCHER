@@ -59,7 +59,7 @@ La version `servers[0].version` est affichée aux joueurs dans le launcher (over
 - **Modpack** : hébergé sur `apk.nerysia.fr/nerysia-laucher/` (FTP via `Y:\apk\` chez Hugo)
 - **Distribution** : `docs/distribution.json` (local) + `Y:\apk\nerysia-laucher\distribution.json` (web)
 - **News RSS** : `docs/feed.xml` → upload manuel vers `apk.nerysia.fr/nerysia-laucher/feed.xml`
-- **Auth Microsoft** : Client ID Helios partagé (`1ce6e35a-...`) en attendant whitelist Nerysia (`4979ff0d-...`). Procédure dans `docs/AUTH_AZURE.md`
+- **Auth Microsoft** : Client ID Nerysia (`4979ff0d-...`, whitelist Microsoft validée, utilisé depuis la v1.0.14). Ancien Client ID Helios partagé (`1ce6e35a-...`) gardé en commentaire dans `ipcconstants.js` pour un retour arrière. Détails dans `docs/AUTH_AZURE.md`
 - **Build** : push tag `v*` → GitHub Actions build Windows (.exe) + macOS Intel/Apple Silicon (.dmg, signé ad-hoc via `build/mac-adhoc-sign.js`) + Linux (.AppImage, .deb, .pacman pour Arch) + release publique automatique. Doc joueurs : `docs/INSTALLATION.md`. **Le tag doit être égal à `package.json` version** (sinon le build échoue volontairement). **Notes de version** : réécrire `build/release-notes.md` (français, pour les joueurs) avant chaque tag : c'est le texte de la release GitHub, affiché dans le launcher (Paramètres → À propos / Mises à jour)
 - **Config du modpack** : `tools/distribution-config.json` = source unique (exclusions, bloc Fabric, infos serveur) lue par `generate-distribution.ps1` (local, via `Y:`) ET `generate-distribution-from-ftp.py` (GitHub Actions). Ne jamais dupliquer ces infos dans les scripts
 - **Presets de performance** (onglet Mods du launcher + fenêtre de choix du serveur, règles communes dans `app/assets/js/presetutil.js`) : Faible = `fabricmods/required/` seul, Moyen = + `moyen/`, Ultra = + `moyen/` + `ultra/`, case Builder = + `builder/`. Le dossier d'un jar donne le champ `"preset"` dans `distribution.json` (liste des dossiers dans `distribution-config.json` → `modFolders`). Nouveau joueur = Moyen par défaut. `optionalon/`/`optionaloff/` sont supprimés : tout dossier inconnu contenant des jars **bloque** la publication (les deux scripts)
@@ -130,7 +130,7 @@ npm run dist -- -w -p never
 
 ## 📌 État actuel à retenir
 
-- Microsoft whitelist du Client ID Nerysia : **demandé le 2026-05-02**, toujours sans réponse au 2026-09-25 (délai annoncé 24-72h largement dépassé → relancer)
+- Microsoft whitelist du Client ID Nerysia : demandée le 2026-05-02, **validée** (connexion testée OK le 2026-11-16)
 - Audit du 2026-09-25 : configs serveur (DB, Redis, anti-triche, raids, crates, quêtes) retirées du modpack et déplacées dans `Y:\_backup_hors_web\` (mots de passe vérifiés vides par Hugo)
 - Build v1.0.3 : **publiée** sur GitHub Releases le 2026-09-26 (Win .exe + Linux AppImage + latest.yml → MAJ auto des joueurs en 1.0.2). v1.0.4 publiée le 2026-09-26 (presets de performance). v1.0.5 = 1re version Mac + .deb + .pacman (tag Helios existant → `--force`). Tags Helios existants jusqu'à v1.0.5 ; à partir de v1.0.6 plus besoin de `--force`
 - v1.0.7 publiée le 2026-11-10 (Win + Mac Intel/Apple Silicon + Linux) : MAJ auto du modpack, préréglages dans la sélection du serveur, vérification 3× plus rapide, fix skin et instance admin. Le build Mac utilise `macos-15` (`macos-latest` restait bloqué en attente). Si un seul système échoue : Actions → Build & Release → Run workflow (tag + système), dans les 2 h après la publication. Les machines Mac de GitHub sont souvent saturées (job annulé après 15 min sans démarrer) : relancer avec `machine_mac = macos-15-intel` (fait aussi le .dmg Apple Silicon)
@@ -140,6 +140,7 @@ npm run dist -- -w -p never
 - v1.0.11 publiée le 2026-11-12 : « Mes skins » dans la fenêtre skin = historique local des skins (`app/assets/js/skinhistory.js`, dossier `skins/<uuid>/` dans les données du launcher, 40 max). Le skin porté est ajouté à chaque ouverture de la fenêtre, chaque skin envoyé aussi
 - v1.0.12 publiée le 2026-11-12 : configs du joueur gardées malgré les MAJ du modpack (`playerConfigs`, cf piège n°5). Effectif une fois `distribution.json` régénéré avec le champ `playerConfigs`
 - v1.0.13 (2026-11-15) : dossier du jeu renommé `.helioslauncher` → `.Nerysia` (`configmanager.js` bascule tout seul l'ancien dossier par défaut ; jeu + Java retéléchargés une fois, l'ancien dossier n'est pas supprimé). Notes de version Nerysia dans le launcher (au lieu de celles de Helios), nom « Nerysia » dans le Dock Mac
+- v1.0.14 (2026-11-16) : passage au Client ID Microsoft Nerysia. Chaque joueur doit se reconnecter une fois (ses anciens jetons viennent du Client ID Helios)
 - Mod DefaultOptions + `config/defaultoptions/options.txt` : ajoutés au modpack pour fixer le pb de GUI scale auto
 - Modpack **admin** passé en 1.28.0 le 2026-11-08 (pack de la réunion : Cobblemon 1.8.4, Fabric 0.20.1, paliers required/moyen/ultra + builder = litematica/worldedit). Le modpack **joueur** reste en 1.26.0 (Cobblemon 1.8.1, Fabric 0.19.2) : ne pas le toucher sans demande explicite de Hugo
 - Bug fix critique gardé : `decodeURI → decodeURIComponent` dans `index.js:155` (parsing OAuth code)
