@@ -2,7 +2,7 @@
 
 > Ce document conserve la **config Azure officielle de Nerysia** pour pouvoir la rebrancher quand le whitelist Microsoft sera validé.
 >
-> **Statut au 2026-05-02** : Azure App créée + configurée correctement, mais **whitelist Microsoft non encore demandé/validé**. C'est pour ça que le login échoue avec `403 Invalid app registration` à l'étape "Get MC Access Token".
+> **Statut au 2026-11-16** : ✅ **whitelist Microsoft validée**. Le launcher utilise le Client ID Nerysia depuis la v1.0.14 (connexion testée le 2026-11-16). Avant (2026-05-02 → 2026-11-16), le login échouait avec `403 Invalid app registration` et le launcher utilisait le Client ID Helios partagé.
 
 ---
 
