@@ -1532,6 +1532,7 @@ function populateAboutVersionInformation(){
 function populateReleaseNotes(){
     $.ajax({
         url: 'https://github.com/Lightshadow02/Nerysia-LAUCHER/releases.atom',
+        cache: false,
         success: (data) => {
             const version = 'v' + remote.app.getVersion()
             const entries = $(data).find('entry')

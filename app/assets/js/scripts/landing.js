@@ -1585,6 +1585,9 @@ async function loadNews(){
         const newsHost = new URL(newsFeed).origin + '/'
         $.ajax({
             url: newsFeed,
+            // Toujours retelecharger : sinon Chromium garde l'ancien feed.xml en cache pendant des jours
+            // (le serveur n'envoie pas d'en-tete de cache) et les nouvelles news n'apparaissent pas.
+            cache: false,
             success: (data) => {
                 const items = $(data).find('item')
                 const articles = []

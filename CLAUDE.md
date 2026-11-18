@@ -141,6 +141,7 @@ npm run dist -- -w -p never
 - v1.0.12 publiée le 2026-11-12 : configs du joueur gardées malgré les MAJ du modpack (`playerConfigs`, cf piège n°5). Effectif une fois `distribution.json` régénéré avec le champ `playerConfigs`
 - v1.0.13 (2026-11-15) : dossier du jeu renommé `.helioslauncher` → `.Nerysia` (`configmanager.js` bascule tout seul l'ancien dossier par défaut ; jeu + Java retéléchargés une fois, l'ancien dossier n'est pas supprimé). Notes de version Nerysia dans le launcher (au lieu de celles de Helios), nom « Nerysia » dans le Dock Mac
 - v1.0.14 (2026-11-16) : passage au Client ID Microsoft Nerysia. Chaque joueur doit se reconnecter une fois (ses anciens jetons viennent du Client ID Helios)
+- v1.0.15 (2026-11-18) : les news sont toujours retéléchargées (`cache: false` dans `loadNews`, `landing.js`). Avant, Chromium gardait l'ancien `feed.xml` en cache des jours/semaines (le serveur n'envoie pas d'en-tête de cache) et les nouvelles news n'apparaissaient pas
 - Mod DefaultOptions + `config/defaultoptions/options.txt` : ajoutés au modpack pour fixer le pb de GUI scale auto
 - Modpack **admin** passé en 1.28.0 le 2026-11-08 (pack de la réunion : Cobblemon 1.8.4, Fabric 0.20.1, paliers required/moyen/ultra + builder = litematica/worldedit). Le modpack **joueur** reste en 1.26.0 (Cobblemon 1.8.1, Fabric 0.19.2) : ne pas le toucher sans demande explicite de Hugo
 - Bug fix critique gardé : `decodeURI → decodeURIComponent` dans `index.js:155` (parsing OAuth code)
