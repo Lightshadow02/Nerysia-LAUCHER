@@ -11,132 +11,83 @@
 
     <!-- ================================================================ SEMAINE 8 -->
     <item>
-      <title>Semaine de dev #8 — Carte de joueur, boîte aux lettres, Brèches et 330 attaques refaites</title>
+      <title>Semaine de dev #8 : ta carte de joueur, la boîte aux lettres et les Brèches au complet</title>
       <link>https://apk.nerysia.fr</link>
       <pubDate>Sun, 15 Nov 2026 18:00:00 +0100</pubDate>
       <dc:creator>Lightshadow02</dc:creator>
       <slash:comments>0</slash:comments>
       <content:encoded><![CDATA[
-        <h2>🚀 La plus grosse semaine depuis le début</h2>
-        <p>Du 9 au 15 novembre, on a mis les bouchées doubles : ta carte de joueur, la boîte aux lettres, les Brèches presque complètes, des centaines d'attaques refaites et 62 nouveaux skins. Voici le détail.</p>
+        <p>On n'a pas vu passer cette semaine. Du 9 au 15 novembre, c'est la plus grosse fournée depuis le début du projet : ta carte de joueur, une boîte aux lettres, les Brèches presque terminées, 330 attaques refaites et 62 nouveaux skins. Installe-toi, il y a de quoi lire.</p>
 
         <h3>🪪 Ta carte de joueur</h3>
-        <p>Un nouveau bouton <strong>Ma carte</strong> en bas du <code>/menu</code>. Elle n'est visible que par toi.</p>
-        <ul>
-          <li><strong>Ton profil</strong> — ta tête, ton grade, ta faction, ta date d'arrivée sur Nerysia et ton temps de jeu</li>
-          <li><strong>Ton Pokédex</strong> — le pourcentage d'espèces capturées, avec ce que tu as vu et ce que tu as attrapé</li>
-          <li><strong>Tes exploits</strong> — captures, shiny, victoires, raids, Brèches, légendaires et ton rang d'arène, d'un coup d'œil</li>
-          <li><strong>Tes légendaires</strong> — ceux que tu as capturés en Brèche s'affichent en portrait sur ta carte</li>
-        </ul>
+        <p>Il y a maintenant un bouton <strong>Ma carte</strong> en bas du <code>/menu</code>. C'est ta fiche à toi, personne d'autre ne la voit.</p>
+        <p>On y retrouve ta tête, ton grade, ta faction, ta date d'arrivée sur Nerysia et ton temps de jeu (certains vont avoir des surprises). Juste en dessous, ton Pokédex en pourcentage, avec ce que tu as vu et ce que tu as attrapé. Puis tes exploits d'un coup d'œil : captures, shiny, victoires, raids, Brèches, légendaires et rang d'arène. Les légendaires que tu as capturés en Brèche s'affichent même en portrait.</p>
 
-        <h3>🏆 34 trophées à débloquer</h3>
-        <p>Rangés en 4 familles. Clique sur une famille pour voir ses trophées, ta progression et la date où tu les as obtenus.</p>
+        <h3>🏆 34 trophées à aller chercher</h3>
+        <p>Ils sont rangés en 4 familles. Clique sur une famille pour voir ce qu'il te reste, où tu en es, et la date de chaque trophée débloqué.</p>
         <ul>
-          <li><strong>Pokédex</strong> — de « Premiers pas » (10 % des espèces) à « Maître du Pokédex » (toutes les espèces)</li>
-          <li><strong>Brèches</strong> — entrer dans une Brèche, dans une super Brèche, capturer 1, 5 puis 20 légendaires, dompter Groudon, Kyogre et Rayquaza</li>
-          <li><strong>Combat et arène</strong> — 50 et 500 victoires, 10 duels contre des joueurs, chaque rang d'arène jusqu'à Maître, 10 / 50 / 100 matchs d'arène gagnés, tes premiers raids</li>
-          <li><strong>Collection</strong> — ton premier shiny, 10 shiny, un Pokémon aux 6 IV parfaits, 100 / 1 000 / 10 000 captures, 10 œufs éclos, 25 évolutions</li>
+          <li><strong>Pokédex</strong> : de « Premiers pas » (10 % des espèces) jusqu'à « Maître du Pokédex » (toutes les espèces).</li>
+          <li><strong>Brèches</strong> : y entrer, entrer dans une super Brèche, capturer 1, 5 puis 20 légendaires, et dompter Groudon, Kyogre et Rayquaza.</li>
+          <li><strong>Combat et arène</strong> : 50 puis 500 victoires, 10 duels contre des joueurs, chaque rang d'arène jusqu'à Maître, 10, 50 et 100 matchs d'arène gagnés, et tes premiers raids.</li>
+          <li><strong>Collection</strong> : ton premier shiny, puis 10, un Pokémon aux 6 IV parfaits, 100, 1 000 et 10 000 captures, 10 œufs éclos et 25 évolutions.</li>
         </ul>
-        <p>Beaucoup de trophées donnent un <strong>titre</strong> à porter sur ta carte (« Chasseur de shiny », « Gardien des brèches », « Maître de l'arène »…). Les plus durs offrent en plus un <strong>skin de Pokémon</strong>.</p>
+        <p>Beaucoup de trophées donnent un titre à afficher sur ta carte (« Chasseur de shiny », « Gardien des brèches », « Maître de l'arène »…), et les plus durs offrent en plus un skin de Pokémon. Bon courage pour les 10 000 captures.</p>
 
         <h3>✉️ La boîte aux lettres</h3>
-        <ul>
-          <li><strong>Fini les objets perdus</strong> — quand ton inventaire est plein, ce que tu gagnes ne tombe plus par terre : boutique, caisses, récompense du jour, trophées, raids, Brèches, arène, PNJ</li>
-          <li><strong>Gardé 7 jours</strong> — tout t'attend dans ta boîte aux lettres, sur ta carte de joueur, puis est détruit au bout d'une semaine</li>
-          <li><strong>Récupérer ou Tout récupérer</strong> — un clic par objet, ou tout ce qui rentre d'un coup. Les objets presque expirés s'affichent en rouge</li>
-          <li><strong>Tu es prévenu</strong> — à la connexion (« 3 objets t'attendent »), et dès qu'un objet arrive, même si tu joues sur un autre serveur</li>
-          <li><strong>La même boîte partout</strong> — elle est partagée par tous les serveurs du réseau et rien ne se perd à un redémarrage</li>
-        </ul>
+        <p>On connaît tous ce moment : inventaire plein, tu ouvres une caisse, et ta récompense finit par terre. C'est terminé.</p>
+        <p>Tout ce que tu gagnes quand ton inventaire est plein (boutique, caisses, récompense du jour, trophées, raids, Brèches, arène, PNJ) part maintenant dans ta boîte aux lettres, sur ta carte de joueur. Tu as 7 jours pour le récupérer, objet par objet ou d'un coup avec « Tout récupérer ». Ce qui va bientôt expirer passe en rouge.</p>
+        <p>Tu es prévenu à la connexion (« 3 objets t'attendent ») et dès qu'un objet arrive, même si tu joues sur un autre serveur. C'est la même boîte sur tout le réseau, et rien ne se perd au redémarrage.</p>
 
-        <h3>🛍️ La boutique rangée par catégories</h3>
-        <ul>
-          <li><strong>Les fêtes de l'année</strong>, dans l'ordre du calendrier — Épiphanie, Nouvel An lunaire, Chandeleur, Saint-Valentin, Carnaval, Saint-Patrick, Poisson d'avril, Pâques, Fête de la musique, 14 Juillet, Halloween, Noël et Réveillon</li>
-          <li><strong>Les collections</strong> — Pikachu en tenue, la lignée de Vipélierre, la lignée de Poussifeu</li>
-          <li><strong>Divers</strong> — tout le reste, et une recherche pour trouver un skin d'un coup</li>
-          <li><strong>Fini le lag</strong> — la boutique ne charge plus tous les skins en même temps à l'ouverture</li>
-        </ul>
+        <h3>🛍️ Une boutique enfin rangée</h3>
+        <p>Les skins sont maintenant classés. D'abord les fêtes de l'année, dans l'ordre du calendrier : de l'Épiphanie au Réveillon, en passant par la Chandeleur, le Poisson d'avril, le 14 Juillet ou Halloween. Ensuite les collections : Pikachu en tenue, la lignée de Vipélierre et celle de Poussifeu. Tout le reste est dans Divers, avec une recherche pour trouver un skin en deux secondes.</p>
+        <p>Et la boutique ne charge plus tous les skins d'un coup à l'ouverture. Fini le lag.</p>
 
-        <h3>🎨 62 nouveaux skins Cobblemon</h3>
-        <p>Carapuce Plage, Dracaufeu Magma, Mimiqui robot et bien d'autres, avec leurs animations, leurs parties lumineuses et leur version shiny.</p>
+        <h3>🎨 62 skins et 330 attaques refaites</h3>
+        <p>62 nouveaux skins Cobblemon arrivent : Carapuce Plage, Dracaufeu Magma, Mimiqui robot et plein d'autres, avec leurs animations, leurs parties lumineuses et leur version shiny.</p>
+        <p>Côté combats, on a repris 330 attaques animées, une par une, pour qu'elles ressemblent enfin à ce qu'elles font dans les jeux. Surf ne ressemble plus à Hydrocanon (il était temps). Aurasphère et ses cousines ont des boules d'énergie faites maison, et Lucario a sa propre animation d'attaque.</p>
 
-        <h3>✨ 330 attaques animées refaites</h3>
-        <ul>
-          <li><strong>Une par une</strong> — chaque attaque a été revue pour ressembler à ce qu'elle fait vraiment dans les jeux. Fini Surf qui ressemblait à Hydrocanon</li>
-          <li><strong>Des boules d'énergie maison</strong> — Aurasphère et compagnie</li>
-          <li><strong>Lucario</strong> — sa propre animation d'attaque</li>
-        </ul>
+        <h3>🌀 Les Brèches, au complet</h3>
+        <p>Petit rappel : sur Nerysia, aucun légendaire n'apparaît dans la nature. Pour en croiser un, il faut traverser une Brèche. Et cette semaine, tout le gameplay est là.</p>
+        <p>Il y a 94 légendaires et fabuleux, chacun avec son domaine, son île et un ciel aux couleurs de ses types. Une Brèche peut s'ouvrir toute seule dans un biome qui correspond à son légendaire. Tout le réseau apprend le biome, jamais les coordonnées : à vous de la trouver avant les autres. Car une Brèche n'accepte qu'un joueur, le premier qui entre, et elle se referme derrière lui.</p>
+        <p>Sur l'île, tu as une heure. Si ton équipe tombe K.O. ou si tu meurs, retour à la maison, mais ton inventaire est gardé. Un ou deux gardiens du même type protègent l'autel : bats-les pour réveiller le légendaire. Et méfie-toi, il peut prendre sa forme ultime en plein combat (Primo-Groudon, Primo-Kyogre, Méga-Rayquaza…).</p>
+        <p>À la clé : des Nerycoins et des objets rares propres à chaque légendaire, en plus grande quantité si tu le captures que si tu le bats. De temps en temps, une <strong>super Brèche</strong> est annoncée à tout le réseau : un légendaire plus fort, avec des IV garantis et son talent caché. Pour que ça reste juste, les légendaires sont interdits en arène classée.</p>
 
-        <h3>🌀 Les Brèches : le gameplay complet</h3>
-        <p>Sur Nerysia, aucun légendaire n'apparaît dans la nature. Pour les rencontrer, il faut traverser une Brèche.</p>
-        <ul>
-          <li><strong>94 légendaires et fabuleux</strong> — chacun a son domaine, son île et un ciel aux couleurs de ses types</li>
-          <li><strong>Apparitions</strong> — une Brèche peut s'ouvrir toute seule dans un biome qui correspond au légendaire. Le réseau est prévenu du biome, jamais des coordonnées : à vous de la trouver</li>
-          <li><strong>Un seul joueur par Brèche</strong> — le premier qui entre. Elle se referme derrière lui</li>
-          <li><strong>Une heure maximum</strong> sur l'île. Équipe K.O. ou mort : tu es renvoyé chez toi. Ton inventaire est gardé</li>
-          <li><strong>Les gardiens</strong> — 1 ou 2 Pokémon de son type protègent l'autel. Bats-les pour éveiller le légendaire</li>
-          <li><strong>Forme ultime</strong> — Primo-Groudon, Primo-Kyogre, Méga-Rayquaza en plein combat…</li>
-          <li><strong>Récompenses</strong> — des Nerycoins et des objets rares propres à chaque légendaire, plus gros à la capture qu'à la victoire</li>
-          <li><strong>Les super Brèches</strong> — rares et annoncées à tout le réseau : un légendaire plus fort, avec des IV garantis et son talent caché</li>
-          <li><strong>Pas d'abus</strong> — les légendaires sont interdits en arène classée</li>
-        </ul>
+        <h3>⚔️ Raids et petits plus</h3>
+        <p>Raid Dens passe en version 0.14, avec de nouveaux designs de tanières et de meilleures récompenses. Quand une tanière est près de toi, l'icône du cristal apparaît sur ta minicarte.</p>
+        <p>Et quelques détails qui font du bien : plus aucun Pokémon n'apparaît au HUB, ta cape arrête de partir dans tous les sens pendant les animations, et le nettoyage des objets au sol est réglé sur tous les serveurs, avec une annonce avant.</p>
 
-        <h3>⚔️ Raids</h3>
-        <ul>
-          <li><strong>Raid Dens mis à jour</strong> (0.14), avec de nouveaux designs de tanières et de meilleures récompenses</li>
-          <li><strong>Les tanières sur ta minicarte</strong> — l'icône du cristal s'affiche quand une tanière est près de toi</li>
-        </ul>
-
-        <h3>🎮 Confort de jeu</h3>
-        <ul>
-          <li><strong>Plus aucun Pokémon n'apparaît au HUB</strong></li>
-          <li><strong>Ta cape ne part plus dans tous les sens</strong> pendant les animations</li>
-          <li><strong>Nettoyage des objets au sol</strong> réglé sur tous les serveurs, avec une annonce avant</li>
-        </ul>
-
-        <h3>👮 Pour le staff (récap)</h3>
-        <p>Un mute vaut maintenant <strong>sur tout le réseau</strong>, même quand le joueur change de serveur, et on peut le retirer depuis <code>/admin</code>. Nouveau panneau <strong>Brèches</strong> dans <code>/admin</code> (réglages, légendaires, Brèches ouvertes, musique des domaines). <code>/courrier envoyer &lt;joueur&gt; &lt;objet&gt;</code> dépose un objet dans une boîte aux lettres.</p>
+        <h3>👮 Pour le staff</h3>
+        <p>Un mute vaut maintenant sur tout le réseau, même quand le joueur change de serveur, et on peut le retirer depuis <code>/admin</code>. Nouveau panneau <strong>Brèches</strong> dans <code>/admin</code> (réglages, légendaires, Brèches ouvertes, musique des domaines). Et <code>/courrier envoyer &lt;joueur&gt; &lt;objet&gt;</code> dépose un objet dans une boîte aux lettres.</p>
 
         <h3>📌 À savoir</h3>
-        <ul>
-          <li><strong>Nouvelle installation des serveurs</strong> : ils se mettent maintenant à jour tout seuls à chaque redémarrage</li>
-          <li><strong>Aucun reset</strong> : tes Pokémon, ton argent et tes homes restent intacts</li>
-        </ul>
+        <p>Les serveurs ont été réinstallés et se mettent maintenant à jour tout seuls à chaque redémarrage. Aucun reset : tes Pokémon, ton argent et tes homes sont toujours là.</p>
 
+        <p>Merci de nous suivre semaine après semaine.</p>
         <p><em>Bonne aventure sur Nerysia ! 🐉⚔️</em></p>
       ]]></content:encoded>
     </item>
 
     <!-- ================================================================ SEMAINE 7 -->
     <item>
-      <title>Semaine de dev #7 — Les Brèches s'ouvrent, et les joueurs prennent vie</title>
+      <title>Semaine de dev #7 : on a franchi la première Brèche</title>
       <link>https://apk.nerysia.fr</link>
       <pubDate>Sun, 08 Nov 2026 18:00:00 +0100</pubDate>
       <dc:creator>Lightshadow02</dc:creator>
       <slash:comments>0</slash:comments>
       <content:encoded><![CDATA[
-        <h2>🌀 On a franchi la première Brèche</h2>
-        <p>Du 2 au 8 novembre : le premier légendaire a son domaine, les joueurs bougent enfin comme des humains, et un projet secret avance en coulisses.</p>
+        <p>Du 2 au 8 novembre, trois choses ont avancé : le premier légendaire a son domaine, vos personnages bougent enfin comme de vrais humains, et un projet secret prend forme dans notre coin.</p>
 
-        <h3>🔥 Les Brèches : le domaine du légendaire</h3>
-        <ul>
-          <li><strong>Une fissure dans le monde</strong> — la Brèche est une faille étroite et lumineuse, qui crépite d'éclairs aux couleurs du légendaire</li>
-          <li><strong>Une arrivée filmée</strong> — quand tu la traverses, la caméra te montre l'île et le légendaire avant de te rendre la main</li>
-          <li><strong>Premier domaine : Groudon</strong> — son île de basalte, et le retour vers ton monde une fois le combat fini</li>
-          <li><strong>Une île par joueur</strong> — chacun la sienne : personne ne te vole ton légendaire</li>
-          <li><strong>Un ciel qui aspire</strong> — en version Ultra, le ciel du domaine est un tourbillon d'étoiles autour d'un trou noir</li>
-        </ul>
+        <h3>🔥 Le domaine de Groudon</h3>
+        <p>Une Brèche, c'est une faille étroite et lumineuse qui crépite d'éclairs aux couleurs de son légendaire. Quand tu la traverses, la caméra prend le relais quelques secondes pour te montrer l'île et son occupant, puis elle te rend la main.</p>
+        <p>Le premier domaine est celui de Groudon : une île de basalte, avec un chemin de retour vers ton monde une fois le combat fini. Chaque joueur a sa propre île, donc personne ne viendra te voler ton légendaire.</p>
+        <p>En version Ultra, le ciel du domaine est un tourbillon d'étoiles qui tourne autour d'un trou noir. Pense à lever les yeux.</p>
 
-        <h3>🏃 Les joueurs prennent vie (version Ultra)</h3>
-        <p>Nouvelles animations pour ton personnage :</p>
-        <ul>
-          <li><strong>Vol</strong> en créatif, <strong>nage</strong>, <strong>échelle</strong> et <strong>ramper</strong></li>
-          <li><strong>À cheval, en barque et sur les montures Cobblemon</strong> — on se penche avec l'élan, en arrière quand la monture monte</li>
-          <li><strong>Ta façon de marcher</strong> — une allure plus naturelle</li>
-        </ul>
+        <h3>🏃 Des personnages plus vivants</h3>
+        <p>En version Ultra, ton personnage a de nouvelles animations : vol en créatif, nage, échelle et ramper. Sur une monture, ça change tout : à cheval, en barque ou sur un Pokémon, tu te penches avec l'élan, et en arrière quand ta monture grimpe. Même ta façon de marcher est plus naturelle.</p>
         <p>La version Faible garde les animations de Minecraft, pour préserver les FPS.</p>
 
         <h3>📟 Et dans l'ombre…</h3>
-        <p>Un <strong>nouveau monde</strong> se prépare. On y travaille sur une <strong>tablette holographique</strong> (ton équipe, le résumé de tes Pokémon, ton PC), sur des <strong>PNJ vivants</strong> qui ont leurs habitudes, et sur une histoire à vivre. Une première démo a été présentée à l'équipe le 8 novembre. On vous en dit plus bientôt. 👀</p>
+        <p>Un nouveau monde se prépare. On y travaille sur une tablette holographique (ton équipe, le résumé de tes Pokémon, ton PC), sur des PNJ qui ont leurs propres habitudes, et sur une histoire à vivre. L'équipe a vu une première démo le 8 novembre. On n'en dit pas plus pour l'instant… 👀</p>
 
         <p><em>Bonne aventure sur Nerysia ! 🐉⚔️</em></p>
       ]]></content:encoded>
@@ -144,55 +95,35 @@
 
     <!-- ================================================================ SEMAINE 6 -->
     <item>
-      <title>Semaine de dev #6 — Le modpack fait peau neuve</title>
+      <title>Semaine de dev #6 : le modpack fait peau neuve</title>
       <link>https://apk.nerysia.fr</link>
       <pubDate>Sun, 01 Nov 2026 18:00:00 +0100</pubDate>
       <dc:creator>Lightshadow02</dc:creator>
       <slash:comments>0</slash:comments>
       <content:encoded><![CDATA[
-        <h2>🧹 Grand ménage du modpack</h2>
-        <p>Du 26 octobre au 1er novembre, on a repris le modpack <strong>mod par mod</strong> pour qu'il tourne mieux sur tous les PC, et on a mis en scène les combats.</p>
+        <p>Du 26 octobre au 1er novembre, on a ouvert le modpack et repris chaque mod, un par un. Le but : qu'il tourne bien sur tous les PC, des plus modestes aux plus costauds. Et pendant qu'on y était, on a mis les combats en scène.</p>
 
         <h3>📦 Le modpack</h3>
-        <ul>
-          <li><strong>Cobblemon 1.8.4</strong> — passage à la dernière version</li>
-          <li><strong>Trois versions dans le lanceur</strong> — Faible, Moyen et Ultra. Choisis celle qui convient à ton PC : la Faible garde l'essentiel, l'Ultra ajoute les animations et les effets</li>
-          <li><strong>Nouvelle minicarte</strong> (Xaero) — à droite de l'écran, avec les icônes des Pokémon autour de toi</li>
-          <li><strong>EMI</strong> pour chercher les recettes</li>
-          <li><strong>Réglages par défaut</strong> — un nouveau joueur arrive avec un jeu déjà bien réglé</li>
-          <li><strong>Mods retirés</strong> parce que Cobblemon 1.8 fait maintenant la même chose : Alphas, SimpleTMs, MoveDex, Journey Mounts, Fight or Flight. Et quelques mods en double avec les nôtres</li>
-          <li><strong>Shaders</strong> — correction d'un plantage au démarrage avec Iris</li>
-        </ul>
+        <p>On passe à <strong>Cobblemon 1.8.4</strong>, la dernière version. Dans le launcher, tu choisis maintenant entre trois versions : Faible, Moyen ou Ultra. La Faible garde l'essentiel, l'Ultra ajoute les animations et les effets. À toi de voir ce que ton PC supporte.</p>
+        <p>Côté nouveautés, une minicarte Xaero s'affiche à droite de l'écran avec les icônes des Pokémon autour de toi, et EMI t'aide à chercher tes recettes. Un nouveau joueur arrive aussi avec un jeu déjà bien réglé.</p>
+        <p>Côté ménage, plusieurs mods partent parce que Cobblemon 1.8 fait désormais la même chose : Alphas, SimpleTMs, MoveDex, Journey Mounts et Fight or Flight. Quelques mods en double avec les nôtres ont aussi disparu. Et si Iris plantait au démarrage chez toi avec les shaders, c'est corrigé.</p>
 
         <h3>🎬 Des combats mis en scène</h3>
-        <ul>
-          <li><strong>Présentation filmée</strong> — avant un combat contre un dresseur, la caméra vous présente face à face</li>
-          <li><strong>Un vrai lancer de Poké Ball</strong> — avec 6 styles différents selon le dresseur</li>
-          <li><strong>Des PNJ animés</strong> — ils bougent comme de vrais joueurs (et ils se couchent enfin dans le bon sens)</li>
-          <li><strong>Ton propre lancer</strong> — ton personnage lance lui aussi ses Poké Balls</li>
-        </ul>
+        <p>Avant un combat contre un dresseur, la caméra vous présente face à face, comme dans les jeux. Le dresseur lance sa Poké Ball pour de vrai, avec 6 styles différents selon le personnage, et ton personnage lance les siennes aussi. Les PNJ bougent maintenant comme de vrais joueurs. Et oui, ils se couchent enfin dans le bon sens.</p>
 
-        <h3>🏆 Arène classée : la fin de match</h3>
-        <ul>
-          <li><strong>« Victoire » ou « Défaite »</strong> — avec ton adversaire, l'emblème de ton rang et ta cote qui défile</li>
-          <li><strong>L'écart</strong> (« +28 ») et les trophées qui volent vers le compteur</li>
-          <li><strong>Le détail du calcul</strong> — la victoire, le bonus de série, les matchs de placement</li>
-          <li><strong>Promotion</strong> — un éclair, le nouvel emblème entouré d'éclats et « Nouveau rang : Or ! ». À la rétrogradation, l'ancien emblème tremble puis tombe</li>
-          <li><strong>Rejouer</strong> te remet dans la file, <strong>Classement</strong> ouvre l'échelle des six rangs</li>
-          <li><strong>Les seuils</strong> — Argent 1 000, Or 1 200, Platine 1 400, Diamant 1 600, Maître 1 800</li>
-        </ul>
+        <h3>🏆 La fin d'un match classé</h3>
+        <p>La fin d'un match d'arène a maintenant son vrai écran : « Victoire » ou « Défaite », ton adversaire, l'emblème de ton rang et ta cote qui défile, avec l'écart (« +28 ») et les trophées qui filent vers le compteur. Le détail du calcul est là aussi : la victoire, le bonus de série, les matchs de placement.</p>
+        <p>Si tu montes de rang : un éclair, le nouvel emblème entouré d'éclats, et « Nouveau rang : Or ! ». Si tu descends, l'ancien emblème tremble, puis tombe. Ensuite, <strong>Rejouer</strong> te remet dans la file et <strong>Classement</strong> ouvre l'échelle des six rangs.</p>
+        <p>Pour rappel, les seuils : Argent 1 000, Or 1 200, Platine 1 400, Diamant 1 600, Maître 1 800.</p>
 
         <h3>🔮 Un mystérieux passeur…</h3>
         <p>Quelqu'un prépare un drôle de commerce entre le <strong>Monde Nerysia</strong> et le <strong>Monde ?????</strong>. Contre des gemmes d'échange, il fera passer tes Pokémon de l'un à l'autre. Les légendaires et les fabuleux, eux, resteront sous cadenas. 🔒</p>
 
-        <h3>👮 Pour le staff (récap)</h3>
+        <h3>👮 Pour le staff</h3>
         <p>Tous les menus de <code>/admin</code> ont été redessinés et passent en français : Administration, Serveurs, Minage, Caisses, Musique, Apparitions, Récompenses. Dans l'éditeur de caisses, l'aperçu des particules montre la vraie animation du jeu.</p>
 
         <h3>🐛 Bugs corrigés</h3>
-        <ul>
-          <li>Les annonces du nettoyage des objets au sol ne remplissent plus la console des serveurs</li>
-          <li>L'aperçu d'une caisse montre son vrai bloc et sa vraie clé</li>
-        </ul>
+        <p>Les annonces du nettoyage des objets au sol ne remplissent plus la console des serveurs, et l'aperçu d'une caisse montre maintenant son vrai bloc et sa vraie clé.</p>
 
         <p><em>Bonne aventure sur Nerysia ! 🐉⚔️</em></p>
       ]]></content:encoded>
@@ -200,30 +131,20 @@
 
     <!-- ================================================================ SEMAINE 5 -->
     <item>
-      <title>Semaine de dev #5 — La carte des quêtes</title>
+      <title>Semaine de dev #5 : la carte des quêtes</title>
       <link>https://apk.nerysia.fr</link>
       <pubDate>Sun, 25 Oct 2026 18:00:00 +0100</pubDate>
       <dc:creator>Lightshadow02</dc:creator>
       <slash:comments>0</slash:comments>
       <content:encoded><![CDATA[
-        <h2>🗺️ Une semaine pour les quêtes</h2>
-        <p>Du 19 au 25 octobre, une semaine plus calme, mais un beau morceau pour les quêtes.</p>
+        <p>Du 19 au 25 octobre, une semaine plus calme. Mais on est assez fiers de ce qui en sort : une vraie carte pour tes quêtes.</p>
 
         <h3>📜 La carte des quêtes</h3>
-        <ul>
-          <li><strong>Un nouveau bouton Carte</strong> dans l'onglet Quêtes du <code>/menu</code></li>
-          <li><strong>Zoom et glisser</strong> — promène-toi sur la carte comme sur une vraie carte, et « Ajuster » la recadre d'un clic</li>
-          <li><strong>Le rail des chapitres</strong> — passe d'un chapitre à l'autre sans te perdre</li>
-          <li><strong>La fiche de la quête</strong> — ce qu'il faut faire, où tu en es, ce que tu gagnes</li>
-          <li><strong>Pokémon en 3D</strong> — une quête qui vise une espèce montre le Pokémon en grand, en 3D (les légendaires d'abord)</li>
-        </ul>
+        <p>Dans l'onglet Quêtes du <code>/menu</code>, il y a un nouveau bouton <strong>Carte</strong>. Tu zoomes, tu fais glisser, tu te promènes comme sur une vraie carte, et « Ajuster » la recadre d'un clic. Un rail sur le côté te fait passer d'un chapitre à l'autre sans te perdre.</p>
+        <p>Clique sur une quête pour ouvrir sa fiche : ce qu'il faut faire, où tu en es, ce que tu gagnes. Et quand une quête vise une espèce précise, le Pokémon s'affiche en grand, en 3D. On a commencé par les légendaires, évidemment.</p>
 
-        <h3>🎮 Confort</h3>
-        <ul>
-          <li><strong>Écrans ultra-larges</strong> (21:9) — le logo du menu n'est plus coupé en haut</li>
-          <li><strong>Les têtes des joueurs</strong> — le vrai skin s'affiche, même pour un joueur hors ligne ou sur un autre serveur</li>
-          <li><strong>Une croix de fermeture</strong> sur toutes les fenêtres</li>
-        </ul>
+        <h3>🎮 Petit confort</h3>
+        <p>Si tu joues sur un écran ultra-large (21:9), le logo du menu n'est plus coupé en haut. Les têtes des joueurs affichent leur vrai skin, même s'ils sont hors ligne ou sur un autre serveur. Et toutes les fenêtres ont maintenant une croix pour les fermer.</p>
 
         <p>En coulisses, on prépare déjà le grand ménage du modpack. Rendez-vous la semaine prochaine !</p>
 
@@ -233,38 +154,26 @@
 
     <!-- ================================================================ SEMAINE 4 -->
     <item>
-      <title>Semaine de dev #4 — Un écran de lancement à nous, et les factions dans le chat</title>
+      <title>Semaine de dev #4 : un écran de lancement à nous, et les factions dans le chat</title>
       <link>https://apk.nerysia.fr</link>
       <pubDate>Sun, 18 Oct 2026 18:00:00 +0200</pubDate>
       <dc:creator>Lightshadow02</dc:creator>
       <slash:comments>0</slash:comments>
       <content:encoded><![CDATA[
-        <h2>🎬 Nerysia dès le lancement</h2>
-        <p>Du 12 au 18 octobre : le jeu a enfin notre visage dès qu'on le lance, et les factions entrent dans le chat.</p>
+        <p>Du 12 au 18 octobre, Nerysia a enfin son visage dès que tu lances le jeu. Et les factions débarquent dans le chat.</p>
 
         <h3>🎥 L'écran de lancement</h3>
-        <ul>
-          <li><strong>Un logo animé</strong> pendant le chargement du jeu</li>
-          <li><strong>Une intro en vidéo</strong>, réalisée par notre graphiste — elle démarre pile quand le chargement se termine et enchaîne sans coupure sur le menu</li>
-          <li><strong>Un écran titre animé</strong>, avec sa propre musique. Les boutons restent ceux de Minecraft</li>
-          <li><strong>Le son suit ton volume Musique</strong> — et la musique du menu de Minecraft se tait pendant celle de Nerysia</li>
-          <li><strong>La fenêtre s'appelle Nerysia</strong>, avec son icône</li>
-        </ul>
+        <p>Pendant le chargement, un logo animé. Puis une intro en vidéo, réalisée par notre graphiste : elle démarre pile à la fin du chargement et enchaîne sans coupure sur le menu.</p>
+        <p>L'écran titre est animé lui aussi, avec sa propre musique (les boutons, eux, restent ceux de Minecraft). Le son suit ton volume Musique, et la musique du menu de Minecraft se tait pour laisser la place à celle de Nerysia. Même la fenêtre du jeu s'appelle Nerysia, avec son icône.</p>
 
         <h3>⚔️ Les factions dans le chat</h3>
-        <ul>
-          <li><strong>L'emblème de ta faction</strong> — et ton titre de compétition — s'affichent devant ton grade, sur tous les serveurs</li>
-          <li><strong>Le tchat de faction</strong> — pour parler uniquement aux tiens</li>
-          <li><strong>Un onglet Factions</strong> dans le <code>/menu</code></li>
-        </ul>
+        <p>L'emblème de ta faction et ton titre de compétition s'affichent maintenant devant ton grade, sur tous les serveurs. Tu as aussi un tchat de faction pour parler uniquement aux tiens, et un onglet Factions dans le <code>/menu</code>.</p>
 
         <h3>🌀 Un nouveau chantier commence</h3>
-        <p>Plus aucun légendaire n'apparaîtra dans la nature. Pour les trouver, il faudra passer par… <strong>les Brèches</strong>. On a commencé à écrire ce projet cette semaine. Plus d'infos très vite.</p>
+        <p>Plus aucun légendaire n'apparaîtra dans la nature. Pour les trouver, il faudra passer par… <strong>les Brèches</strong>. On a commencé à écrire ce projet cette semaine, et on vous en reparle très vite.</p>
 
-        <h3>🐛 Bugs corrigés</h3>
-        <ul>
-          <li>Les œufs de spawn et les seaux marchent de nouveau sur les mobs normalement bloqués dans la nature</li>
-        </ul>
+        <h3>🐛 Bug corrigé</h3>
+        <p>Les œufs de spawn et les seaux remarchent sur les mobs normalement bloqués dans la nature.</p>
 
         <p><em>Bonne aventure sur Nerysia ! 🐉⚔️</em></p>
       ]]></content:encoded>
@@ -272,52 +181,30 @@
 
     <!-- ================================================================ SEMAINE 3 -->
     <item>
-      <title>Semaine de dev #3 — Nouveau menu, PNJ et arène classée</title>
+      <title>Semaine de dev #3 : nouveau menu, PNJ et arène classée</title>
       <link>https://apk.nerysia.fr</link>
       <pubDate>Sun, 11 Oct 2026 18:00:00 +0200</pubDate>
       <dc:creator>Lightshadow02</dc:creator>
       <slash:comments>0</slash:comments>
       <content:encoded><![CDATA[
-        <h2>🎉 Une semaine énorme</h2>
-        <p>Du 5 au 11 octobre : un menu principal tout neuf, des PNJ qui vivent leur vie, et une arène classée sur tout le réseau.</p>
+        <p>Du 5 au 11 octobre, grosse semaine : un menu principal tout neuf, des PNJ qui vivent leur vie, et une arène classée ouverte sur tout le réseau.</p>
 
         <h3>📋 Le nouveau /menu</h3>
-        <ul>
-          <li><strong>Entièrement redessiné</strong> — touche <strong>H</strong> ou <code>/menu</code> : les îles du réseau, ton Pokédex en barre, tes bourses de Nerycoins et de Nerygems</li>
-          <li><strong>La boutique de cosmétiques</strong> — directement dans le menu, avec un <strong>aperçu 3D</strong> du Pokémon et une loupe pour voir chaque skin de près</li>
-          <li><strong>Un onglet Quêtes</strong> — tes quêtes sans quitter le menu</li>
-          <li><strong>La récompense du jour</strong> — elle se prend maintenant dans le menu (onglet Récompenses) et rapporte des Nerycoins ou des Nerygems. Le message de connexion y mène en un clic</li>
-          <li><strong>Les 9 starters en noir-violet</strong> — une nouvelle recoloration à collectionner</li>
-        </ul>
+        <p>Appuie sur <strong>H</strong> (ou tape <code>/menu</code>) : le menu a été entièrement redessiné. Tu y trouves les îles du réseau, ton Pokédex en barre et tes bourses de Nerycoins et de Nerygems.</p>
+        <p>La boutique de cosmétiques est directement dedans, avec un aperçu 3D du Pokémon et une loupe pour voir chaque skin de près. Tes quêtes ont aussi leur onglet. Et la récompense du jour se récupère maintenant dans l'onglet Récompenses : des Nerycoins ou des Nerygems, et le message de connexion t'y emmène en un clic.</p>
+        <p>Petit bonus pour les collectionneurs : les 9 starters ont une nouvelle recoloration noir-violet.</p>
 
         <h3>🧑 Les PNJ de Nerysia</h3>
-        <ul>
-          <li><strong>Ils parlent</strong> — dans une vraie fenêtre de dialogue, avec des choix de réponses</li>
-          <li><strong>Ils te défient</strong> — dresseurs, champions d'arène et ligue, avec leur entrée en scène, des badges à gagner et une revanche possible</li>
-          <li><strong>Ils tiennent boutique</strong> et <strong>donnent des quêtes</strong></li>
-          <li><strong>Ils vivent leur journée</strong> — ils se déplacent selon l'heure, s'assoient, vont dormir dans leur lit et ferment leur boutique la nuit</li>
-          <li><strong>Les arènes de PNJ</strong> — des dresseurs à battre avant le champion, dont l'équipe s'adapte à tes badges</li>
-        </ul>
+        <p>Les PNJ parlent, dans une vraie fenêtre de dialogue avec des choix de réponses. Certains te défient : dresseurs, champions d'arène et ligue, avec leur entrée en scène, des badges à gagner et une revanche possible. D'autres tiennent boutique ou te donnent des quêtes.</p>
+        <p>Et ils vivent leur journée : ils se déplacent selon l'heure, s'assoient, vont dormir dans leur lit et ferment boutique la nuit. Dans les arènes de PNJ, tu affrontes d'abord des dresseurs avant le champion, et leur équipe s'adapte à tes badges.</p>
 
         <h3>🏆 L'arène classée</h3>
-        <ul>
-          <li><strong>Des combats 1 contre 1 classés</strong>, ouverts à tous, sans faction</li>
-          <li><strong>Sur tout le réseau</strong> — une file d'attente commune et des défis d'un serveur à l'autre : le jeu t'emmène à l'arène, puis te ramène</li>
-          <li><strong>Tes vrais Pokémon ne risquent rien</strong> — le combat se fait sur des copies, toutes au niveau 80</li>
-          <li><strong>Six rangs</strong> de Bronze à Maître, avec 5 matchs de placement pour commencer</li>
-          <li><strong>Des saisons</strong> avec des récompenses par rang : Nerycoins, Nerygems, objets et titre. Si tu es absent à la fin d'une saison, tu reçois tout à ta prochaine connexion</li>
-          <li><strong>Un onglet Arène</strong> dans le <code>/menu</code> (ou <code>/arena</code>) — Jouer, Classement, Historique et Récompenses</li>
-        </ul>
-
-        <h3>🔁 Et aussi</h3>
-        <ul>
-          <li><code>/tpahere</code> — fais venir un joueur près de toi, même s'il est sur un autre serveur</li>
-        </ul>
+        <p>Des combats 1 contre 1 classés, ouverts à tous, sans faction. La file d'attente est commune à tout le réseau, et tu peux défier quelqu'un sur un autre serveur : le jeu t'emmène à l'arène, puis te ramène. Tes vrais Pokémon ne risquent rien, le combat se fait sur des copies, toutes au niveau 80.</p>
+        <p>Il y a six rangs, de Bronze à Maître, et 5 matchs de placement pour commencer. Chaque saison donne des récompenses selon ton rang : Nerycoins, Nerygems, objets et titre. Absent à la fin d'une saison ? Tu reçois tout à ta prochaine connexion.</p>
+        <p>Tout se passe dans l'onglet Arène du <code>/menu</code> (ou <code>/arena</code>) : Jouer, Classement, Historique et Récompenses.</p>
 
         <h3>📌 À savoir</h3>
-        <ul>
-          <li><code>/daily</code> n'existe plus : la récompense du jour se prend dans le <code>/menu</code></li>
-        </ul>
+        <p><code>/tpahere</code> fait venir un joueur près de toi, même s'il est sur un autre serveur. Et attention, <code>/daily</code> n'existe plus : la récompense du jour se prend dans le <code>/menu</code>.</p>
 
         <p><em>Bonne aventure sur Nerysia ! 🐉⚔️</em></p>
       ]]></content:encoded>
@@ -325,42 +212,26 @@
 
     <!-- ================================================================ SEMAINE 2 -->
     <item>
-      <title>Semaine de dev #2 — Un seul Nerysia, plusieurs serveurs</title>
+      <title>Semaine de dev #2 : un seul Nerysia, plusieurs serveurs</title>
       <link>https://apk.nerysia.fr</link>
       <pubDate>Sun, 04 Oct 2026 18:00:00 +0200</pubDate>
       <dc:creator>Lightshadow02</dc:creator>
       <slash:comments>0</slash:comments>
       <content:encoded><![CDATA[
-        <h2>🌐 Tous les serveurs ne font plus qu'un</h2>
-        <p>Du 28 septembre au 4 octobre, on a fait en sorte que tous les serveurs du réseau se comportent comme un seul.</p>
+        <p>Du 28 septembre au 4 octobre, on s'est attaqués à un gros morceau : faire en sorte que tous les serveurs du réseau se comportent comme un seul.</p>
 
         <h3>💬 Parler sur tout le réseau</h3>
-        <ul>
-          <li><code>/msg</code> <strong>et</strong> <code>/r</code> — écris à un ami et réponds-lui, quel que soit son serveur</li>
-          <li><strong>Ton grade au-dessus de ta tête</strong> — avec l'icône de ton grade</li>
-        </ul>
+        <p><code>/msg</code> et <code>/r</code> marchent maintenant d'un serveur à l'autre : écris à un ami et réponds-lui, où qu'il soit. Ton grade s'affiche aussi au-dessus de ta tête, avec son icône.</p>
 
         <h3>🛒 Des boutiques</h3>
-        <ul>
-          <li><strong>Plusieurs boutiques</strong> sur le serveur, chacune avec ses propres articles</li>
-          <li><strong>Prêtes pour les PNJ</strong> — un marchand pourra t'ouvrir sa boutique en lui parlant</li>
-        </ul>
+        <p>Le serveur a désormais plusieurs boutiques, chacune avec ses propres articles. Elles sont déjà prêtes pour les PNJ : bientôt, un marchand pourra t'ouvrir sa boutique quand tu lui parles.</p>
 
         <h3>🛡️ Anti-triche</h3>
-        <p>Pour que tout le monde joue à armes égales :</p>
-        <ul>
-          <li><strong>Alertes x-ray</strong> — le minage suspect est repéré</li>
-          <li><strong>Mods interdits</strong> mieux vérifiés à la connexion</li>
-          <li><strong>Argent et Pokémon surveillés</strong> — les gains anormaux et les Pokémon impossibles sont signalés au staff</li>
-        </ul>
+        <p>Pour que tout le monde joue à armes égales, l'anti-triche monte d'un cran. Le minage suspect (x-ray) est repéré, les mods interdits sont mieux vérifiés à la connexion, et les gains d'argent anormaux comme les Pokémon impossibles sont signalés au staff.</p>
+        <p>Et en passant, les cosmétiques sont mieux cadrés dans l'écran de l'équipe.</p>
 
-        <h3>🎨 Cosmétiques</h3>
-        <ul>
-          <li><strong>Mieux cadrés</strong> dans l'écran de l'équipe</li>
-        </ul>
-
-        <h3>👮 Pour le staff (récap)</h3>
-        <p>Les sanctions valent sur <strong>tout le réseau</strong> : changer de serveur ne sert plus à rien. Un <strong>journal du réseau</strong> note qui a fait quoi, à qui, quand et sur quel serveur. <code>/homes &lt;joueur&gt;</code> montre les homes d'un joueur, même déconnecté. Nouveau <strong>bâton du staff</strong>. Éditeur de boutiques directement en jeu.</p>
+        <h3>👮 Pour le staff</h3>
+        <p>Les sanctions valent sur tout le réseau : changer de serveur ne sert plus à rien. Un journal du réseau note qui a fait quoi, à qui, quand et sur quel serveur. <code>/homes &lt;joueur&gt;</code> montre les homes d'un joueur, même déconnecté. Il y a aussi un nouveau bâton du staff, et l'éditeur de boutiques se fait directement en jeu.</p>
 
         <p><em>Bonne aventure sur Nerysia ! 🐉⚔️</em></p>
       ]]></content:encoded>
@@ -368,53 +239,29 @@
 
     <!-- ================================================================ SEMAINE 1 -->
     <item>
-      <title>Semaine de dev #1 — Les fondations</title>
+      <title>Semaine de dev #1 : les fondations</title>
       <link>https://apk.nerysia.fr</link>
       <pubDate>Sun, 27 Sep 2026 18:00:00 +0200</pubDate>
       <dc:creator>Lightshadow02</dc:creator>
       <slash:comments>0</slash:comments>
       <content:encoded><![CDATA[
-        <h2>🏗️ On reprend tout, en mieux</h2>
-        <p>Du 21 au 27 septembre, première semaine de dev : on a repris le mod Nerysia de fond en comble pour qu'il soit plus stable, plus rapide et prêt pour tout ce qui arrive.</p>
+        <p>Du 21 au 27 septembre, première semaine de dev. On a repris le mod Nerysia de fond en comble. Ce n'est pas ce qui se voit le plus, mais c'est ce qui rend tout le reste possible.</p>
 
         <h3>🔧 Plus solide</h3>
-        <ul>
-          <li><strong>Résiste aux mises à jour de Cobblemon</strong> — une nouvelle version de Cobblemon ne fait plus tomber le serveur</li>
-          <li><strong>Téléportation instantanée</strong> d'un serveur à l'autre, et plus de téléportation en plein combat</li>
-          <li><strong>Raids plus sûrs</strong> — un participant qui change de serveur ne casse plus le raid, et ses récompenses l'attendent</li>
-          <li><strong>Connexion plus stable</strong> — les gros menus ne te déconnectent plus</li>
-        </ul>
+        <p>Une nouvelle version de Cobblemon ne fait plus tomber le serveur. La téléportation d'un serveur à l'autre est instantanée, et on ne peut plus se téléporter en plein combat. Les raids sont plus sûrs : un participant qui change de serveur ne casse plus le raid, et ses récompenses l'attendent. Et les gros menus ne te déconnectent plus.</p>
 
         <h3>💰 Deux monnaies</h3>
-        <ul>
-          <li><strong>Les Nerycoins</strong> — la monnaie du jeu, gagnée en jouant</li>
-          <li><strong>Les Nerygems</strong> — la monnaie précieuse</li>
-          <li><strong>Un seul compte pour tout le réseau</strong> — ton argent te suit partout, et chaque mouvement est noté</li>
-        </ul>
+        <p>Nerysia a maintenant deux monnaies : les <strong>Nerycoins</strong>, que tu gagnes en jouant, et les <strong>Nerygems</strong>, la monnaie précieuse. Ton compte est le même sur tout le réseau : ton argent te suit partout, et chaque mouvement est noté.</p>
 
         <h3>🖼️ Des interfaces refaites</h3>
-        <ul>
-          <li><strong>Les raids</strong> — la liste, le menu et l'écran des résultats</li>
-          <li><strong>Tes homes</strong> — un écran plus clair pour les gérer</li>
-          <li><strong>Le calendrier des récompenses du jour</strong></li>
-          <li><strong>Les caisses</strong> — l'aperçu de leur contenu et une nouvelle animation d'ouverture</li>
-          <li><strong>Une première version du /menu</strong>, sur la touche <strong>H</strong></li>
-        </ul>
+        <p>On a refait l'interface des raids (la liste, le menu et l'écran des résultats), celle de tes homes, le calendrier des récompenses du jour, et les caisses, avec l'aperçu de leur contenu et une nouvelle animation d'ouverture. Une première version du <code>/menu</code> arrive aussi, sur la touche <strong>H</strong>.</p>
 
-        <h3>🎵 Ambiance</h3>
-        <ul>
-          <li><strong>Des musiques différentes en grotte et en montagne</strong></li>
-          <li><strong>Un ruban Nerysia</strong> pour vos Pokémon, remis par le staff</li>
-        </ul>
+        <h3>🎵 Ambiance et réseau</h3>
+        <p>Les grottes et les montagnes ont maintenant leurs propres musiques, et le staff peut remettre un ruban Nerysia à vos Pokémon.</p>
+        <p>Les grades sont les mêmes partout, la liste des joueurs (TAB) est commune à tout le réseau, et un chat du réseau te permet de parler à tout le monde, avec ton grade devant ton pseudo.</p>
 
-        <h3>🌐 Le réseau</h3>
-        <ul>
-          <li><strong>Les mêmes grades partout</strong>, et une liste des joueurs (TAB) commune à tout le réseau</li>
-          <li><strong>Un chat du réseau</strong> — tu parles à tout le monde, avec ton grade devant ton pseudo</li>
-        </ul>
-
-        <h3>👮 Pour le staff (récap)</h3>
-        <p><code>/vanish</code>, <code>/supervanish</code> et <code>/nick</code> sur tout le réseau. Depuis la fiche d'un joueur : gérer son argent et ses gemmes, modifier les IV et EV, la forme, les rubans et les cosmétiques de ses Pokémon. Donner un Pokémon par son nom français.</p>
+        <h3>👮 Pour le staff</h3>
+        <p><code>/vanish</code>, <code>/supervanish</code> et <code>/nick</code> marchent sur tout le réseau. Depuis la fiche d'un joueur, on peut gérer son argent et ses gemmes, et modifier les IV, les EV, la forme, les rubans et les cosmétiques de ses Pokémon. On peut aussi donner un Pokémon par son nom français.</p>
 
         <p><em>Bonne aventure sur Nerysia ! 🐉⚔️</em></p>
       ]]></content:encoded>
