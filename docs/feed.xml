@@ -268,85 +268,45 @@
     </item>
 
     <item>
-      <title>Mise à jour majeure — Mod Nerysia v1.0.6 + Factions V6.6</title>
+      <title>Grosse mise à jour : Mod Nerysia v1.0.6 et Factions V6.6</title>
       <link>https://apk.nerysia.fr</link>
       <pubDate>Sat, 02 May 2026 14:00:00 +0200</pubDate>
       <dc:creator>Lightshadow02</dc:creator>
       <slash:comments>0</slash:comments>
       <content:encoded><![CDATA[
-        <h2>🎉 Grosse mise à jour !</h2>
-        <p>Une grosse update vient d'arriver sur Nerysia, regroupant les patchs <strong>Mod Nerysia v1.0.6</strong> et <strong>Factions/Cobblemon V6.6</strong>. Voici tout ce qui change pour vous.</p>
+        <p>Une grosse mise à jour vient d'arriver sur Nerysia. Elle regroupe deux patchs, <strong>Mod Nerysia v1.0.6</strong> et <strong>Factions/Cobblemon V6.6</strong>, et elle touche un peu à tout. Voici ce qui change pour vous.</p>
 
-        <h3>🛡️ Raid Dens enfin tranquilles</h3>
-        <p>Plus aucune interruption pendant vos combats de raid Cobblemon :</p>
-        <ul>
-          <li><strong>Vos Pokémon sauvages ne disparaissent plus</strong> pendant le raid</li>
-          <li><strong>Les drops d'objets restent au sol</strong> leur durée vanilla, plus de despawn boost</li>
-          <li><strong>Aucun monstre hostile ne peut spawner</strong> dans le donjon</li>
-          <li><strong>TPA et /home bloqués</strong> dans les raid dens (anti-cheat)</li>
-        </ul>
+        <h3>🛡️ Des Raid Dens enfin tranquilles</h3>
+        <p>Plus rien ne vient interrompre vos combats de raid. Vos Pokémon sauvages ne disparaissent plus en plein raid, les objets qui tombent restent au sol aussi longtemps qu'en vanilla, et aucun monstre hostile ne peut apparaître dans le donjon. Pour éviter les petits malins, la TPA et le <code>/home</code> sont bloqués dans les raid dens.</p>
 
-        <h3>🌳 Branches Factions : refonte totale</h3>
-        <p>Fini les coûts ridicules ! Investir dans une branche est maintenant accessible à tous :</p>
-        <ul>
-          <li><strong>1 seul point par tier</strong> (au lieu de 2 à 8 selon le tier)</li>
-          <li><strong>10 points pour maxer une branche</strong> entière (au lieu de 45)</li>
-          <li><strong>40 points pour TOUT maxer</strong> les 4 branches (Agriculture, Expansion, Forge, Chasseur) — atteignable au niveau 40</li>
-          <li>+10 points de marge au cap pour les bonus admin/events</li>
-        </ul>
+        <h3>🌳 Les branches de Factions, en beaucoup moins cher</h3>
+        <p>On l'a entendu : les coûts étaient bien trop élevés. Chaque tier coûte maintenant <strong>1 seul point</strong> (au lieu de 2 à 8). Maxer une branche entière demande 10 points au lieu de 45, et maxer les 4 branches (Agriculture, Expansion, Forge, Chasseur) en demande 40, ce qui est atteignable au niveau 40. On a gardé 10 points de marge au plafond pour les bonus d'events et du staff.</p>
 
-        <h3>📊 Nouveaux écrans dans le Nexus</h3>
-        <ul>
-          <li><strong>Paliers XP</strong> — table complète des 50 niveaux, ta progression, prochain niveau, sources d'XP avec valeurs. Scrollable, auto-centrée sur ton niveau actuel.</li>
-          <li><strong>Joueurs</strong> (Leaders &amp; Co-Leaders) — gérez vos membres : promouvoir, rétrograder, exclure, statut online/offline en un coup d'œil.</li>
-        </ul>
+        <h3>📊 Deux nouveaux écrans dans le Nexus</h3>
+        <p><strong>Paliers XP</strong> te montre la table complète des 50 niveaux : où tu en es, ce qu'il te faut pour le prochain, et combien rapporte chaque source d'XP. L'écran se place tout seul sur ton niveau actuel.</p>
+        <p><strong>Joueurs</strong> est réservé aux Leaders et Co-Leaders : promouvoir, rétrograder ou exclure un membre, et voir d'un coup d'œil qui est en ligne.</p>
 
-        <h3>🏠 Renommage homes &amp; faction</h3>
-        <ul>
-          <li><strong>Renommer une home</strong> : commande <code>/f renamehome &lt;ancien&gt; &lt;nouveau&gt;</code> ou bouton <strong>R</strong> jaune dans le Nexus → Territoire</li>
-          <li><strong>Renommer ta faction</strong> (Leader &amp; Co-Leader) directement via le Nexus → Accueil</li>
-        </ul>
+        <h3>🏠 Renommer tes homes et ta faction</h3>
+        <p>Tu peux renommer une home avec <code>/f renamehome &lt;ancien&gt; &lt;nouveau&gt;</code>, ou avec le bouton <strong>R</strong> jaune dans le Nexus, onglet Territoire. Les Leaders et Co-Leaders peuvent aussi renommer leur faction directement depuis l'accueil du Nexus.</p>
 
-        <h3>🎮 Confort de jeu</h3>
-        <ul>
-          <li><strong>HUDs déplacés en haut-gauche</strong> (Bounty, Leurre, Catalyst) — ne masquent plus l'inventaire</li>
-          <li><strong>Blocs faction rendus à l'inventaire</strong> si placement invalide (hors claim, branche pas débloquée, etc.) — fini les Forges qui disparaissent dans le vide</li>
-          <li><strong>Nexus destructible plus facilement</strong> (résistance pierre au lieu d'obsidienne) — toujours protégé par les permissions Co-Leader+</li>
-          <li><strong>Plus de "vrombissement d'abeille"</strong> sans abeille à proximité</li>
-        </ul>
+        <h3>🎮 Petit confort</h3>
+        <p>Les HUD Bounty, Leurre et Catalyst passent en haut à gauche, pour ne plus cacher l'inventaire. Si tu poses un bloc de faction au mauvais endroit (hors claim, branche pas débloquée…), il revient dans ton inventaire au lieu de disparaître : fini les Forges perdues dans le vide.</p>
+        <p>Le Nexus se casse plus facilement (résistance de la pierre au lieu de l'obsidienne), mais il reste protégé par les permissions Co-Leader et plus. Et le vrombissement d'abeille sans abeille à côté, c'est terminé.</p>
 
-        <h3>🔒 Sécurité &amp; serveur</h3>
-        <ul>
-          <li><strong>Mobs hostiles bloqués partout</strong> : wither skeleton, piglin, noyé, gardien, elder guardian, vindicateur, évocateur</li>
-          <li><strong>Crate zones strictes</strong> — dans les zones d'events, seules les crates sont cliquables (fini le placement de blocs ou clic sur n'importe quoi)</li>
-        </ul>
+        <h3>🔒 Sécurité</h3>
+        <p>Plusieurs mobs hostiles sont bloqués partout : wither squelette, piglin, noyé, gardien, gardien ancien, vindicateur et évocateur. Dans les zones d'events, seules les caisses sont cliquables : impossible d'y poser des blocs ou de cliquer sur n'importe quoi.</p>
 
-        <h3>🆘 Découvre tout en jeu : <code>/nhelp</code></h3>
-        <p>Nouvelle commande pour explorer toutes les fonctionnalités selon ton rang :</p>
-        <ul>
-          <li><code>/nhelp</code> — vue d'ensemble</li>
-          <li><code>/nhelp joueur</code> — commandes joueur (TPA, home, raid, daily…)</li>
-          <li><code>/nhelp staff</code> / <code>/nhelp modo</code> / <code>/nhelp admin</code> — selon tes permissions</li>
-        </ul>
+        <h3>🆘 Tout découvrir avec /nhelp</h3>
+        <p>Une nouvelle commande pour explorer toutes les fonctionnalités selon ton rang. <code>/nhelp</code> donne la vue d'ensemble, <code>/nhelp joueur</code> les commandes joueur (TPA, home, raid, daily…), et <code>/nhelp staff</code>, <code>/nhelp modo</code> ou <code>/nhelp admin</code> le reste, selon tes permissions.</p>
 
-        <h3>👮 Pour le staff (récap)</h3>
-        <p>Nouveaux outils dispo : <code>/vanish</code> cross-serveur, <code>/fly</code>, <code>/speed</code>, <code>/nightvision</code>, panneau <code>/modo</code> avec liste cross-serveur de tous les joueurs, <code>/annonce</code> diffusée sur tout le réseau, <code>/ntp</code> téléport cross-serveur. Voir <code>/nhelp staff</code> en jeu.</p>
+        <h3>👮 Pour le staff</h3>
+        <p>Nouveaux outils : <code>/vanish</code> sur tout le réseau, <code>/fly</code>, <code>/speed</code>, <code>/nightvision</code>, un panneau <code>/modo</code> avec la liste de tous les joueurs du réseau, <code>/annonce</code> diffusée partout et <code>/ntp</code> pour se téléporter d'un serveur à l'autre. Tout est détaillé dans <code>/nhelp staff</code>.</p>
 
         <h3>🐛 Bugs corrigés</h3>
-        <ul>
-          <li>Plus de crash client pour les joueurs sans LuckPerms installé</li>
-          <li>Le focus des champs de texte (Nexus, Admin) ne se perd plus pendant la saisie</li>
-          <li>Le compteur de points disponibles dans le Nexus prend bien en compte les +pts admin</li>
-          <li>Quêtes synchronisées entre tous les serveurs du réseau</li>
-          <li>Faction chat compatible avec les chat-sync de proxy</li>
-        </ul>
+        <p>Les joueurs sans LuckPerms ne crashent plus. Les champs de texte du Nexus et de l'Admin ne perdent plus le focus pendant que tu écris. Le compteur de points du Nexus compte bien les points ajoutés par le staff. Les quêtes sont synchronisées entre tous les serveurs, et le chat de faction marche avec la synchro du chat du proxy.</p>
 
         <h3>📌 À savoir</h3>
-        <ul>
-          <li><strong>Aucun reset</strong> : vos points, homes, factions, Pokémon, banque restent intacts</li>
-          <li><strong>Compatibilité totale</strong> avec vos configurations actuelles</li>
-          <li>Si vous étiez modo non-OP utilisant <code>/kick</code> <code>/ban</code> <code>/tp</code> → utilisez maintenant <code>/nkick</code>, <code>/nban</code>, <code>/ntp</code></li>
-        </ul>
+        <p>Aucun reset : vos points, homes, factions, Pokémon et votre banque sont intacts, et vos réglages actuels restent compatibles. Si vous étiez modo sans être OP et que vous utilisiez <code>/kick</code>, <code>/ban</code> ou <code>/tp</code>, passez maintenant par <code>/nkick</code>, <code>/nban</code> et <code>/ntp</code>.</p>
 
         <p><em>Bonne aventure sur Nerysia ! 🐉⚔️</em></p>
       ]]></content:encoded>
@@ -359,15 +319,14 @@
       <dc:creator>Lightshadow02</dc:creator>
       <slash:comments>0</slash:comments>
       <content:encoded><![CDATA[
-        <h2>🎉 Le serveur Nerysia est en ligne !</h2>
-        <p>Bienvenue sur le serveur <strong>Nerysia</strong>, un serveur Minecraft Fabric 1.21.1 avec <strong>Cobblemon</strong> !</p>
-        <p>Pour rejoindre le serveur :</p>
+        <p>Ça y est, le serveur <strong>Nerysia</strong> est ouvert ! 🎉 Un serveur Minecraft 1.21.1 sous Fabric, avec <strong>Cobblemon</strong>, et une équipe très contente de vous y accueillir.</p>
+        <p>Pour nous rejoindre, c'est simple :</p>
         <ol>
-          <li>Connectez-vous avec votre compte Microsoft dans le launcher</li>
-          <li>Cliquez sur <strong>Jouer</strong></li>
-          <li>Le launcher télécharge et installe tout automatiquement</li>
+          <li>Connecte-toi avec ton compte Microsoft dans le launcher.</li>
+          <li>Clique sur <strong>Jouer</strong>.</li>
+          <li>Le launcher télécharge et installe tout seul ce qu'il faut. Tu n'as rien d'autre à faire.</li>
         </ol>
-        <p>Bonne aventure à tous ! 🐉</p>
+        <p>On se retrouve en jeu. Bonne aventure à tous ! 🐉</p>
       ]]></content:encoded>
     </item>
 
