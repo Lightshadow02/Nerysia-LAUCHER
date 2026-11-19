@@ -13,8 +13,33 @@ const { pathToFileURL }                 = require('url')
 const { AZURE_CLIENT_ID, MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR, SHELL_OPCODE } = require('./app/assets/js/ipcconstants')
 const LangLoader                        = require('./app/assets/js/langloader')
 
-// Setup Lang
+// Setup Lang (anglais en attendant 'ready' : la langue du PC n'est connue qu'apres, cf setupLauncherLanguage)
 LangLoader.setupLanguage()
+
+/**
+ * Langue du launcher : reglage "Langue" du joueur (config.json), sinon langue du PC.
+ * Choisie une fois au demarrage et transmise a la fenetre (--nerysia-lang) pour que
+ * les pages (EJS, rendues ici) et les scripts de la fenetre affichent la meme langue.
+ */
+function setupLauncherLanguage() {
+    let preference = 'auto'
+    try {
+        const config = JSON.parse(fs.readFileSync(path.join(app.getPath('userData'), 'config.json'), 'utf-8'))
+        preference = config?.settings?.launcher?.language || 'auto'
+    } catch (err) {
+        // Pas encore de config (1er lancement) : langue du PC
+    }
+    const systemLanguages = LangLoader.getSystemLanguages(app)
+    const language = LangLoader.resolveLanguage(preference, systemLanguages)
+    LangLoader.setupLanguage(language)
+    console.log(`Langue du launcher : ${language} (reglage : ${preference}, PC : ${systemLanguages.join(', ')})`)
+}
+
+// Changement de langue dans les parametres : on redemarre le launcher
+ipcMain.on('relaunchLauncher', () => {
+    app.relaunch()
+    app.quit()
+})
 
 // Setup auto updater.
 function initAutoUpdater(event, data) {
@@ -254,7 +279,9 @@ function createWindow() {
         webPreferences: {
             preload: path.join(__dirname, 'app', 'assets', 'js', 'preloader.js'),
             nodeIntegration: true,
-            contextIsolation: false
+            contextIsolation: false,
+            // Langue choisie au demarrage (lue par langloader.js dans la fenetre)
+            additionalArguments: [`--nerysia-lang=${LangLoader.getLanguage()}`]
         },
         backgroundColor: '#171614'
     })
@@ -262,6 +289,7 @@ function createWindow() {
 
     const data = {
         bkid: pickBackground(),
+        langTag: LangLoader.getLocaleTag(),
         lang: (str, placeHolders) => LangLoader.queryEJS(str, placeHolders)
     }
     Object.entries(data).forEach(([key, val]) => ejse.data(key, val))
@@ -287,14 +315,14 @@ function createMenu() {
 
         // Extend default included application menu to continue support for quit keyboard shortcut
         let applicationSubMenu = {
-            label: 'Application',
+            label: LangLoader.queryJS('index.menu.application'),
             submenu: [{
-                label: 'About Application',
+                label: LangLoader.queryJS('index.menu.about'),
                 selector: 'orderFrontStandardAboutPanel:'
             }, {
                 type: 'separator'
             }, {
-                label: 'Quit',
+                label: LangLoader.queryJS('index.menu.quit'),
                 accelerator: 'Command+Q',
                 click: () => {
                     app.quit()
@@ -304,31 +332,31 @@ function createMenu() {
 
         // New edit menu adds support for text-editing keyboard shortcuts
         let editSubMenu = {
-            label: 'Edit',
+            label: LangLoader.queryJS('index.menu.edit'),
             submenu: [{
-                label: 'Undo',
+                label: LangLoader.queryJS('index.menu.undo'),
                 accelerator: 'CmdOrCtrl+Z',
                 selector: 'undo:'
             }, {
-                label: 'Redo',
+                label: LangLoader.queryJS('index.menu.redo'),
                 accelerator: 'Shift+CmdOrCtrl+Z',
                 selector: 'redo:'
             }, {
                 type: 'separator'
             }, {
-                label: 'Cut',
+                label: LangLoader.queryJS('index.menu.cut'),
                 accelerator: 'CmdOrCtrl+X',
                 selector: 'cut:'
             }, {
-                label: 'Copy',
+                label: LangLoader.queryJS('index.menu.copy'),
                 accelerator: 'CmdOrCtrl+C',
                 selector: 'copy:'
             }, {
-                label: 'Paste',
+                label: LangLoader.queryJS('index.menu.paste'),
                 accelerator: 'CmdOrCtrl+V',
                 selector: 'paste:'
             }, {
-                label: 'Select All',
+                label: LangLoader.queryJS('index.menu.selectAll'),
                 accelerator: 'CmdOrCtrl+A',
                 selector: 'selectAll:'
             }]
@@ -376,6 +404,8 @@ function getPlatformIcon(filename){
     return path.join(__dirname, 'app', 'assets', 'images', `${filename}.${ext}`)
 }
 
+// La langue d'abord : la fenetre et le menu en ont besoin
+app.on('ready', setupLauncherLanguage)
 app.on('ready', createWindow)
 app.on('ready', createMenu)
 

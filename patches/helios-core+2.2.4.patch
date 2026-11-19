@@ -1,4 +1,5 @@
 diff --git a/node_modules/helios-core/dist/common/util/FileUtils.js b/node_modules/helios-core/dist/common/util/FileUtils.js
+index 133f3c8..20a3fc8 100644
 --- a/node_modules/helios-core/dist/common/util/FileUtils.js
 +++ b/node_modules/helios-core/dist/common/util/FileUtils.js
 @@ -11,6 +11,7 @@ exports.getVersionJarPath = getVersionJarPath;
@@ -9,7 +10,7 @@ diff --git a/node_modules/helios-core/dist/common/util/FileUtils.js b/node_modul
  const crypto_1 = require("crypto");
  const path_1 = require("path");
  const fs_extra_1 = require("fs-extra");
-@@ -19,6 +20,19 @@ const node_stream_zip_1 = __importDefault(require("node-stream-zip"));
+@@ -19,10 +20,23 @@ const node_stream_zip_1 = __importDefault(require("node-stream-zip"));
  const zlib_1 = require("zlib");
  const tar_fs_1 = __importDefault(require("tar-fs"));
  const log = LoggerUtil_1.LoggerUtil.getLogger('FileUtils');
@@ -29,10 +30,119 @@ diff --git a/node_modules/helios-core/dist/common/util/FileUtils.js b/node_modul
  function calculateHashByBuffer(buf, algo) {
      return (0, crypto_1.createHash)(algo).update(buf).digest('hex');
  }
-@@ -31,13 +45,79 @@ function calculateHash(path, algo) {
+-function calculateHash(path, algo) {
++function streamHash(path, algo) {
+     return new Promise((resolve, reject) => {
+         const hash = (0, crypto_1.createHash)(algo);
+         const input = (0, fs_extra_1.createReadStream)(path);
+@@ -31,13 +45,183 @@ function calculateHash(path, algo) {
          input.on('close', () => resolve(hash.digest('hex')));
      });
  }
++// ---------------------------------------------------------------------------
++// Nerysia (patch-package) : empreintes calculees sur plusieurs coeurs du processeur.
++// Avant, tout le calcul (MD5 / SHA1 de ~1 Go de mods, configs et librairies a chaque clic
++// sur Jouer) se faisait sur un seul coeur. Mesure (16 coeurs, 6 workers) : 3,6 s -> 1,7 s.
++// Chaque fichier reste lu et verifie en entier (anti-triche inchange).
++// Seulement dans le processus de verification du launcher (NERYSIA_HASH_CACHE fourni).
++// En cas de souci avec un worker : retour au calcul classique pour ce fichier.
++// ---------------------------------------------------------------------------
++const HASH_WORKER_CODE = `
++const { parentPort } = require('worker_threads');
++const fs = require('fs');
++const crypto = require('crypto');
++const buf = Buffer.allocUnsafe(1 << 20);
++parentPort.on('message', ({ id, path, algo }) => {
++    let fd = null;
++    try {
++        const hash = crypto.createHash(algo);
++        fd = fs.openSync(path, 'r');
++        let read;
++        while ((read = fs.readSync(fd, buf, 0, buf.length, null)) > 0) {
++            hash.update(buf.subarray(0, read));
++        }
++        parentPort.postMessage({ id, hash: hash.digest('hex') });
++    }
++    catch (err) {
++        parentPort.postMessage({ id, error: err.message });
++    }
++    finally {
++        if (fd != null) {
++            try { fs.closeSync(fd); } catch (e) { }
++        }
++    }
++});
++`;
++let hashPool = null;
++function getHashPool() {
++    if (hashPool !== null) {
++        return hashPool || null;
++    }
++    hashPool = false;
++    if (!process.env.NERYSIA_HASH_CACHE) {
++        return null;
++    }
++    try {
++        const { Worker } = require("worker_threads");
++        const size = Math.max(2, Math.min(6, require("os").cpus().length - 1));
++        const pending = new Map();
++        const workers = [];
++        let nextId = 0;
++        for (let i = 0; i < size; i++) {
++            const worker = new Worker(HASH_WORKER_CODE, { eval: true });
++            worker.unref();
++            worker.busy = 0;
++            worker.on('message', (msg) => {
++                const job = pending.get(msg.id);
++                if (job == null) {
++                    return;
++                }
++                pending.delete(msg.id);
++                worker.busy--;
++                if (msg.error != null) {
++                    job.reject(new Error(msg.error));
++                }
++                else {
++                    job.resolve(msg.hash);
++                }
++            });
++            worker.on('error', (err) => {
++                log.warn('Calcul des empreintes : worker arrete, retour au calcul classique.', err);
++                hashPool = false;
++                for (const [id, job] of pending) {
++                    if (job.worker === worker) {
++                        pending.delete(id);
++                        job.reject(err);
++                    }
++                }
++            });
++            workers.push(worker);
++        }
++        hashPool = {
++            hash(path, algo) {
++                return new Promise((resolve, reject) => {
++                    const worker = workers.reduce((a, b) => (b.busy < a.busy ? b : a));
++                    const id = ++nextId;
++                    pending.set(id, { resolve, reject, worker });
++                    worker.busy++;
++                    worker.postMessage({ id, path, algo });
++                });
++            }
++        };
++    }
++    catch (err) {
++        log.warn('Calcul des empreintes sur plusieurs coeurs indisponible.', err);
++        hashPool = false;
++    }
++    return hashPool || null;
++}
++function calculateHash(path, algo) {
++    const pool = getHashPool();
++    if (pool != null) {
++        return pool.hash(path, algo).catch(() => streamHash(path, algo));
++    }
++    return streamHash(path, algo);
++}
 +// ---------------------------------------------------------------------------
 +// Nerysia (patch-package) : cache des empreintes.
 +// Avant, CHAQUE fichier (~680 Mo de mods + assets Minecraft) etait relu et hashe a
@@ -111,6 +221,7 @@ diff --git a/node_modules/helios-core/dist/common/util/FileUtils.js b/node_modul
          catch (err) {
              log.error('Failed to calculate hash.', err);
 diff --git a/node_modules/helios-core/dist/dl/distribution/DistributionIndexProcessor.js b/node_modules/helios-core/dist/dl/distribution/DistributionIndexProcessor.js
+index f09b6b4..c6c430e 100644
 --- a/node_modules/helios-core/dist/dl/distribution/DistributionIndexProcessor.js
 +++ b/node_modules/helios-core/dist/dl/distribution/DistributionIndexProcessor.js
 @@ -14,6 +14,93 @@ const MojangUtils_1 = require("../../common/util/MojangUtils");
@@ -246,6 +357,7 @@ diff --git a/node_modules/helios-core/dist/dl/distribution/DistributionIndexProc
      async loadModLoaderVersionJson() {
          const server = this.distribution.getServerById(this.serverId);
 diff --git a/node_modules/helios-core/dist/dl/mojang/MojangIndexProcessor.js b/node_modules/helios-core/dist/dl/mojang/MojangIndexProcessor.js
+index 37d1008..d50efef 100644
 --- a/node_modules/helios-core/dist/dl/mojang/MojangIndexProcessor.js
 +++ b/node_modules/helios-core/dist/dl/mojang/MojangIndexProcessor.js
 @@ -165,7 +165,8 @@ class MojangIndexProcessor extends IndexProcessor_1.IndexProcessor {

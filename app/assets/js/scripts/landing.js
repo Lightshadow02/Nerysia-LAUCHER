@@ -35,6 +35,9 @@ const GameInstances           = require('./assets/js/gameinstances')
 const SkinChanger             = require('./assets/js/skinchanger')
 const SkinViewer              = require('./assets/js/skinviewer')
 const SkinHistory             = require('./assets/js/skinhistory')
+const Screenshots             = require('./assets/js/screenshots')
+const GameLanguage            = require('./assets/js/gamelanguage')
+const { REMOTE_DISTRO_URL }   = require('./assets/js/distromanager')
 
 // Launch Elements
 const launch_content          = document.getElementById('launch_content')
@@ -208,8 +211,25 @@ function initSkinChanger(){
         currentPng: null,     // image du skin porte (Buffer)
         currentHash: null,    // son empreinte dans "Mes skins"
         historyId: null,      // skin de "Mes skins" affiche dans l'apercu
-        session: 0            // ouverture en cours (ignore les reponses d'une ouverture precedente)
+        session: 0,           // ouverture en cours (ignore les reponses d'une ouverture precedente)
+        poseIndex: 0          // pose de l'apercu (SkinViewer.POSES)
     }
+
+    // Pose de l'apercu : fleches sous le personnage (marche, course, debout, salut, assis)
+    const showPose = (step) => {
+        const poses = SkinViewer.POSES
+        skinChange.poseIndex = (skinChange.poseIndex + step + poses.length) % poses.length
+        const pose = poses[skinChange.poseIndex]
+        skinChange.viewer.setPose(pose)
+        document.getElementById('skinChangePoseName').textContent = Lang.queryJS('skin.poses.' + pose)
+    }
+    const posePrev = document.getElementById('skinChangePosePrev')
+    const poseNext = document.getElementById('skinChangePoseNext')
+    posePrev.title = Lang.queryJS('skin.posePrev')
+    poseNext.title = Lang.queryJS('skin.poseNext')
+    posePrev.onclick = () => showPose(-1)
+    poseNext.onclick = () => showPose(1)
+    showPose(0)
 
     document.getElementById('skinChangeChoose').onclick = () => {
         skinChange.fileInput.value = '' // pour pouvoir rechoisir le meme fichier
@@ -547,6 +567,229 @@ async function applySkinChange(action){
 document.getElementById('skinMediaButton').onclick = () => openSkinChanger()
 document.getElementById('avatarOverlay').onclick = () => openSkinChanger()
 
+/* ===== Mes captures d'ecran (bouton a droite, cf assets/js/screenshots.js) ===== */
+
+// Fenetre preparee au 1er clic : overlay.ejs est charge apres landing.js
+let shots = null
+
+function initScreenshots(){
+    if(shots != null){
+        return
+    }
+    shots = {
+        header:    document.getElementById('screenshotsHeader'),
+        grid:      document.getElementById('screenshotsGrid'),
+        viewer:    document.getElementById('screenshotsViewer'),
+        viewerImg: document.getElementById('screenshotsViewerImg'),
+        bar:       document.getElementById('screenshotsViewerBar'),
+        name:      document.getElementById('screenshotsViewerName'),
+        status:    document.getElementById('screenshotsStatus'),
+        close:     document.getElementById('screenshotsClose'),
+        folder:    document.getElementById('screenshotsOpenFolder'),
+        list: [],          // captures, la plus recente en premier
+        names: {},         // id du serveur -> nom affiche
+        index: -1,         // capture affichee en grand (-1 = grille)
+        observer: null,    // charge les vignettes quand elles apparaissent
+        session: 0         // ouverture en cours (ignore les reponses d'une ouverture precedente)
+    }
+
+    document.getElementById('screenshotsPrev').onclick = () => showScreenshot(shots.index - 1)
+    document.getElementById('screenshotsNext').onclick = () => showScreenshot(shots.index + 1)
+
+    // Fermer (ou revenir a la grille si une capture est affichee en grand). Aussi : Echap / Entree.
+    shots.close.onclick = () => {
+        if(shots.index >= 0){
+            showScreenshotGrid()
+        } else {
+            closeScreenshots()
+        }
+    }
+
+    shots.folder.onclick = async () => {
+        if(shots.index >= 0){
+            Screenshots.showInFolder(shots.list[shots.index].path)
+            return
+        }
+        // Dossier du serveur selectionne (sinon celui de la capture la plus recente)
+        const server = ConfigManager.getSelectedServer() || shots.list[0]?.server
+        if(server == null){
+            return
+        }
+        const error = await Screenshots.openFolder(Screenshots.folderOf(ConfigManager.getInstanceDirectory(), server))
+        if(error){
+            loggerLanding.warn('Dossier des captures non ouvert :', error)
+            setScreenshotsStatus(Lang.queryJS('screenshots.openFailed'), 'error')
+        }
+    }
+
+    document.getElementById('screenshotsCopy').onclick = () => {
+        const ok = Screenshots.copy(shots.list[shots.index].path)
+        setScreenshotsStatus(Lang.queryJS(ok ? 'screenshots.copied' : 'screenshots.copyFailed'), ok ? 'success' : 'error')
+    }
+
+    document.getElementById('screenshotsDelete').onclick = async () => {
+        const index = shots.index
+        try {
+            await Screenshots.trash(shots.list[index].path)
+        } catch (err) {
+            loggerLanding.warn('Capture non supprimee :', err)
+            setScreenshotsStatus(Lang.queryJS('screenshots.deleteFailed'), 'error')
+            return
+        }
+        shots.list.splice(index, 1)
+        renderScreenshots()
+        if(shots.list.length > 0){
+            showScreenshot(Math.min(index, shots.list.length - 1))
+        } else {
+            showScreenshotGrid()
+        }
+        setScreenshotsStatus(Lang.queryJS('screenshots.deleted'), 'success')
+    }
+}
+
+function setScreenshotsStatus(text, type = ''){
+    shots.status.innerHTML = text
+    shots.status.setAttribute('type', type)
+}
+
+/** Date d'une capture, dans la langue du launcher (ex : 19 nov. 2026, 14:32). */
+function formatScreenshotDate(time){
+    return new Date(time).toLocaleString(Lang.getLocaleTag(), { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
+
+/** Fleches gauche / droite : capture precedente / suivante (quand une capture est en grand). */
+function screenshotsKeys(e){
+    if(shots == null || shots.index < 0 || shots.viewer.offsetParent === null){
+        return
+    }
+    if(e.key === 'ArrowLeft'){
+        showScreenshot(shots.index - 1)
+    } else if(e.key === 'ArrowRight'){
+        showScreenshot(shots.index + 1)
+    }
+}
+
+/** Grille des vignettes. */
+function renderScreenshots(){
+    if(shots.observer != null){
+        shots.observer.disconnect()
+    }
+    shots.grid.innerHTML = ''
+    shots.header.textContent = Lang.queryJS('screenshots.title') + (shots.list.length > 0 ? ` (${shots.list.length})` : '')
+
+    if(shots.list.length === 0){
+        const empty = document.createElement('div')
+        empty.id = 'screenshotsEmpty'
+        empty.innerHTML = Lang.queryJS('screenshots.empty')
+        shots.grid.appendChild(empty)
+        return
+    }
+
+    // Plusieurs serveurs : on indique le serveur sous chaque capture
+    const severalServers = new Set(shots.list.map(s => s.server)).size > 1
+
+    // Les vignettes ne sont preparees que lorsqu'elles apparaissent (pas 200 images d'un coup)
+    shots.observer = new IntersectionObserver(entries => {
+        for(const entry of entries){
+            if(!entry.isIntersecting) continue
+            const tile = entry.target
+            shots.observer.unobserve(tile)
+            const shot = shots.list[Number(tile.getAttribute('index'))]
+            if(shot == null) continue
+            Screenshots.thumbnail(shot.path).then(url => {
+                tile.firstChild.style.backgroundImage = `url("${url}")`
+            })
+        }
+    }, { root: shots.grid, rootMargin: '150px' })
+
+    shots.list.forEach((shot, i) => {
+        const tile = document.createElement('button')
+        tile.className = 'screenshotsTile'
+        tile.setAttribute('index', i)
+        const thumb = document.createElement('div')
+        thumb.className = 'screenshotsThumb'
+        const caption = document.createElement('span')
+        caption.className = 'screenshotsCaption'
+        caption.textContent = formatScreenshotDate(shot.time) + (severalServers ? ' · ' + (shots.names[shot.server] || shot.server) : '')
+        tile.append(thumb, caption)
+        tile.onclick = () => showScreenshot(i)
+        shots.grid.appendChild(tile)
+        shots.observer.observe(tile)
+    })
+}
+
+/** Affiche une capture en grand (i peut deborder : on reboucle). */
+function showScreenshot(i){
+    if(shots.list.length === 0){
+        showScreenshotGrid()
+        return
+    }
+    shots.index = (i + shots.list.length) % shots.list.length
+    const shot = shots.list[shots.index]
+    shots.viewerImg.src = Screenshots.fileUrl(shot.path)
+    shots.name.textContent = `${shots.index + 1} / ${shots.list.length} · ${formatScreenshotDate(shot.time)}`
+    shots.grid.style.display = 'none'
+    shots.viewer.style.display = ''
+    shots.bar.style.display = ''
+    shots.close.innerHTML = Lang.queryJS('screenshots.back')
+    shots.folder.innerHTML = Lang.queryJS('screenshots.showInFolder')
+    setScreenshotsStatus('')
+}
+
+function showScreenshotGrid(){
+    shots.index = -1
+    shots.viewer.style.display = 'none'
+    shots.bar.style.display = 'none'
+    shots.grid.style.display = ''
+    shots.viewerImg.removeAttribute('src')
+    shots.close.innerHTML = Lang.queryJS('screenshots.close')
+    shots.folder.innerHTML = Lang.queryJS('screenshots.openFolder')
+    setScreenshotsStatus('')
+}
+
+async function openScreenshots(){
+    initScreenshots()
+    const session = ++shots.session
+    document.getElementById('screenshotsPrev').title = Lang.queryJS('screenshots.previous')
+    document.getElementById('screenshotsNext').title = Lang.queryJS('screenshots.next')
+    document.getElementById('screenshotsCopy').innerHTML = Lang.queryJS('screenshots.copy')
+    document.getElementById('screenshotsDelete').innerHTML = Lang.queryJS('screenshots.delete')
+    shots.header.textContent = Lang.queryJS('screenshots.title')
+    shots.grid.innerHTML = ''
+    showScreenshotGrid()
+    setScreenshotsStatus(Lang.queryJS('screenshots.loading'))
+    toggleOverlay(true, true, 'screenshotsContent')
+    document.addEventListener('keydown', screenshotsKeys)
+
+    try {
+        const distro = await DistroAPI.getDistribution()
+        shots.names = Object.fromEntries(distro.servers.map(s => [s.rawServer.id, s.rawServer.name]))
+    } catch (err) {
+        shots.names = {}
+    }
+    // Dossier actuel + ancien dossier .helioslauncher (captures d'avant la v1.0.13)
+    const roots = [ConfigManager.getInstanceDirectory(), ConfigManager.getLegacyInstanceDirectory()].filter(Boolean)
+    const list = await Screenshots.list(roots)
+    if(session !== shots.session){
+        return
+    }
+    shots.list = list
+    renderScreenshots()
+    setScreenshotsStatus('')
+}
+
+function closeScreenshots(){
+    shots.session++
+    document.removeEventListener('keydown', screenshotsKeys)
+    if(shots.observer != null){
+        shots.observer.disconnect()
+    }
+    showScreenshotGrid()
+    toggleOverlay(false)
+}
+
+document.getElementById('screenshotsMediaButton').onclick = () => openScreenshots()
+
 // Bind selected account
 function updateSelectedAccount(authUser){
     let username = Lang.queryJS('landing.selectedAccount.noAccountSelected')
@@ -570,7 +813,7 @@ function updateSelectedServer(serv){
     }
     ConfigManager.setSelectedServer(serv != null ? serv.rawServer.id : null)
     ConfigManager.save()
-    server_selection_button.innerHTML = '&#8226; ' + (serv != null ? serv.rawServer.name : Lang.queryJS('landing.noSelection'))
+    server_selection_button.innerHTML = '&#8226; ' + (serv != null ? serv.rawServer.name : Lang.queryJS('landing.selectedServer.noSelection'))
     if(getCurrentView() === VIEWS.settings){
         animateSettingsTabRefresh()
     }
@@ -584,63 +827,92 @@ server_selection_button.onclick = async e => {
     await toggleServerSelection(true)
 }
 
-// Update Mojang Status Color
+/*
+ * Statut (en bas a gauche, ex-"Statut Mojang") : seulement ce qui compte pour jouer sur Nerysia,
+ * regroupe par usage (ex : Microsoft + Xbox Live + Minecraft = "Connexion au compte").
+ * Les services Mojang viennent de MojangRestAPI.status(), Discord de discordstatus.com,
+ * et "Telechargements Nerysia" verifie que le site du modpack repond.
+ * Couleur du point = pire statut des services essentiels.
+ */
+const STATUS_TIMEOUT = 5000
+
+/** Le site du modpack (apk.nerysia.fr) repond-il ? */
+async function checkNerysiaFiles(){
+    try {
+        // no-cors : on veut juste savoir si le site repond (pas lire la reponse)
+        await fetch(REMOTE_DISTRO_URL, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(STATUS_TIMEOUT) })
+        return 'green'
+    } catch (err) {
+        return 'red'
+    }
+}
+
+/** Etat de Discord (page de statut officielle). */
+async function checkDiscordStatus(){
+    try {
+        const res = await fetch('https://discordstatus.com/api/v2/status.json', { cache: 'no-store', signal: AbortSignal.timeout(STATUS_TIMEOUT) })
+        const indicator = (await res.json())?.status?.indicator
+        return { none: 'green', minor: 'yellow', maintenance: 'yellow', major: 'red', critical: 'red' }[indicator] || 'grey'
+    } catch (err) {
+        return 'grey'
+    }
+}
+
+const STATUS_GROUPS = [
+    { key: 'account',     essential: true,  mojang: ['microsoft-o-auth-server', 'xbox-live-auth-server', 'xbox-live-gatekeeper', 'microsoft-minecraft-api'] },
+    { key: 'multiplayer', essential: true,  mojang: ['mojang-multiplayer-session-service'] },
+    { key: 'nerysia',     essential: true,  check: checkNerysiaFiles },
+    { key: 'skins',       essential: false, mojang: ['minecraft-skins', 'microsoft-minecraft-profile'] },
+    { key: 'discord',     essential: false, check: checkDiscordStatus }
+]
+
+/** Pire statut d'une liste (rouge > jaune > vert > gris = inconnu). */
+function worstStatus(list){
+    for(const s of ['red', 'yellow', 'green']){
+        if(list.includes(s)) return s
+    }
+    return 'grey'
+}
+
 const refreshMojangStatuses = async function(){
-    loggerLanding.info('Refreshing Mojang Statuses..')
+    loggerLanding.info('Refreshing service statuses..')
 
-    let status = 'grey'
-    let tooltipEssentialHTML = ''
-    let tooltipNonEssentialHTML = ''
-
-    const response = await MojangRestAPI.status()
-    let statuses
+    const [response, ...checks] = await Promise.all([
+        MojangRestAPI.status(),
+        ...STATUS_GROUPS.map(g => g.check ? g.check() : null)
+    ])
+    let mojangStatuses
     if(response.responseStatus === RestResponseStatus.SUCCESS) {
-        statuses = response.data
+        mojangStatuses = response.data
     } else {
         loggerLanding.warn('Unable to refresh Mojang service status.')
-        statuses = MojangRestAPI.getDefaultStatuses()
+        mojangStatuses = MojangRestAPI.getDefaultStatuses()
     }
-    
-    greenCount = 0
-    greyCount = 0
+    const mojangById = {}
+    for(const service of mojangStatuses){
+        mojangById[service.service || service.slug] = service.status
+    }
 
-    for(let i=0; i<statuses.length; i++){
-        const service = statuses[i]
-
-        const tooltipHTML = `<div class="mojangStatusContainer">
-            <span class="mojangStatusIcon" style="color: ${MojangRestAPI.statusToHex(service.status)};">&#8226;</span>
-            <span class="mojangStatusName">${service.name}</span>
+    let essentialHTML = ''
+    let otherHTML = ''
+    const essentialStatuses = []
+    STATUS_GROUPS.forEach((group, i) => {
+        const status = group.check ? checks[i] : worstStatus(group.mojang.map(id => mojangById[id] || 'grey'))
+        const html = `<div class="mojangStatusContainer">
+            <span class="mojangStatusIcon" style="color: ${MojangRestAPI.statusToHex(status)};">&#8226;</span>
+            <span class="mojangStatusName">${Lang.queryJS('landing.status.' + group.key)}</span>
         </div>`
-        if(service.essential){
-            tooltipEssentialHTML += tooltipHTML
+        if(group.essential){
+            essentialHTML += html
+            essentialStatuses.push(status)
         } else {
-            tooltipNonEssentialHTML += tooltipHTML
+            otherHTML += html
         }
+    })
 
-        if(service.status === 'yellow' && status !== 'red'){
-            status = 'yellow'
-        } else if(service.status === 'red'){
-            status = 'red'
-        } else {
-            if(service.status === 'grey'){
-                ++greyCount
-            }
-            ++greenCount
-        }
-
-    }
-
-    if(greenCount === statuses.length){
-        if(greyCount === statuses.length){
-            status = 'grey'
-        } else {
-            status = 'green'
-        }
-    }
-    
-    document.getElementById('mojangStatusEssentialContainer').innerHTML = tooltipEssentialHTML
-    document.getElementById('mojangStatusNonEssentialContainer').innerHTML = tooltipNonEssentialHTML
-    document.getElementById('mojang_status_icon').style.color = MojangRestAPI.statusToHex(status)
+    document.getElementById('mojangStatusEssentialContainer').innerHTML = essentialHTML
+    document.getElementById('mojangStatusNonEssentialContainer').innerHTML = otherHTML
+    document.getElementById('mojang_status_icon').style.color = MojangRestAPI.statusToHex(worstStatus(essentialStatuses))
 }
 
 const refreshServerStatus = async (fade = false) => {
@@ -677,8 +949,8 @@ const refreshServerStatus = async (fade = false) => {
 refreshMojangStatuses()
 // Server Status is refreshed in uibinder.js on distributionIndexDone.
 
-// Refresh statuses every hour. The status page itself refreshes every day so...
-let mojangStatusListener = setInterval(() => refreshMojangStatuses(true), 60*60*1000)
+// Statut rafraichi toutes les 10 minutes
+let mojangStatusListener = setInterval(() => refreshMojangStatuses(true), 10*60*1000)
 // Set refresh rate to once every 5 minutes.
 let serverStatusListener = setInterval(() => refreshServerStatus(true), 300000)
 
@@ -917,29 +1189,17 @@ async function dlAsyncInner(login = true) {
 
     setLaunchDetails(Lang.queryJS('landing.dlAsync.loadingServerInfo'))
 
-    let distro
-
-    try {
-        distro = await DistroAPI.refreshDistributionOrFallback()
-        onDistroRefresh(distro)
-    } catch(err) {
-        loggerLaunchSuite.error('Unable to refresh distribution index.', err)
-        showLaunchFailure(Lang.queryJS('landing.dlAsync.fatalError'), Lang.queryJS('landing.dlAsync.unableToLoadDistributionIndex'))
+    if(login && ConfigManager.getSelectedAccount() == null){
+        loggerLanding.error('You must be logged into an account.')
         return
     }
 
-    const serv = distro.getServerById(ConfigManager.getSelectedServer())
-
-    if(login) {
-        if(ConfigManager.getSelectedAccount() == null){
-            loggerLanding.error('You must be logged into an account.')
-            return
-        }
-    }
-
-    setLaunchDetails(Lang.queryJS('landing.dlAsync.pleaseWait'))
-    toggleLaunchArea(true)
-    setLaunchPercentage(0, 100)
+    // Reactivite : le processus de verification (~0,6 s a demarrer) et la verification du compte
+    // Microsoft se font PENDANT le chargement des infos du serveur et la verification des fichiers,
+    // au lieu de les attendre. Le processus ne lit le modpack qu'au moment de verifier (verifyFiles).
+    // Compte : jeton renouvele si besoin (launcher ouvert depuis plus de 24 h), sinon on ne lance
+    // pas le jeu avec une connexion expiree (validateSelectedAccount affiche alors "reconnecte-toi").
+    const accountCheck = login ? validateSelectedAccount().catch(() => false) : Promise.resolve(true)
 
     const fullRepairModule = new FullRepair(
         ConfigManager.getCommonDirectory(),
@@ -965,6 +1225,24 @@ async function dlAsyncInner(login = true) {
             showLaunchFailure(Lang.queryJS('landing.dlAsync.errorDuringLaunchTitle'), Lang.queryJS('landing.dlAsync.seeConsoleForDetails'))
         }
     })
+
+    let distro
+
+    try {
+        distro = await DistroAPI.refreshDistributionOrFallback()
+        onDistroRefresh(distro)
+    } catch(err) {
+        loggerLaunchSuite.error('Unable to refresh distribution index.', err)
+        fullRepairModule.destroyReceiver()
+        showLaunchFailure(Lang.queryJS('landing.dlAsync.fatalError'), Lang.queryJS('landing.dlAsync.unableToLoadDistributionIndex'))
+        return
+    }
+
+    const serv = distro.getServerById(ConfigManager.getSelectedServer())
+
+    setLaunchDetails(Lang.queryJS('landing.dlAsync.pleaseWait'))
+    toggleLaunchArea(true)
+    setLaunchPercentage(0, 100)
 
     loggerLaunchSuite.info('Validating files.')
     setLaunchDetails(Lang.queryJS('landing.dlAsync.validatingFileIntegrity'))
@@ -1006,6 +1284,13 @@ async function dlAsyncInner(login = true) {
 
     fullRepairModule.destroyReceiver()
 
+    if(!(await accountCheck)){
+        // Connexion expiree et non renouvelable : la fenetre "reconnecte-toi" est deja affichee
+        loggerLaunchSuite.warn('Compte non valide, lancement annule.')
+        toggleLaunchArea(false)
+        return
+    }
+
     setLaunchDetails(Lang.queryJS('landing.dlAsync.preparingToLaunch'))
 
     const mojangIndexProcessor = new MojangIndexProcessor(
@@ -1021,6 +1306,9 @@ async function dlAsyncInner(login = true) {
     const versionData = await mojangIndexProcessor.getVersionJson()
 
     if(login) {
+        // Minecraft dans la langue du launcher (cf assets/js/gamelanguage.js)
+        GameLanguage.apply(path.join(ConfigManager.getInstanceDirectory(), serv.rawServer.id), Lang.getMinecraftLanguage())
+
         const authUser = ConfigManager.getSelectedAccount()
         loggerLaunchSuite.info(`Sending selected account (${authUser.displayName}) to ProcessBuilder.`)
         let pb = new ProcessBuilder(serv, versionData, modLoaderData, authUser, remote.app.getVersion())
@@ -1520,12 +1808,38 @@ document.addEventListener('keydown', (e) => {
  * @param {Object} articleObject The article meta object.
  * @param {number} index The article index.
  */
+/*
+ * News prioritaires (mise en avant en jaune), meme regle que le site vitrine et l'admin :
+ * une <category> qui vaut "prioritaire" (espaces retires, minuscules), et si elle existe,
+ * <category domain="https://nerysia.fr/rss/prioritaire-jusqu-au"> = date de fin (format de pubDate) pas encore passee.
+ * Date illisible = ignoree (reste prioritaire). Les autres <category> sont ignorees.
+ * La date de fin est relue a chaque affichage : la news redevient normale toute seule.
+ * L'ordre des news ne change pas (par date).
+ */
+const PRIORITY_UNTIL_DOMAIN = 'https://nerysia.fr/rss/prioritaire-jusqu-au'
+
+function readPriority(el){
+    const categories = el.find('category').toArray()
+    const priority = categories.some(c => c.textContent.trim().toLowerCase() === 'prioritaire')
+    const untilCategory = categories.find(c => c.getAttribute('domain') === PRIORITY_UNTIL_DOMAIN)
+    return { priority, priorityUntil: untilCategory ? Date.parse(untilCategory.textContent.trim()) : NaN }
+}
+
+function isPriorityNow(article){
+    return article.priority === true && (isNaN(article.priorityUntil) || Date.now() < article.priorityUntil)
+}
+
 function displayArticle(articleObject, index){
     newsArticleTitle.innerHTML = articleObject.title
     newsArticleTitle.href = articleObject.link
-    newsArticleAuthor.innerHTML = articleObject.author ? 'par ' + articleObject.author : ''
+    newsArticleAuthor.innerHTML = articleObject.author ? Lang.queryJS('landing.news.by', { author: articleObject.author }) : ''
     newsArticleAuthor.style.display = articleObject.author ? '' : 'none'
     newsArticleDate.innerHTML = articleObject.date
+    const priority = isPriorityNow(articleObject)
+    const priorityChip = document.getElementById('newsArticlePriority')
+    priorityChip.innerHTML = Lang.queryJS('landing.news.priority')
+    priorityChip.style.display = priority ? '' : 'none'
+    newsContent.toggleAttribute('prioritaire', priority)
     newsArticleComments.innerHTML = articleObject.comments
     newsArticleComments.href = articleObject.commentsLink
     newsArticleContentScrollable.scrollTop = 0
@@ -1555,6 +1869,7 @@ function renderNewsList(){
         const item = document.createElement('button')
         item.className = 'newsListItem'
         item.setAttribute('article', i)
+        item.toggleAttribute('prioritaire', isPriorityNow(article))
         const title = document.createElement('span')
         title.className = 'newsListItemTitle'
         title.textContent = article.title
@@ -1597,13 +1912,15 @@ async function loadNews(){
                     const el = $(items[i])
 
                     // Resolve date.
-                    // date : affichee en francais ; timestamp : pour la detection "nouvel article" (initNews)
+                    // date : affichee dans la langue du launcher ; timestamp : pour la detection "nouvel article" (initNews)
                     const timestamp = new Date(el.find('pubDate').text()).getTime()
-                    const date = new Date(timestamp).toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', year: 'numeric'})
+                    const date = new Date(timestamp).toLocaleDateString(Lang.getLocaleTag(), {day: 'numeric', month: 'long', year: 'numeric'})
 
                     // Resolve comments.
-                    let comments = el.find('slash\\:comments').text() || '0'
-                    comments = comments + ' Comment' + (comments === '1' ? '' : 's')
+                    const commentCount = el.find('slash\\:comments').text() || '0'
+                    const comments = commentCount === '1'
+                        ? Lang.queryJS('landing.news.commentsOne')
+                        : Lang.queryJS('landing.news.commentsMany', { count: commentCount })
 
                     // Fix relative links in content.
                     let content = el.find('content\\:encoded').text()
@@ -1616,6 +1933,7 @@ async function loadNews(){
                     let link   = el.find('link').text()
                     let title  = el.find('title').text()
                     let author = el.find('dc\\:creator').text()
+                    const { priority, priorityUntil } = readPriority(el)
 
                     // Generate article.
                     articles.push(
@@ -1627,7 +1945,9 @@ async function loadNews(){
                             author,
                             content,
                             comments,
-                            commentsLink: link + '#comments'
+                            commentsLink: link + '#comments',
+                            priority,
+                            priorityUntil
                         }
                     )
                 }

@@ -295,6 +295,18 @@
                 <span class="settingsTabHeaderText"><%- lang('settings.launcherTabHeaderText') %></span>
                 <span class="settingsTabHeaderDesc"><%- lang('settings.launcherTabHeaderDesc') %></span>
             </div>
+            <!-- Langue du launcher et du jeu (settings.js -> bindLanguageButtons, cf langloader.js) -->
+            <div class="settingsFieldContainer" id="settingsLanguageField">
+                <div class="settingsFieldLeft">
+                    <span class="settingsFieldTitle"><%- lang('settings.languageTitle') %></span>
+                    <span class="settingsFieldDesc"><%- lang('settings.languageDesc') %></span>
+                </div>
+                <div id="settingsLanguageButtons">
+                    <button class="settingsPresetButton settingsLanguageButton" language="auto"><%- lang('settings.languageAuto') %></button>
+                    <button class="settingsPresetButton settingsLanguageButton" language="fr_FR"><%- lang('settings.languageFrench') %></button>
+                    <button class="settingsPresetButton settingsLanguageButton" language="en_US"><%- lang('settings.languageEnglish') %></button>
+                </div>
+            </div>
             <div class="settingsFieldContainer">
                 <div class="settingsFieldLeft">
                     <span class="settingsFieldTitle"><%- lang('settings.allowPrereleaseTitle') %></span>

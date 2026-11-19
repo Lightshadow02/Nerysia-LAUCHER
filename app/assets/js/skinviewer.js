@@ -1,6 +1,6 @@
 /**
- * Apercu 3D d'un skin : le personnage tourne sur lui-meme en marchant.
- * On peut aussi le faire tourner a la souris (cliquer-glisser).
+ * Apercu 3D d'un skin : le personnage tourne sur lui-meme (marche, court, salue, s'assoit...,
+ * cf POSES et setPose). On peut aussi le faire tourner a la souris (cliquer-glisser).
  *
  * Fait en CSS 3D (chaque partie du corps = une boite de 6 faces qui affichent la bonne zone
  * de l'image du skin), sans bibliotheque 3D a embarquer.
@@ -24,6 +24,44 @@ function boxFaces(u, v, w, h, d){
         { name: 'top',    fw: w, fh: d, fx: u + d,         fy: v,     tf: `rotateX(90deg) translateZ(${h * S / 2}px)` },
         { name: 'bottom', fw: w, fh: d, fx: u + d + w,     fy: v,     tf: `rotateX(-90deg) translateZ(${h * S / 2}px) scaleY(-1)` }
     ]
+}
+
+/*
+ * Poses de l'apercu. Chaque pose donne, a l'instant t (secondes), la rotation en degres de chaque
+ * partie autour de son articulation : x = vers l'avant / l'arriere, y = tourner (tete),
+ * z = ecarter sur le cote. armR / legR = bras / jambe droite du personnage (a gauche de l'ecran).
+ * dy = decalage vertical de tout le personnage (en pixels de skin, positif = plus bas).
+ */
+const POSES = {
+    walk: t => {
+        const w = Math.sin(t * 4) * 18
+        return { armR: { x: w }, armL: { x: -w }, legR: { x: -w * 1.3 }, legL: { x: w * 1.3 }, cape: { x: -(8 + Math.abs(w) * 0.4) } }
+    },
+    run: t => {
+        const w = Math.sin(t * 9) * 42
+        return {
+            dy: -Math.abs(Math.sin(t * 9)) * 0.8,
+            head: { x: 6 },
+            armR: { x: w, z: 4 }, armL: { x: -w, z: -4 },
+            legR: { x: -w * 1.1 }, legL: { x: w * 1.1 },
+            cape: { x: -(30 + Math.abs(w) * 0.25) }
+        }
+    },
+    idle: t => {
+        const b = 3 + Math.sin(t * 1.6) * 1.5 // respiration
+        return { head: { x: Math.sin(t * 0.9) * 4, y: Math.sin(t * 0.6) * 25 }, armR: { z: b }, armL: { z: -b }, cape: { x: -6 } }
+    },
+    wave: t => {
+        const b = 3 + Math.sin(t * 1.6) * 1.5
+        return { head: { y: -12, x: -4 }, armR: { z: 160 + Math.sin(t * 8) * 14 }, armL: { z: -b }, cape: { x: -6 } }
+    },
+    sit: t => ({
+        dy: 6,
+        head: { x: Math.sin(t * 0.8) * 3, y: Math.sin(t * 0.5) * 15 },
+        armR: { x: -30, z: 3 }, armL: { x: -30, z: -3 },
+        legR: { x: -88, z: 4 }, legL: { x: -88, z: -4 },
+        cape: { x: -4 }
+    })
 }
 
 function el(cls, parent){
@@ -58,7 +96,8 @@ class SkinViewer {
         this.container = container
         this.container.classList.add('skin3d-stage')
         this.root = null
-        this.limbs = []
+        this.parts = []
+        this.pose = 'walk'
         this.angle = 30
         this.frame = null
         this.dragging = false
@@ -87,7 +126,7 @@ class SkinViewer {
      */
     setSkin(img, slim, cape = null){
         this.container.innerHTML = ''
-        this.limbs = []
+        this.parts = []
         this.root = null
         if(img == null){
             return
@@ -101,7 +140,7 @@ class SkinViewer {
         this.root = root
 
         // Une partie du corps : articulation (pivot) + boite(s) de base et 2e couche
-        const part = ({ x, y, z = 0, offY, offZ = 0, w, h, d, base, layer, mirror, turn, swing, tex = skinTex }) => {
+        const part = ({ role, x, y, z = 0, offY, offZ = 0, w, h, d, base, layer, mirror, turn, tex = skinTex }) => {
             const pivot = el('skin3d-pivot', root)
             pivot.style.transform = `translate3d(${x * S}px, ${y * S}px, ${z * S}px)`
             const boxes = [{ uv: base, grow: 0 }]
@@ -125,36 +164,42 @@ class SkinViewer {
                     face.style.transform = f.tf
                 }
             }
-            if(swing) this.limbs.push({ pivot, x, y, z, swing })
+            this.parts.push({ pivot, x, y, z, role })
         }
 
         // Le personnage fait 32 pixels de haut, centre au milieu du corps. Sa droite = gauche de l'ecran.
-        part({ x: 0, y: -6, offY: -4, w: 8, h: 8, d: 8, base: [0, 0], layer: (!legacy || hatHasTransparency(img)) ? [32, 0] : null })
-        part({ x: 0, y: 0, offY: 0, w: 8, h: 12, d: 4, base: [16, 16], layer: legacy ? null : [16, 32] })
+        part({ role: 'head', x: 0, y: -6, offY: -4, w: 8, h: 8, d: 8, base: [0, 0], layer: (!legacy || hatHasTransparency(img)) ? [32, 0] : null })
+        part({ role: 'body', x: 0, y: 0, offY: 0, w: 8, h: 12, d: 4, base: [16, 16], layer: legacy ? null : [16, 32] })
         // bras (articulation a l'epaule)
-        part({ x: -(4 + aw / 2), y: -5, offY: 5, w: aw, h: 12, d: 4, base: [40, 16], layer: legacy ? null : [40, 32], swing: 1 })
-        part({ x: 4 + aw / 2, y: -5, offY: 5, w: aw, h: 12, d: 4, base: legacy ? [40, 16] : [32, 48], layer: legacy ? null : [48, 48], mirror: legacy, swing: -1 })
+        part({ role: 'armR', x: -(4 + aw / 2), y: -5, offY: 5, w: aw, h: 12, d: 4, base: [40, 16], layer: legacy ? null : [40, 32] })
+        part({ role: 'armL', x: 4 + aw / 2, y: -5, offY: 5, w: aw, h: 12, d: 4, base: legacy ? [40, 16] : [32, 48], layer: legacy ? null : [48, 48], mirror: legacy })
         // jambes (articulation a la hanche)
-        part({ x: -2, y: 6, offY: 6, w: 4, h: 12, d: 4, base: [0, 16], layer: legacy ? null : [0, 32], swing: -1.3 })
-        part({ x: 2, y: 6, offY: 6, w: 4, h: 12, d: 4, base: legacy ? [0, 16] : [16, 48], layer: legacy ? null : [0, 48], mirror: legacy, swing: 1.3 })
+        part({ role: 'legR', x: -2, y: 6, offY: 6, w: 4, h: 12, d: 4, base: [0, 16], layer: legacy ? null : [0, 32] })
+        part({ role: 'legL', x: 2, y: 6, offY: 6, w: 4, h: 12, d: 4, base: legacy ? [0, 16] : [16, 48], layer: legacy ? null : [0, 48], mirror: legacy })
         // cape (texture 64x32, ou plus grande en gardant les proportions) : accrochee en haut du dos,
         // retournee pour que l'exterieur de la cape soit vu de dos
         if(cape != null){
             const capeTex = { bg: `url("${cape.src}")`, w: 64, h: 64 * cape.naturalHeight / cape.naturalWidth }
-            part({ x: 0, y: -6, z: -2, offY: 8, offZ: -0.5, w: 10, h: 16, d: 1, base: [0, 0], turn: 180, swing: 'cape', tex: capeTex })
+            part({ role: 'cape', x: 0, y: -6, z: -2, offY: 8, offZ: -0.5, w: 10, h: 16, d: 1, base: [0, 0], turn: 180, tex: capeTex })
         }
 
         this.render(performance.now())
     }
 
+    /** Change la pose (cle de POSES : walk, run, idle, wave, sit). */
+    setPose(name){
+        if(POSES[name] != null){
+            this.pose = name
+        }
+    }
+
     render(now){
         if(this.root == null) return
-        this.root.style.transform = `rotateX(${TILT}deg) rotateY(${this.angle}deg)`
-        const walk = Math.sin(now / 1000 * 4) * 18 // degres
-        for(const limb of this.limbs){
-            // la cape s'ecarte du dos et flotte un peu en marchant
-            const angle = limb.swing === 'cape' ? -(8 + Math.abs(walk) * 0.4) : walk * limb.swing
-            limb.pivot.style.transform = `translate3d(${limb.x * S}px, ${limb.y * S}px, ${limb.z * S}px) rotateX(${angle}deg)`
+        const pose = POSES[this.pose](now / 1000)
+        this.root.style.transform = `translateY(${(pose.dy || 0) * S}px) rotateX(${TILT}deg) rotateY(${this.angle}deg)`
+        for(const p of this.parts){
+            const r = pose[p.role] || {}
+            p.pivot.style.transform = `translate3d(${p.x * S}px, ${p.y * S}px, ${p.z * S}px) rotateY(${r.y || 0}deg) rotateX(${r.x || 0}deg) rotateZ(${r.z || 0}deg)`
         }
     }
 
@@ -181,5 +226,6 @@ class SkinViewer {
 }
 
 SkinViewer.hatHasTransparency = hatHasTransparency
+SkinViewer.POSES = Object.keys(POSES)
 
 module.exports = SkinViewer

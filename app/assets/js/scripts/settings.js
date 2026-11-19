@@ -770,7 +770,8 @@ function applyPerformancePreset(level){
 function refreshPresetUI(){
     const active = PresetUtil.detect(CACHE_PRESET_MODS, isModToggleOn)
 
-    for(const btn of document.getElementsByClassName('settingsPresetButton')){
+    // Seulement les boutons du preset (les boutons Langue ont le meme style)
+    for(const btn of document.querySelectorAll('#settingsPresetButtons .settingsPresetButton')){
         if(btn.getAttribute('preset') === active) btn.setAttribute('selected', '')
         else btn.removeAttribute('selected')
     }
@@ -782,7 +783,8 @@ function refreshPresetUI(){
 }
 
 function bindPresetControls(){
-    for(const btn of document.getElementsByClassName('settingsPresetButton')){
+    // Seulement les boutons du preset (les boutons Langue ont le meme style)
+    for(const btn of document.querySelectorAll('#settingsPresetButtons .settingsPresetButton')){
         btn.onclick = () => applyPerformancePreset(btn.getAttribute('preset'))
     }
     const builder = document.getElementById('settingsPresetBuilder')
@@ -1471,6 +1473,70 @@ async function prepareJavaTab(){
 }
 
 /**
+ * Launcher Tab : langue (Automatique / Francais / English).
+ * La langue est choisie au demarrage du launcher (index.js) : un changement demande un redemarrage.
+ */
+
+function prepareLanguageButtons(){
+    const choice = ConfigManager.getLanguage()
+    for(const btn of document.getElementsByClassName('settingsLanguageButton')){
+        btn.toggleAttribute('selected', btn.getAttribute('language') === choice)
+    }
+}
+
+function bindLanguageButtons(){
+    for(const btn of document.getElementsByClassName('settingsLanguageButton')){
+        btn.onclick = () => {
+            const choice = btn.getAttribute('language')
+            if(choice === ConfigManager.getLanguage()){
+                return
+            }
+            ConfigManager.setLanguage(choice)
+            ConfigManager.save()
+            prepareLanguageButtons()
+
+            // Meme langue qu'aujourd'hui (ex : Automatique sur un PC en francais) : rien a redemarrer
+            const newLanguage = Lang.resolveLanguage(choice, Lang.getSystemLanguages(remote.app))
+            if(newLanguage === Lang.getLanguage()){
+                return
+            }
+
+            // Pas de redemarrage pendant un lancement, une partie ou une mise a jour du modpack
+            const busy = launchInProgress || GameInstances.isAnyRunning() || ModpackUpdater.isRunning()
+            if(busy){
+                setOverlayContent(
+                    Lang.queryJS('settings.language.restartTitle'),
+                    Lang.queryJS('settings.language.busyText'),
+                    Lang.queryJS('settings.language.ok')
+                )
+                setOverlayHandler(null)
+                toggleOverlay(true)
+                return
+            }
+            setOverlayContent(
+                Lang.queryJS('settings.language.restartTitle'),
+                Lang.queryJS('settings.language.restartText'),
+                Lang.queryJS('settings.language.restartNow'),
+                Lang.queryJS('settings.language.restartLater')
+            )
+            setOverlayHandler(() => {
+                // Comme le bouton Termine (desactive si une valeur est invalide)
+                if(settingsState.invalid.size === 0){
+                    fullSettingsSave()
+                }
+                ipcRenderer.send('relaunchLauncher')
+            })
+            setDismissHandler(() => {
+                toggleOverlay(false)
+            })
+            toggleOverlay(true, true)
+        }
+    }
+}
+
+bindLanguageButtons()
+
+/**
  * About Tab
  */
 
@@ -1655,6 +1721,7 @@ async function prepareSettings(first = false) {
     await initSettingsValues()
     prepareAccountsTab()
     await prepareJavaTab()
+    prepareLanguageButtons()
     prepareAboutTab()
 }
 

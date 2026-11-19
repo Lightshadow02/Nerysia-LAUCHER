@@ -48,6 +48,12 @@
             <div id="skinChangePreviewBox">
                 <div id="skinChangePreview"></div>
                 <span id="skinChangePreviewLabel"></span>
+                <!-- Pose de l'apercu (skinviewer.js -> POSES, landing.js -> initSkinChanger) -->
+                <div id="skinChangePose">
+                    <button id="skinChangePosePrev" class="skinChangePoseArrow">&#8249;</button>
+                    <span id="skinChangePoseName"></span>
+                    <button id="skinChangePoseNext" class="skinChangePoseArrow">&#8250;</button>
+                </div>
             </div>
             <div id="skinChangeForm">
                 <input type="file" id="skinChangeFile" accept="image/png" style="display: none;">
@@ -75,6 +81,28 @@
             <div id="skinChangeCancelWrapper">
                 <button id="skinChangeCancel" class="overlayKeybindEsc"></button>
             </div>
+        </div>
+    </div>
+    <!-- Mes captures d'ecran (landing.js -> openScreenshots, assets/js/screenshots.js) -->
+    <div id="screenshotsContent" style="display: none;">
+        <span id="screenshotsHeader"></span>
+        <div id="screenshotsBox">
+            <div id="screenshotsGrid"><!-- vignettes (landing.js -> renderScreenshots) --></div>
+            <div id="screenshotsViewer" style="display: none;">
+                <img id="screenshotsViewerImg"/>
+                <button id="screenshotsPrev" class="screenshotsNav">&#8249;</button>
+                <button id="screenshotsNext" class="screenshotsNav">&#8250;</button>
+            </div>
+        </div>
+        <div id="screenshotsViewerBar" style="display: none;">
+            <span id="screenshotsViewerName"></span>
+            <button id="screenshotsCopy" class="screenshotsAction"></button>
+            <button id="screenshotsDelete" class="screenshotsAction"></button>
+        </div>
+        <span id="screenshotsStatus"></span>
+        <div id="screenshotsActions">
+            <button id="screenshotsClose" class="overlayKeybindEnter overlayKeybindEsc"></button>
+            <button id="screenshotsOpenFolder"></button>
         </div>
     </div>
     <div id="overlayContent">

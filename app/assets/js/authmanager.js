@@ -15,6 +15,7 @@ const { RestResponseStatus } = require('helios-core/common')
 const { MojangRestAPI, MojangErrorCode } = require('helios-core/mojang')
 const { MicrosoftAuth, MicrosoftErrorCode } = require('helios-core/microsoft')
 const { AZURE_CLIENT_ID }    = require('./ipcconstants')
+const got                    = require('got')
 const Lang = require('./langloader')
 
 const log = LoggerUtil.getLogger('AuthManager')
@@ -169,6 +170,49 @@ exports.addMojangAccount = async function(username, password) {
 
 const AUTH_MODE = { FULL: 0, MS_REFRESH: 1, MC_REFRESH: 2 }
 
+/*
+ * Jeton Microsoft : code de connexion -> jetons, ou renouvellement avec le refresh_token.
+ * Fait ici plutot qu'avec MicrosoftAuth.getAccessToken (helios-core) pour demander
+ * explicitement "offline_access" : sans lui, Microsoft ne renvoyait pas de refresh_token avec
+ * le Client ID Nerysia (constate le 2026-11-19), et la connexion expirait au bout de 24 h
+ * ("Ta connexion a expire, reconnecte-toi").
+ * Requete faite par Node (got) et non fetch : Microsoft refuse une demande de jeton qui vient
+ * d'une page web (en-tete Origin) pour une application de bureau.
+ */
+const MS_TOKEN_URL = 'https://login.microsoftonline.com/consumers/oauth2/v2.0/token'
+const MS_REDIRECT_URI = 'https://login.microsoftonline.com/common/oauth2/nativeclient'
+
+async function getMicrosoftAccessToken(code, refresh){
+    const form = {
+        client_id: AZURE_CLIENT_ID,
+        scope: 'XboxLive.signin offline_access',
+        redirect_uri: MS_REDIRECT_URI
+    }
+    if(refresh){
+        form.grant_type = 'refresh_token'
+        form.refresh_token = code
+    } else {
+        form.grant_type = 'authorization_code'
+        form.code = code
+    }
+    try {
+        const res = await got.post(MS_TOKEN_URL, { form, responseType: 'json', throwHttpErrors: false, timeout: 15000 })
+        const data = res.body || {}
+        if(res.statusCode !== 200 || data.access_token == null){
+            // Jamais de jeton dans les logs : seulement le code d'erreur de Microsoft
+            log.warn(`Jeton Microsoft refuse (${res.statusCode}) : ${data.error || '?'}`)
+            return { responseStatus: RestResponseStatus.ERROR, microsoftErrorCode: MicrosoftErrorCode.UNKNOWN }
+        }
+        if(data.refresh_token == null){
+            log.warn('Microsoft n\'a pas renvoye de jeton de renouvellement (refresh_token).')
+        }
+        return { responseStatus: RestResponseStatus.SUCCESS, data }
+    } catch(err) {
+        log.error('Jeton Microsoft impossible a obtenir :', err.message)
+        return { responseStatus: RestResponseStatus.ERROR, microsoftErrorCode: MicrosoftErrorCode.UNKNOWN }
+    }
+}
+
 /**
  * Perform the full MS Auth flow in a given mode.
  * 
@@ -186,7 +230,7 @@ async function fullMicrosoftAuthFlow(entryCode, authMode) {
         let accessTokenRaw
         let accessToken
         if(authMode !== AUTH_MODE.MC_REFRESH) {
-            const accessTokenResponse = await MicrosoftAuth.getAccessToken(entryCode, authMode === AUTH_MODE.MS_REFRESH, AZURE_CLIENT_ID)
+            const accessTokenResponse = await getMicrosoftAccessToken(entryCode, authMode === AUTH_MODE.MS_REFRESH)
             if(accessTokenResponse.responseStatus === RestResponseStatus.ERROR) {
                 return Promise.reject(microsoftErrorDisplayable(accessTokenResponse.microsoftErrorCode))
             }
@@ -370,13 +414,18 @@ async function validateSelectedMicrosoftAccount(){
     if(msExpired) {
         // MS expired, do full refresh.
         try {
+            if(current.microsoft.refresh_token == null){
+                // Compte connecte sans jeton de renouvellement (avant le correctif) : reconnexion
+                log.warn('Pas de jeton de renouvellement pour ce compte : il faut se reconnecter.')
+                return false
+            }
             const res = await fullMicrosoftAuthFlow(current.microsoft.refresh_token, AUTH_MODE.MS_REFRESH)
 
             ConfigManager.updateMicrosoftAuthAccount(
                 current.uuid,
                 res.mcToken.access_token,
                 res.accessToken.access_token,
-                res.accessToken.refresh_token,
+                res.accessToken.refresh_token || current.microsoft.refresh_token,
                 calculateExpiryDate(now, res.accessToken.expires_in),
                 calculateExpiryDate(now, res.mcToken.expires_in)
             )

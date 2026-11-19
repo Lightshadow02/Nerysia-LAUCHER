@@ -1,0 +1,487 @@
+# Textes FRANCAIS du launcher (toutes les cles de en_US.toml, memes noms).
+# Une cle absente ici s'affiche en anglais (en_US.toml sert de secours).
+# Ce qui ne depend pas de la langue (titre, liens) : _custom.toml
+
+[ejs.landing]
+updateAvailableTooltip = "Mise à jour disponible"
+usernamePlaceholder = "Pseudo"
+usernameEditButton = "Skin"
+skinTooltip = "Skin"
+screenshotsTooltip = "Captures"
+settingsTooltip = "Paramètres"
+serverStatus = "SERVEUR"
+serverStatusPlaceholder = "HORS LIGNE"
+mojangStatus = "STATUT"
+mojangStatusTooltipTitle = "Services"
+mojangStatusNETitle = "Autres"
+newsButton = "ACTUALITÉS"
+launchButton = "JOUER"
+launchButtonPlaceholder = "&#8226; Aucun serveur sélectionné"
+launchDetails = "Un instant…"
+newsNavigationStatus = "{currentPage} sur {totalPages}"
+newsSidebarTitle = "Actualités"
+newsErrorLoadSpan = "Chargement des actualités…"
+newsErrorFailedSpan = "Impossible de charger les actualités"
+newsErrorRetryButton = "Réessayer"
+newsErrorNoneSpan = "Aucune actualité pour le moment"
+
+[ejs.login]
+loginCancelText = "Annuler"
+loginSubheader = "CONNEXION MINECRAFT"
+loginEmailError = "* Valeur invalide"
+loginEmailPlaceholder = "E-MAIL OU PSEUDO"
+loginPasswordError = "* Obligatoire"
+loginPasswordPlaceholder = "MOT DE PASSE"
+loginForgotPasswordLink = "https://minecraft.net/password/forgot/"
+loginForgotPasswordText = "mot de passe oublié ?"
+loginRememberMeText = "se souvenir de moi"
+loginButtonText = "CONNEXION"
+loginNeedAccountLink = "https://minecraft.net/store/minecraft-java-edition/"
+loginNeedAccountText = "Pas encore de compte ?"
+loginPasswordDisclaimer1 = "Ton mot de passe est envoyé directement à Mojang et n'est jamais enregistré."
+loginPasswordDisclaimer2 = "{appName} n'est pas affilié à Mojang AB."
+
+[ejs.loginOptions]
+loginOptionsTitle = "Connexion"
+loginWithMicrosoft = "Se connecter avec Microsoft"
+loginWithMojang = "Se connecter avec Mojang"
+cancelButton = "Annuler"
+
+[ejs.overlay]
+serverSelectHeader = "Serveurs disponibles"
+serverSelectConfirm = "Sélectionner"
+serverSelectCancel = "Annuler"
+accountSelectHeader = "Choisis un compte"
+accountSelectConfirm = "Sélectionner"
+accountSelectCancel = "Annuler"
+
+[ejs.settings]
+navHeaderText = "Paramètres"
+navAccount = "Compte"
+navMinecraft = "Minecraft"
+navMods = "Mods"
+navJava = "Java"
+navLauncher = "Launcher"
+navAbout = "À propos"
+navUpdates = "Mises à jour"
+navDone = "Terminé"
+tabAccountHeaderText = "Comptes"
+tabAccountHeaderDesc = "Ajoute un compte ou gère ceux déjà connectés."
+microsoftAccount = "Microsoft"
+addMicrosoftAccount = "+ Ajouter un compte Microsoft"
+mojangAccount = "Mojang"
+addMojangAccount = "+ Ajouter un compte Mojang"
+minecraftTabHeaderText = "Réglages de Minecraft"
+minecraftTabHeaderDesc = "Options de lancement du jeu."
+gameResolutionTitle = "Résolution du jeu"
+launchFullscreenTitle = "Lancer en plein écran."
+autoConnectTitle = "Se connecter automatiquement au serveur au lancement."
+launchDetachedTitle = "Lancer le jeu indépendamment du launcher."
+launchDetachedDesc = "Sinon, fermer le launcher fermera aussi le jeu."
+tabModsHeaderText = "Mods"
+tabModsHeaderDesc = "Active ou désactive des mods."
+switchServerButton = "Changer"
+presetTitle = "Préréglage de performance"
+presetLow = "Faible"
+presetMedium = "Moyen"
+presetUltra = "Ultra"
+presetBuilderTitle = "Mode Builder"
+presetBuilderDesc = "Ajoute les outils de construction (Litematica…). Compatible avec tous les préréglages."
+requiredMods = "Mods obligatoires"
+optionalMods = "Mods optionnels"
+dropinMods = "Mods ajoutés à la main"
+addMods = "Ajouter des mods"
+dropinRefreshNote = "(F5 pour actualiser)"
+shaderpacks = "Shaderpacks"
+shaderpackDesc = "Active ou désactive les shaders. Attention : ils ne tournent bien que sur les PC puissants. Tu peux ajouter tes propres packs ici."
+selectShaderpack = "Choisir un shaderpack"
+tabJavaHeaderText = "Réglages de Java"
+tabJavaHeaderDesc = "Configuration de Java (avancé)."
+memoryTitle = "Mémoire"
+maxRAM = "RAM maximale"
+minRAM = "RAM minimale"
+memoryDesc = "La RAM minimale conseillée est de 3 Go. Mettre la même valeur au minimum et au maximum peut réduire les ralentissements."
+memoryTotalTitle = "Totale"
+memoryAvailableTitle = "Disponible"
+javaExecutableTitle = "Exécutable Java"
+javaExecSelDialogTitle = "Choisir l'exécutable Java"
+javaExecSelButtonText = "Choisir un fichier"
+javaExecDesc = "L'exécutable Java est vérifié avant le lancement du jeu."
+javaPathDesc = "Le chemin doit se terminer par <strong>{pathSuffix}</strong>."
+jvmOptsTitle = "Options JVM supplémentaires"
+jvmOptsDesc = "Options avancées passées à Java (réglages de performance <em>-XX:…</em>). Par sécurité anti-triche, seules les options de performance sont prises en compte : <em>-javaagent</em>, <em>-D…</em> et assimilées sont ignorées. <em>-Xms</em> et <em>-Xmx</em> se règlent avec les curseurs ci-dessus."
+launcherTabHeaderText = "Réglages du launcher"
+launcherTabHeaderDesc = "Options du launcher lui-même."
+languageTitle = "Langue"
+languageDesc = "Langue du launcher et du jeu. Automatique = la même langue que ton PC."
+languageAuto = "Automatique"
+languageFrench = "Français"
+languageEnglish = "English"
+allowPrereleaseTitle = "Autoriser les pré-versions."
+allowPrereleaseDesc = "Les pré-versions contiennent des nouveautés qui n'ont peut-être pas encore été entièrement testées.<br>Toujours activé si tu utilises déjà une pré-version."
+dataDirectoryTitle = "Dossier des données"
+selectDataDirectory = "Choisir le dossier des données"
+chooseFolder = "Choisir un dossier"
+dataDirectoryDesc = "Tous les fichiers du jeu et les installations de Java du launcher sont rangés dans ce dossier.<br>Les captures d'écran et les mondes sont dans le dossier de l'instance du serveur correspondant."
+aboutTabHeaderText = "À propos"
+aboutTabHeaderDesc = "Informations et notes de la version actuelle."
+aboutTitle = "{appName}"
+stableRelease = "Version stable"
+versionText = "Version "
+sourceGithub = "Code source (GitHub)"
+support = "Support"
+devToolsConsole = "Console DevTools"
+releaseNotes = "Notes de version"
+changelog = "Nouveautés"
+noReleaseNotes = "Aucune note de version"
+viewReleaseNotes = "Voir les notes de version sur GitHub"
+launcherUpdatesHeaderText = "Mises à jour du launcher"
+launcherUpdatesHeaderDesc = "Télécharge, installe et consulte les mises à jour du launcher."
+checkForUpdates = "Rechercher des mises à jour"
+whatsNew = "Nouveautés"
+updateReleaseNotes = "Notes de la mise à jour"
+
+[ejs.waiting]
+waitingText = "En attente de Microsoft…"
+
+[ejs.welcome]
+welcomeHeader = "Bienvenue sur Nerysia"
+welcomeDescription = "Nerysia est un serveur Cobblemon français : Pokémon exclusifs, GTS, boutiques, arènes de combat et roleplay."
+welcomeDescCTA = "Tu n'es plus qu'à quelques clics de Nerysia."
+continueButton = "CONTINUER"
+
+
+[js.discord]
+waiting = "En attente du client…"
+state = "Serveur : {shortId}"
+
+[js.index]
+microsoftLoginTitle = "Connexion Microsoft"
+microsoftLogoutTitle = "Déconnexion Microsoft"
+
+# Barre de menu sur Mac
+[js.index.menu]
+application = "Application"
+about = "À propos"
+quit = "Quitter"
+edit = "Édition"
+undo = "Annuler"
+redo = "Rétablir"
+cut = "Couper"
+copy = "Copier"
+paste = "Coller"
+selectAll = "Tout sélectionner"
+
+[js.login]
+login = "CONNEXION"
+loggingIn = "CONNEXION…"
+success = "CONNECTÉ"
+tryAgain = "Réessayer"
+
+[js.login.error]
+invalidValue = "* Valeur invalide"
+requiredValue = "* Obligatoire"
+
+[js.login.error.unknown]
+title = "Erreur inconnue pendant la connexion"
+desc = "Une erreur inconnue s'est produite. Les détails sont dans la console."
+
+[js.landing.launch]
+pleaseWait = "Un instant…"
+failureTitle = "Erreur au lancement"
+failureText = "Plus de détails dans la console (Ctrl + Maj + I)."
+okay = "OK"
+
+[js.landing.selectedAccount]
+noAccountSelected = "Aucun compte sélectionné"
+
+[js.landing.selectedServer]
+noSelection = "Aucun serveur sélectionné"
+loading = "Chargement…"
+
+[js.landing.serverStatus]
+server = "SERVEUR"
+offline = "HORS LIGNE"
+players = "JOUEURS"
+
+# Services Mojang (bulle d'info de "STATUT MOJANG"). Service inconnu = nom donné par Mojang.
+[js.landing.status]
+account = "Connexion au compte"
+multiplayer = "Serveurs multijoueur"
+nerysia = "Téléchargements Nerysia"
+skins = "Skins"
+discord = "Discord"
+
+[js.landing.systemScan]
+checking = "Vérification du système…"
+noCompatibleJava = "Aucune installation<br>de Java compatible"
+installJavaMessage = "Pour lancer Minecraft, il faut Java {major} (64 bits). Veux-tu que le launcher l'installe pour toi ?"
+installJava = "Installer Java"
+installJavaManually = "Installer moi-même"
+javaDownloadPrepare = "Préparation du téléchargement de Java…"
+javaDownloadFailureTitle = "Erreur pendant le téléchargement de Java"
+javaDownloadFailureText = "Plus de détails dans la console (Ctrl + Maj + I)."
+javaRequired = "Java est nécessaire<br>pour jouer"
+javaRequiredMessage = "Il faut une installation valide de Java {major} (x64) pour lancer le jeu.<br><br>Le <a href=\"https://github.com/dscalzi/HeliosLauncher/wiki/Java-Management#manually-installing-a-valid-version-of-java\">guide de gestion de Java</a> (en anglais) explique comment l'installer à la main."
+javaRequiredDismiss = "J'ai compris"
+javaRequiredCancel = "Retour"
+
+[js.landing.downloadJava]
+findJdkFailure = "Impossible de trouver une version d'OpenJDK."
+javaDownloadCorruptedError = "Le Java téléchargé est abîmé (empreinte incorrecte), le fichier est peut-être corrompu."
+extractingJava = "Extraction de Java"
+javaInstalled = "Java installé !"
+
+[js.landing.dlAsync]
+loadingServerInfo = "Chargement des infos du serveur…"
+fatalError = "Erreur fatale"
+unableToLoadDistributionIndex = "Impossible de charger la liste des fichiers du modpack. Plus de détails dans la console (Ctrl + Maj + I)."
+pleaseWait = "Un instant…"
+errorDuringLaunchTitle = "Erreur au lancement"
+errorDuringLaunchText = "Une erreur s'est produite pendant la préparation du jeu. Plus de détails dans la console (Ctrl + Maj + I)."
+seeConsoleForDetails = "Plus de détails dans la console (Ctrl + Maj + I)."
+validatingFileIntegrity = "Vérification des fichiers…"
+errorDuringFileVerificationTitle = "Erreur pendant la vérification des fichiers"
+downloadingFiles = "Téléchargement des fichiers…"
+errorDuringFileDownloadTitle = "Erreur pendant le téléchargement des fichiers"
+preparingToLaunch = "Préparation du lancement…"
+launchingGame = "Lancement du jeu…"
+launchWrapperNotDownloaded = "Le fichier principal du jeu (LaunchWrapper) n'a pas été téléchargé correctement : le jeu ne peut pas démarrer.<br><br>Pour régler le problème, désactive temporairement ton antivirus, puis relance le jeu.<br><br>Si ça continue, préviens le staff sur Discord en indiquant quel antivirus tu utilises."
+doneEnjoyServer = "C'est parti, bon jeu sur Nerysia !"
+checkConsoleForDetails = "Plus de détails dans la console (Ctrl + Maj + I)."
+
+[js.landing.news]
+checking = "Chargement des actualités"
+by = "par {author}"
+commentsOne = "1 commentaire"
+commentsMany = "{count} commentaires"
+priority = "Important"
+
+[js.landing.discord]
+loading = "Chargement du jeu…"
+joining = "En route vers Nerysia !"
+joined = "En exploration sur Nerysia !"
+
+[js.landing.modpackUpdate]
+downloading = "&#10227; Mise à jour du modpack… {percent} %"
+done = "&#10003; Modpack à jour (v{version})"
+finishing = "Fin de la mise à jour du modpack…"
+
+[js.landing.gameStart]
+starting = "Démarrage de Minecraft…"
+loadingMods = "Chargement des mods…"
+initMods = "Démarrage des mods…"
+openingWindow = "Ouverture du jeu…"
+crashedTitle = "Minecraft s'est fermé"
+crashedText = "Minecraft s'est arrêté pendant son démarrage (code {code}).<br><br>Réessaie. Si ça recommence, envoie au staff le fichier <b>logs/latest.log</b> du jeu."
+
+[js.landing.alreadyRunning]
+launchingTitle = "Minecraft est déjà en train de se lancer"
+launchingText = "<b>{name}</b> démarre depuis {minutes} min.<br>Avec tous les mods, la fenêtre du jeu peut mettre 1 à 2 minutes à s'ouvrir : pas besoin de recliquer sur Jouer.<br><br>Es-tu sûr de vouloir lancer une deuxième instance ?"
+runningTitle = "Minecraft est déjà ouvert"
+runningText = "<b>{name}</b> est déjà ouvert.<br>Deux jeux en même temps utilisent deux fois plus de mémoire (RAM) et peuvent faire planter les deux.<br><br>Es-tu sûr de vouloir lancer une deuxième instance ?"
+confirm = "Lancer quand même"
+cancel = "Annuler"
+
+[js.overlay]
+dismiss = "Fermer"
+
+[js.settings.fileSelectors]
+executables = "Exécutables"
+allFiles = "Tous les fichiers"
+
+[js.settings.msftLogin]
+errorTitle = "Échec de la connexion Microsoft"
+errorMessage = "Impossible de vérifier ton compte Microsoft. Réessaie."
+okButton = "OK"
+
+[js.settings.msftLogout]
+errorTitle = "Un problème est survenu"
+errorMessage = "La déconnexion Microsoft a échoué. Réessaie."
+okButton = "OK"
+
+[js.settings.authAccountSelect]
+selectButton = "Choisir ce compte"
+selectedButton = "Compte sélectionné &#10004;"
+
+[js.settings.authAccountLogout]
+lastAccountWarningTitle = "Attention<br>c'est ton dernier compte"
+lastAccountWarningMessage = "Pour utiliser le launcher, il faut être connecté à au moins un compte. Tu devras te reconnecter ensuite.<br><br>Veux-tu vraiment te déconnecter ?"
+confirmButton = "Oui, me déconnecter"
+cancelButton = "Annuler"
+
+[js.settings.authAccountPopulate]
+username = "Pseudo"
+uuid = "UUID"
+selectAccount = "Choisir ce compte"
+selectedAccount = "Compte sélectionné ✓"
+logout = "Se déconnecter"
+
+[js.settings.dropinMods]
+removeButton = "Retirer"
+deleteFailedTitle = "Impossible de supprimer<br>le mod {fullName}"
+deleteFailedMessage = "Vérifie que le fichier n'est pas utilisé, puis réessaie."
+failedToggleTitle = "Impossible d'activer ou désactiver<br>un ou plusieurs mods"
+okButton = "OK"
+
+[js.settings.shaderpacks]
+off = "Désactivés (par défaut)"
+
+[js.settings.serverListing]
+mainServer = "Serveur principal"
+
+[js.settings.java]
+selectedJava = "Sélectionné : Java {version} ({vendor})"
+invalidSelection = "Choix invalide"
+requiresJava = "Nécessite Java {major} x64."
+availableOptions = "Options disponibles pour Java {major} (HotSpot VM)"
+
+[js.settings.about]
+preReleaseTitle = "Pré-version"
+stableReleaseTitle = "Version stable"
+releaseNotesFailed = "Impossible de charger les notes de version."
+
+[js.settings.updates]
+newReleaseTitle = "Nouvelle version disponible"
+newPreReleaseTitle = "Nouvelle pré-version disponible"
+downloadingButton = "Téléchargement…"
+downloadButton = 'Télécharger depuis GitHub<span style="font-size: 10px;color: gray;text-shadow: none !important;">Ferme le launcher et lance le fichier .dmg pour mettre à jour.</span>'
+latestVersionTitle = "Tu as la dernière version"
+checkForUpdatesButton = "Rechercher des mises à jour"
+checkingForUpdatesButton = "Recherche de mises à jour…"
+
+[js.settings.presets]
+faible = "Juste l'essentiel pour jouer : idéal pour les petits PC."
+moyen = "Essentiel + mods de confort (inventaire, chat, textures connectées…). Recommandé."
+ultra = "Tout activé : shaders, sons réalistes, skins 3D… Pour les PC puissants."
+custom = "Réglage personnalisé : tu as modifié des mods à la main. Clique sur un préréglage pour revenir à une configuration standard."
+
+[js.settings.language]
+restartTitle = "Redémarrer le launcher ?"
+restartText = "La nouvelle langue sera utilisée au redémarrage du launcher. Minecraft passera aussi dans cette langue à ta prochaine partie."
+restartNow = "Redémarrer maintenant"
+restartLater = "Plus tard"
+busyText = "La nouvelle langue sera utilisée à la prochaine ouverture du launcher (un jeu ou une mise à jour est en cours)."
+ok = "OK"
+
+[js.uibinder.startup]
+fatalErrorTitle = "Erreur fatale : impossible de charger la liste des fichiers"
+fatalErrorMessage = "Impossible de joindre nos serveurs pour télécharger la liste des fichiers du modpack, et aucune copie n'est disponible sur ce PC.<br><br>Cette liste contient les dernières informations du serveur : le launcher ne peut pas démarrer sans elle. Vérifie ta connexion internet, puis relance le launcher."
+closeButton = "Fermer"
+
+[js.uibinder.validateAccount]
+failedMessageTitle = "Impossible de rafraîchir la connexion"
+failedMessage = "Impossible de rafraîchir la connexion de <strong>{account}</strong>. Choisis un autre compte ou reconnecte-toi."
+failedMessageSelectAnotherAccount = "Impossible de rafraîchir la connexion de <strong>{account}</strong>. Reconnecte-toi."
+loginButton = "Se connecter"
+selectAnotherAccountButton = "Choisir un autre compte"
+
+[js.uicore.autoUpdate]
+checkingForUpdateButton = "Recherche de mises à jour…"
+installNowButton = "Installer maintenant"
+checkForUpdatesButton = "Rechercher des mises à jour"
+
+[js.auth.microsoft.error]
+noProfileTitle = "Erreur de connexion :<br>profil non créé"
+noProfileDesc = "Ton compte Microsoft n'a pas encore de profil Minecraft. Si tu viens d'acheter le jeu ou de l'obtenir avec le Xbox Game Pass, crée ton profil sur <a href=\"https://minecraft.net/\">Minecraft.net</a>.<br><br>Si tu n'as pas encore le jeu, tu peux aussi l'acheter sur <a href=\"https://minecraft.net/\">Minecraft.net</a>."
+noXboxAccountTitle = "Erreur de connexion :<br>pas de compte Xbox"
+noXboxAccountDesc = "Aucun compte Xbox n'est associé à ton compte Microsoft."
+xblBannedTitle = "Erreur de connexion :<br>Xbox Live indisponible"
+xblBannedDesc = "Ton compte Microsoft vient d'un pays où Xbox Live n'est pas disponible ou est interdit."
+under18Title = "Erreur de connexion :<br>accord parental requis"
+under18Desc = "Les comptes des moins de 18 ans doivent être ajoutés à une famille Microsoft par un adulte."
+unknownTitle = "Erreur inconnue pendant la connexion"
+unknownDesc = "Une erreur inconnue s'est produite. Les détails sont dans la console."
+
+[js.auth.mojang.error]
+methodNotAllowedTitle = "Erreur interne :<br>méthode non autorisée"
+methodNotAllowedDesc = "Méthode non autorisée. Merci de signaler cette erreur."
+notFoundTitle = "Erreur interne :<br>introuvable"
+notFoundDesc = "Le service de connexion est introuvable. Merci de signaler ce problème."
+accountMigratedTitle = "Erreur de connexion :<br>compte migré"
+accountMigratedDesc = "Ce compte a été migré. Réessaie avec l'adresse e-mail du compte comme identifiant."
+invalidCredentialsTitle = "Erreur de connexion :<br>identifiants incorrects"
+invalidCredentialsDesc = "L'e-mail ou le mot de passe est incorrect. Réessaie."
+tooManyAttemptsTitle = "Erreur de connexion :<br>trop de tentatives"
+tooManyAttemptsDesc = "Trop de tentatives de connexion récentes avec ce compte. Réessaie plus tard."
+invalidTokenTitle = "Erreur de connexion :<br>jeton invalide"
+invalidTokenDesc = "Le jeton d'accès fourni est invalide."
+tokenHasProfileTitle = "Erreur de connexion :<br>jeton déjà associé"
+tokenHasProfileDesc = "Ce jeton d'accès a déjà un profil associé. Le choix du profil n'est pas encore possible."
+credentialsMissingTitle = "Erreur de connexion :<br>identifiants manquants"
+credentialsMissingDesc = "Pseudo ou mot de passe manquant, ou mot de passe de moins de 3 caractères."
+invalidSaltVersionTitle = "Erreur de connexion :<br>version de sel invalide"
+invalidSaltVersionDesc = "Version de sel invalide."
+unsupportedMediaTypeTitle = "Erreur interne :<br>type de média non pris en charge"
+unsupportedMediaTypeDesc = "Type de média non pris en charge. Merci de signaler cette erreur."
+accountGoneTitle = "Erreur de connexion :<br>compte migré"
+accountGoneDesc = "Ce compte a été migré vers un compte Microsoft. Connecte-toi avec Microsoft."
+unreachableTitle = "Erreur de connexion :<br>serveurs injoignables"
+unreachableDesc = "Impossible de joindre les serveurs de connexion. Vérifie qu'ils sont en ligne et que tu es bien connecté à internet."
+gameNotPurchasedTitle = "Erreur de connexion :<br>jeu non acheté"
+gameNotPurchasedDesc = "Ce compte ne possède pas Minecraft. Tu peux l'acheter sur <a href=\"https://minecraft.net/\">Minecraft.net</a>"
+unknownErrorTitle = "Erreur inconnue pendant la connexion"
+unknownErrorDesc = "Une erreur inconnue s'est produite. Les détails sont dans la console."
+
+[js.skin]
+title = "Changer de skin"
+choose = "Choisir une image (.png)"
+fileHint = "Image de skin 64 × 64 pixels"
+modelTitle = "Modèle"
+modelClassic = "Classique (Steve)"
+modelSlim = "Fin (Alex)"
+capeTitle = "Cape"
+capeNone = "Aucune"
+noCape = "Aucune cape sur ce compte (elles s'obtiennent lors d'événements Minecraft)."
+historyTitle = "Mes skins"
+historyEmpty = "Tes skins apparaîtront ici à chaque changement."
+historyPicked = "Skin de « Mes skins »"
+historyCurrent = "Skin porté actuellement"
+historyDelete = "Retirer de « Mes skins »"
+find = "Trouver des skins sur NameMC"
+reset = "Remettre le skin par défaut"
+confirm = "Appliquer"
+cancel = "Fermer"
+loading = "Chargement de ton skin…"
+currentLabel = "Skin actuel"
+previewLabel = "Aperçu"
+sending = "Envoi du skin…"
+success = "&#10003; C'est fait ! Visible en jeu à ta prochaine connexion."
+posePrev = "Pose précédente"
+poseNext = "Pose suivante"
+
+[js.skin.poses]
+walk = "Marche"
+run = "Course"
+idle = "Debout"
+wave = "Salut"
+sit = "Assis"
+
+[js.skin.errors]
+noAccount = "Connecte-toi d'abord à un compte Minecraft."
+notMicrosoft = "Le changement de skin n'est possible qu'avec un compte Microsoft."
+sessionExpired = "Ta connexion a expiré : reconnecte ton compte dans les paramètres, puis réessaie."
+rejected = "Minecraft a refusé cette image. Vérifie que c'est bien un skin 64 × 64 pixels."
+tooMany = "Trop de changements d'affilée : attends une minute puis réessaie."
+network = "Impossible de joindre les serveurs de Minecraft. Vérifie ta connexion et réessaie."
+notPng = "Ce fichier n'est pas une image PNG."
+badSize = "Un skin doit faire 64 × 64 pixels (ou 64 × 32 pour l'ancien format)."
+tooBig = "Ce fichier est trop lourd pour être un skin."
+
+[js.screenshots]
+title = "Mes captures"
+loading = "Recherche de tes captures…"
+empty = "Aucune capture pour l'instant.<br>En jeu, appuie sur <strong>F2</strong> pour en prendre une !"
+close = "Fermer"
+back = "Retour"
+openFolder = "Ouvrir le dossier"
+showInFolder = "Afficher dans le dossier"
+previous = "Précédente"
+next = "Suivante"
+copy = "Copier"
+copied = "&#10003; Copiée ! Tu peux la coller dans Discord."
+copyFailed = "Impossible de copier cette image."
+delete = "Supprimer"
+deleted = "Capture mise à la corbeille."
+deleteFailed = "Impossible de supprimer cette capture."
+openFailed = "Impossible d'ouvrir le dossier."

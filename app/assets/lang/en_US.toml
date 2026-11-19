@@ -1,22 +1,29 @@
+# English texts of the launcher (ALL keys).
+# Also used as a fallback when a key is missing from fr_FR.toml.
+# French version: fr_FR.toml (same keys). Language-independent things (title, links): _custom.toml
+
 [ejs.landing]
 updateAvailableTooltip = "Update Available"
 usernamePlaceholder = "Username"
-usernameEditButton = "Edit"
+usernameEditButton = "Skin"
+skinTooltip = "Skin"
+screenshotsTooltip = "Screenshots"
 settingsTooltip = "Settings"
 serverStatus = "SERVER"
 serverStatusPlaceholder = "OFFLINE"
-mojangStatus = "MOJANG STATUS"
+mojangStatus = "STATUS"
 mojangStatusTooltipTitle = "Services"
-mojangStatusNETitle = "Non&nbsp;Essential"
+mojangStatusNETitle = "Other"
 newsButton = "NEWS"
 launchButton = "PLAY"
 launchButtonPlaceholder = "&#8226; No Server Selected"
-launchDetails = "Please wait.."
+launchDetails = "Please wait…"
 newsNavigationStatus = "{currentPage} of {totalPages}"
-newsErrorLoadSpan = "Checking for News.."
-newsErrorFailedSpan = "Failed to Load News"
+newsSidebarTitle = "News"
+newsErrorLoadSpan = "Loading news…"
+newsErrorFailedSpan = "Couldn't load the news"
 newsErrorRetryButton = "Try Again"
-newsErrorNoneSpan = "No News"
+newsErrorNoneSpan = "No news yet"
 
 [ejs.login]
 loginCancelText = "Cancel"
@@ -31,7 +38,7 @@ loginRememberMeText = "remember me?"
 loginButtonText = "LOGIN"
 loginNeedAccountLink = "https://minecraft.net/store/minecraft-java-edition/"
 loginNeedAccountText = "Need an Account?"
-loginPasswordDisclaimer1 = "Your password is sent directly to mojang and never stored."
+loginPasswordDisclaimer1 = "Your password is sent directly to Mojang and never stored."
 loginPasswordDisclaimer2 = "{appName} is not affiliated with Mojang AB."
 
 [ejs.loginOptions]
@@ -74,6 +81,12 @@ launchDetachedDesc = "If the game is not detached, closing the launcher will als
 tabModsHeaderText = "Mod Settings"
 tabModsHeaderDesc = "Enable or disable mods."
 switchServerButton = "Switch"
+presetTitle = "Performance preset"
+presetLow = "Low"
+presetMedium = "Medium"
+presetUltra = "Ultra"
+presetBuilderTitle = "Builder mode"
+presetBuilderDesc = "Adds building tools (Litematica…). Works with every preset."
 requiredMods = "Required Mods"
 optionalMods = "Optional Mods"
 dropinMods = "Drop-in Mods"
@@ -96,9 +109,14 @@ javaExecSelButtonText = "Choose File"
 javaExecDesc = "The Java executable is validated before game launch."
 javaPathDesc = "The path should end with <strong>{pathSuffix}</strong>."
 jvmOptsTitle = "Additional JVM Options"
-jvmOptsDesc = "Options to be provided to the JVM at runtime. <em>-Xms</em> and <em>-Xmx</em> should not be included."
+jvmOptsDesc = "Advanced options passed to Java (performance settings <em>-XX:…</em>). For anti-cheat reasons, only performance options are used: <em>-javaagent</em>, <em>-D…</em> and similar options are ignored. <em>-Xms</em> and <em>-Xmx</em> are set with the sliders above."
 launcherTabHeaderText = "Launcher Settings"
 launcherTabHeaderDesc = "Options related to the launcher itself."
+languageTitle = "Language"
+languageDesc = "Language of the launcher and of the game. Automatic = same language as your computer."
+languageAuto = "Automatic"
+languageFrench = "Français"
+languageEnglish = "English"
 allowPrereleaseTitle = "Allow Pre-Release Updates."
 allowPrereleaseDesc = "Pre-Releases include new features which may have not been fully tested or integrated.<br>This will always be true if you are using a pre-release version."
 dataDirectoryTitle = "Data Directory"
@@ -124,19 +142,35 @@ whatsNew = "What's New"
 updateReleaseNotes = "Update Release Notes"
 
 [ejs.waiting]
-waitingText = "Waiting for Microsoft.."
+waitingText = "Waiting for Microsoft…"
 
 [ejs.welcome]
+welcomeHeader = "Welcome to Nerysia"
+welcomeDescription = "Nerysia is a French Cobblemon server. We have exclusive Pokémon, a GTS, shops, battle arenas, and roleplay features."
+welcomeDescCTA = "You are just a few clicks away from Nerysia."
 continueButton = "CONTINUE"
 
 
 [js.discord]
-waiting = "Waiting for Client.."
+waiting = "Waiting for Client…"
 state = "Server: {shortId}"
 
 [js.index]
 microsoftLoginTitle = "Microsoft Login"
 microsoftLogoutTitle = "Microsoft Logout"
+
+# Menu bar on Mac
+[js.index.menu]
+application = "Application"
+about = "About Application"
+quit = "Quit"
+edit = "Edit"
+undo = "Undo"
+redo = "Redo"
+cut = "Cut"
+copy = "Copy"
+paste = "Paste"
+selectAll = "Select All"
 
 [js.login]
 login = "LOGIN"
@@ -153,7 +187,7 @@ title = "Unknown Error During Login"
 desc = "An unknown error has occurred. Please see the console for details."
 
 [js.landing.launch]
-pleaseWait = "Please wait.."
+pleaseWait = "Please wait…"
 failureTitle = "Error During Launch"
 failureText = "See console (CTRL + Shift + i) for more details."
 okay = "Okay"
@@ -163,24 +197,32 @@ noAccountSelected = "No Account Selected"
 
 [js.landing.selectedServer]
 noSelection = "No Server Selected"
-loading = "Loading.."
+loading = "Loading…"
 
 [js.landing.serverStatus]
 server = "SERVER"
 offline = "OFFLINE"
 players = "PLAYERS"
 
+# Mojang services (tooltip of "MOJANG STATUS"). Unknown service = name given by Mojang.
+[js.landing.status]
+account = "Account sign-in"
+multiplayer = "Multiplayer"
+nerysia = "Nerysia downloads"
+skins = "Skins"
+discord = "Discord"
+
 [js.landing.systemScan]
-checking = "Checking system info.."
+checking = "Checking system info…"
 noCompatibleJava = "No Compatible<br>Java Installation Found"
 installJavaMessage = "In order to launch Minecraft, you need a 64-bit installation of Java {major}. Would you like us to install a copy?"
 installJava = "Install Java"
 installJavaManually = "Install Manually"
-javaDownloadPrepare = "Preparing Java Download.."
+javaDownloadPrepare = "Preparing Java Download…"
 javaDownloadFailureTitle = "Error During Java Download"
 javaDownloadFailureText = "See console (CTRL + Shift + i) for more details."
 javaRequired = "Java is Required<br>to Launch"
-javaRequiredMessage = 'A valid x64 installation of Java {major} is required to launch.<br><br>Please refer to our <a href="https://github.com/dscalzi/HeliosLauncher/wiki/Java-Management#manually-installing-a-valid-version-of-java">Java Management Guide</a> for instructions on how to manually install Java.'
+javaRequiredMessage = 'A valid x64 installation of Java {major} is required to launch.<br><br>Please refer to the <a href="https://github.com/dscalzi/HeliosLauncher/wiki/Java-Management#manually-installing-a-valid-version-of-java">Java Management Guide</a> for instructions on how to manually install Java.'
 javaRequiredDismiss = "I Understand"
 javaRequiredCancel = "Go Back"
 
@@ -191,29 +233,55 @@ extractingJava = "Extracting Java"
 javaInstalled = "Java Installed!"
 
 [js.landing.dlAsync]
-loadingServerInfo = "Loading server information.."
+loadingServerInfo = "Loading server information…"
 fatalError = "Fatal Error"
 unableToLoadDistributionIndex = "Could not load a copy of the distribution index. See the console (CTRL + Shift + i) for more details."
-pleaseWait = "Please wait.."
+pleaseWait = "Please wait…"
 errorDuringLaunchTitle = "Error During Launch"
+errorDuringLaunchText = "An error occurred while preparing the game. See the console (CTRL + Shift + i) for more details."
 seeConsoleForDetails = "See console (CTRL + Shift + i) for more details."
-validatingFileIntegrity = "Validating file integrity.."
+validatingFileIntegrity = "Validating file integrity…"
 errorDuringFileVerificationTitle = "Error During File Verification"
-downloadingFiles = "Downloading files.."
+downloadingFiles = "Downloading files…"
 errorDuringFileDownloadTitle = "Error During File Download"
-preparingToLaunch = "Preparing to launch.."
-launchingGame = "Launching game.."
-launchWrapperNotDownloaded = "The main file, LaunchWrapper, failed to download properly. As a result, the game cannot launch.<br><br>To fix this issue, temporarily turn off your antivirus software and launch the game again.<br><br>If you have time, please <a href=\"https://github.com/dscalzi/HeliosLauncher/issues\">submit an issue</a> and let us know what antivirus software you use. We'll contact them and try to straighten things out."
-doneEnjoyServer = "Done. Enjoy the server!"
+preparingToLaunch = "Preparing to launch…"
+launchingGame = "Launching game…"
+launchWrapperNotDownloaded = "The main file, LaunchWrapper, failed to download properly. As a result, the game cannot launch.<br><br>To fix this issue, temporarily turn off your antivirus software and launch the game again.<br><br>If it keeps happening, let the staff know on Discord and tell them which antivirus software you use."
+doneEnjoyServer = "Done. Have fun on Nerysia!"
 checkConsoleForDetails = "Please check the console (CTRL + Shift + i) for more details."
 
 [js.landing.news]
-checking = "Checking for News"
+checking = "Loading news"
+by = "by {author}"
+commentsOne = "1 Comment"
+commentsMany = "{count} Comments"
+priority = "Important"
 
 [js.landing.discord]
-loading = "Loading game.."
-joining = "Sailing to Westeros!"
-joined = "Exploring the Realm!"
+loading = "Loading game…"
+joining = "Heading to Nerysia!"
+joined = "Exploring Nerysia!"
+
+[js.landing.modpackUpdate]
+downloading = "&#10227; Updating modpack… {percent}%"
+done = "&#10003; Modpack up to date (v{version})"
+finishing = "Finishing modpack update…"
+
+[js.landing.gameStart]
+starting = "Starting Minecraft…"
+loadingMods = "Loading mods…"
+initMods = "Starting mods…"
+openingWindow = "Opening the game…"
+crashedTitle = "Minecraft closed"
+crashedText = "Minecraft stopped while starting (code {code}).<br><br>Try again. If it keeps happening, send the game's <b>logs/latest.log</b> file to the staff."
+
+[js.landing.alreadyRunning]
+launchingTitle = "Minecraft is already starting"
+launchingText = "<b>{name}</b> has been starting for {minutes} min.<br>With all the mods, the game window can take 1 to 2 minutes to open: no need to click Play again.<br><br>Are you sure you want to launch a second instance?"
+runningTitle = "Minecraft is already open"
+runningText = "<b>{name}</b> is already open.<br>Two games at once use twice as much memory (RAM) and can make both crash.<br><br>Are you sure you want to launch a second instance?"
+confirm = "Launch anyway"
+cancel = "Cancel"
 
 [js.overlay]
 dismiss = "Dismiss"
@@ -222,12 +290,12 @@ dismiss = "Dismiss"
 executables = "Executables"
 allFiles = "All Files"
 
-[js.settings.mstfLogin]
-errorTitle = "Something Went Wrong"
-errorMessage = "Microsoft authentication failed. Please try again."
+[js.settings.msftLogin]
+errorTitle = "Microsoft Login Failed"
+errorMessage = "We were unable to authenticate your Microsoft account. Please try again."
 okButton = "OK"
 
-[js.settings.mstfLogout]
+[js.settings.msftLogout]
 errorTitle = "Something Went Wrong"
 errorMessage = "Microsoft logout failed. Please try again."
 okButton = "OK"
@@ -256,6 +324,9 @@ deleteFailedMessage = "Make sure the file is not in use and try again."
 failedToggleTitle = "Failed to Toggle<br>One or More Drop-in Mods"
 okButton = "Okay"
 
+[js.settings.shaderpacks]
+off = "Off (Default)"
+
 [js.settings.serverListing]
 mainServer = "Main Server"
 
@@ -273,16 +344,25 @@ releaseNotesFailed = "Failed to load release notes."
 [js.settings.updates]
 newReleaseTitle = "New Release Available"
 newPreReleaseTitle = "New Pre-release Available"
-downloadingButton = "Downloading.."
+downloadingButton = "Downloading…"
 downloadButton = 'Download from GitHub<span style="font-size: 10px;color: gray;text-shadow: none !important;">Close the launcher and run the dmg to update.</span>'
 latestVersionTitle = "You Are Running the Latest Version"
 checkForUpdatesButton = "Check for Updates"
-checkingForUpdatesButton = "Checking for Updates.."
+checkingForUpdatesButton = "Checking for Updates…"
 
-[js.settings.msftLogin]
-errorTitle = "Microsoft Login Failed"
-errorMessage = "We were unable to authenticate your Microsoft account. Please try again."
-okButton = "OK"
+[js.settings.presets]
+faible = "Just the essentials to play: great for low-end PCs."
+moyen = "Essentials + comfort mods (inventory, chat, connected textures…). Recommended."
+ultra = "Everything on: shaders, realistic sounds, 3D skins… For powerful PCs."
+custom = "Custom setup: you changed some mods by hand. Click a preset to go back to a standard setup."
+
+[js.settings.language]
+restartTitle = "Restart the launcher?"
+restartText = "The new language will be used once the launcher restarts. Minecraft will also switch to this language the next time you play."
+restartNow = "Restart now"
+restartLater = "Later"
+busyText = "The new language will be used the next time you open the launcher (a game or an update is in progress right now)."
+ok = "OK"
 
 [js.uibinder.startup]
 fatalErrorTitle = "Fatal Error: Unable to Load Distribution Index"
@@ -297,7 +377,7 @@ loginButton = "Login"
 selectAnotherAccountButton = "Select Another Account"
 
 [js.uicore.autoUpdate]
-checkingForUpdateButton = "Checking for Updates..."
+checkingForUpdateButton = "Checking for Updates…"
 installNowButton = "Install Now"
 checkForUpdatesButton = "Check for Updates"
 
@@ -342,3 +422,66 @@ gameNotPurchasedTitle = "Error During Login:<br>Game Not Purchased"
 gameNotPurchasedDesc = "The account you are trying to login with has not purchased a copy of Minecraft. You may purchase a copy on <a href=\"https://minecraft.net/\">Minecraft.net</a>"
 unknownErrorTitle = "Unknown Error During Login"
 unknownErrorDesc = "An unknown error has occurred. Please see the console for details."
+
+[js.skin]
+title = "Change skin"
+choose = "Choose an image (.png)"
+fileHint = "64 × 64 pixel skin image"
+modelTitle = "Model"
+modelClassic = "Classic (Steve)"
+modelSlim = "Slim (Alex)"
+capeTitle = "Cape"
+capeNone = "None"
+noCape = "No cape on this account (they are given out during Minecraft events)."
+historyTitle = "My skins"
+historyEmpty = "Your skins will show up here every time you change skin."
+historyPicked = "Skin from “My skins”"
+historyCurrent = "Skin you are wearing now"
+historyDelete = "Remove from “My skins”"
+find = "Find skins on NameMC"
+reset = "Reset to the default skin"
+confirm = "Apply"
+cancel = "Close"
+loading = "Loading your skin…"
+currentLabel = "Current skin"
+previewLabel = "Preview"
+sending = "Uploading skin…"
+success = "&#10003; Done! You'll see it in game the next time you join."
+posePrev = "Previous pose"
+poseNext = "Next pose"
+
+[js.skin.poses]
+walk = "Walking"
+run = "Running"
+idle = "Standing"
+wave = "Waving"
+sit = "Sitting"
+
+[js.skin.errors]
+noAccount = "Log in to a Minecraft account first."
+notMicrosoft = "Changing your skin only works with a Microsoft account."
+sessionExpired = "Your login has expired: log your account in again in the settings, then try again."
+rejected = "Minecraft rejected this image. Make sure it is a 64 × 64 pixel skin."
+tooMany = "Too many changes in a row: wait a minute, then try again."
+network = "Can't reach the Minecraft servers. Check your connection and try again."
+notPng = "This file is not a PNG image."
+badSize = "A skin must be 64 × 64 pixels (or 64 × 32 for the old format)."
+tooBig = "This file is too big to be a skin."
+
+[js.screenshots]
+title = "My screenshots"
+loading = "Looking for your screenshots…"
+empty = "No screenshots yet.<br>In game, press <strong>F2</strong> to take one!"
+close = "Close"
+back = "Back"
+openFolder = "Open folder"
+showInFolder = "Show in folder"
+previous = "Previous"
+next = "Next"
+copy = "Copy"
+copied = "&#10003; Copied! You can paste it in Discord."
+copyFailed = "Couldn't copy this image."
+delete = "Delete"
+deleted = "Screenshot moved to the trash."
+deleteFailed = "Couldn't delete this screenshot."
+openFailed = "Couldn't open the folder."

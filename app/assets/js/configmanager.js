@@ -92,7 +92,10 @@ const DEFAULT_CONFIG = {
         },
         launcher: {
             allowPrerelease: false,
-            dataDirectory: dataPath
+            dataDirectory: dataPath,
+            // Langue du launcher et du jeu : 'auto' (langue du PC), 'fr_FR' ou 'en_US'.
+            // Lue aussi par index.js au demarrage (cf langloader.js).
+            language: 'auto'
         }
     },
     newsCache: {
@@ -280,6 +283,15 @@ exports.getCommonDirectory = function(){
  */
 exports.getInstanceDirectory = function(){
     return path.join(exports.getDataDirectory(), 'instances')
+}
+
+/**
+ * Instances de l'ancien dossier du jeu (.helioslauncher, avant la v1.0.13). Sert a "Mes captures"
+ * pour montrer aussi les anciennes captures. null si c'est deja le dossier actuel.
+ */
+exports.getLegacyInstanceDirectory = function(){
+    const dir = path.join(OLD_DATA_PATH, 'instances')
+    return path.resolve(dir).toLowerCase() === path.resolve(exports.getInstanceDirectory()).toLowerCase() ? null : dir
 }
 
 /**
@@ -817,4 +829,20 @@ exports.getAllowPrerelease = function(def = false){
  */
 exports.setAllowPrerelease = function(allowPrerelease){
     config.settings.launcher.allowPrerelease = allowPrerelease
+}
+
+/**
+ * Langue choisie par le joueur dans les parametres.
+ *
+ * @returns {string} 'auto' (langue du PC), 'fr_FR' ou 'en_US'.
+ */
+exports.getLanguage = function(def = false){
+    return !def ? (config.settings.launcher.language || 'auto') : DEFAULT_CONFIG.settings.launcher.language
+}
+
+/**
+ * @param {string} language 'auto', 'fr_FR' ou 'en_US'. Pris en compte au prochain demarrage du launcher.
+ */
+exports.setLanguage = function(language){
+    config.settings.launcher.language = language
 }

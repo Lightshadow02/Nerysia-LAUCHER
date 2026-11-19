@@ -1,4 +1,6 @@
-# Custom Language File for Launcher Customizer
+# Ce qui ne depend PAS de la langue (titre, liens). Charge en dernier : ecrase les deux langues.
+# Les TEXTES vont dans en_US.toml (anglais) ET fr_FR.toml (francais), avec la meme cle.
+# Ne pas remettre de texte francais ici : il s'afficherait aussi aux joueurs anglais.
 
 [ejs.app]
 title = "Nerysia Launcher"
@@ -9,92 +11,7 @@ mediaXURL = "#"
 mediaInstagramURL = "#"
 mediaYouTubeURL = "#"
 mediaDiscordURL = "https://discord.gg/dtvMfS69hU"
-newsSidebarTitle = "Actualités"
-newsErrorLoadSpan = "Chargement des actualités…"
-newsErrorFailedSpan = "Impossible de charger les actualités"
-newsErrorRetryButton = "Réessayer"
-newsErrorNoneSpan = "Aucune actualité pour le moment"
-usernameEditButton = "Skin"
-skinTooltip = "Skin"
 
 [ejs.settings]
-jvmOptsDesc = "Options avancées passées à Java (réglages de performance <em>-XX:…</em>). Par sécurité anti-triche, seules les options de performance sont prises en compte : <em>-javaagent</em>, <em>-D…</em> et assimilées sont ignorées. <em>-Xms</em> et <em>-Xmx</em> se règlent avec les curseurs ci-dessus."
 sourceGithubLink = "https://github.com/Lightshadow02/Nerysia-LAUCHER"
 supportLink = "https://github.com/Lightshadow02/Nerysia-LAUCHER/issues"
-presetTitle = "Préréglage de performance"
-presetLow = "Faible"
-presetMedium = "Moyen"
-presetUltra = "Ultra"
-presetBuilderTitle = "Mode Builder"
-presetBuilderDesc = "Ajoute les outils de construction (Litematica…). Compatible avec tous les préréglages."
-
-[ejs.welcome]
-welcomeHeader = "Welcome to Nerysia"
-welcomeDescription = "Nerysia is a French Cobblemon server. We have exclusive Pokemon, a GTS, shops, battle arenas, and roleplay features. "
-welcomeDescCTA = "You are just a few clicks away from Nerysia."
-
-[js.settings.presets]
-faible = "Juste l'essentiel pour jouer : idéal pour les petits PC."
-moyen = "Essentiel + mods de confort (inventaire, chat, textures connectées…). Recommandé."
-ultra = "Tout activé : shaders, sons réalistes, skins 3D… Pour les PC puissants."
-custom = "Réglage personnalisé : tu as modifié des mods à la main. Clique sur un préréglage pour revenir à une configuration standard."
-
-[js.landing.modpackUpdate]
-downloading = "&#10227; Mise à jour du modpack… {percent} %"
-done = "&#10003; Modpack à jour (v{version})"
-finishing = "Fin de la mise à jour du modpack…"
-
-[js.landing.gameStart]
-starting = "Démarrage de Minecraft…"
-loadingMods = "Chargement des mods…"
-initMods = "Démarrage des mods…"
-openingWindow = "Ouverture du jeu…"
-crashedTitle = "Minecraft s'est fermé"
-crashedText = "Minecraft s'est arrêté pendant son démarrage (code {code}).<br><br>Réessaie. Si ça recommence, envoie au staff le fichier <b>logs/latest.log</b> du jeu."
-
-[js.landing.alreadyRunning]
-launchingTitle = "Minecraft est déjà en train de se lancer"
-launchingText = "<b>{name}</b> démarre depuis {minutes} min.<br>Avec tous les mods, la fenêtre du jeu peut mettre 1 à 2 minutes à s'ouvrir : pas besoin de recliquer sur Jouer.<br><br>Es-tu sûr de vouloir lancer une deuxième instance ?"
-runningTitle = "Minecraft est déjà ouvert"
-runningText = "<b>{name}</b> est déjà ouvert.<br>Deux jeux en même temps utilisent deux fois plus de mémoire (RAM) et peuvent faire planter les deux.<br><br>Es-tu sûr de vouloir lancer une deuxième instance ?"
-confirm = "Lancer quand même"
-cancel = "Annuler"
-
-[js.skin]
-title = "Changer de skin"
-choose = "Choisir une image (.png)"
-fileHint = "Image de skin 64 × 64 pixels"
-modelTitle = "Modèle"
-modelClassic = "Classique (Steve)"
-modelSlim = "Fin (Alex)"
-capeTitle = "Cape"
-capeNone = "Aucune"
-noCape = "Aucune cape sur ce compte (elles s'obtiennent lors d'événements Minecraft)."
-historyTitle = "Mes skins"
-historyEmpty = "Tes skins apparaîtront ici à chaque changement."
-historyPicked = "Skin de « Mes skins »"
-historyCurrent = "Skin porté actuellement"
-historyDelete = "Retirer de « Mes skins »"
-find = "Trouver des skins sur NameMC"
-reset = "Remettre le skin par défaut"
-confirm = "Appliquer"
-cancel = "Fermer"
-loading = "Chargement de ton skin…"
-currentLabel = "Skin actuel"
-previewLabel = "Aperçu"
-sending = "Envoi du skin…"
-success = "&#10003; C'est fait ! Visible en jeu à ta prochaine connexion."
-
-[js.skin.errors]
-noAccount = "Connecte-toi d'abord à un compte Minecraft."
-notMicrosoft = "Le changement de skin n'est possible qu'avec un compte Microsoft."
-sessionExpired = "Ta connexion a expiré : reconnecte ton compte dans les paramètres, puis réessaie."
-rejected = "Minecraft a refusé cette image. Vérifie que c'est bien un skin 64 × 64 pixels."
-tooMany = "Trop de changements d'affilée : attends une minute puis réessaie."
-network = "Impossible de joindre les serveurs de Minecraft. Vérifie ta connexion et réessaie."
-notPng = "Ce fichier n'est pas une image PNG."
-badSize = "Un skin doit faire 64 × 64 pixels (ou 64 × 32 pour l'ancien format)."
-tooBig = "Ce fichier est trop lourd pour être un skin."
-
-[js.landing.news]
-checking = "Chargement des actualités"
