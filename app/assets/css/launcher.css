@@ -1745,6 +1745,17 @@ input:checked + .toggleSwitchSlider:before {
     margin-top: 10px;
     min-height: 16px;
 }
+/* Prereglage conseille pour ce PC (assets/js/hardwareprofile.js) : etoile jaune + ligne de conseil */
+.settingsPresetButton[recommended]::after,
+.serverSelectPresetButton[recommended]::after {
+    content: " \2605";
+    color: #F2C230;
+}
+#settingsPresetAdvice {
+    font-size: 11px;
+    color: #F2C230;
+    margin-top: 6px;
+}
 /* Langue (Parametres > Launcher) : memes boutons que les presets, sous le titre. */
 #settingsLanguageField {
     flex-direction: column;
@@ -2758,13 +2769,7 @@ input:checked + .toggleSwitchSlider:before {
     font-weight: bold;
     line-height: 1.25;
     color: white;
-    text-decoration: none;
-    outline: none;
-    transition: text-shadow 0.25s ease;
-}
-#newsArticleTitle:hover,
-#newsArticleTitle:focus-visible {
-    text-shadow: 0px 0px 14px rgba(255, 255, 255, 0.35);
+    cursor: default;
 }
 #newsMetaContainer {
     display: flex;
@@ -4062,6 +4067,11 @@ input:checked + .toggleSwitchSlider:before {
     color: rgba(255, 255, 255, 0.85);
     margin-top: 8px;
     min-height: 14px;
+}
+#serverSelectPresetAdvice {
+    font-size: 10px;
+    color: #F2C230;
+    margin-top: 5px;
 }
 #serverSelectPresetBuilder {
     display: flex;

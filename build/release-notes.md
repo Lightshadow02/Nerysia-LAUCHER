@@ -1,17 +1,11 @@
 **🇫🇷 Nouveautés**
-- **Connexion corrigée** : le launcher ne te demande plus de te reconnecter tous les jours. Après cette mise à jour, reconnecte-toi une dernière fois si on te le demande.
-- **Plus rapide** : le jeu démarre bien plus vite après le clic sur Jouer (vérification des fichiers environ 3× plus rapide).
-- **Mes captures** : nouveau bouton appareil photo à droite. Tes captures d'écran (F2 en jeu) en grand, à copier pour Discord ou à supprimer.
-- **Poses du skin** : dans la fenêtre skin, fais marcher, courir, saluer ou asseoir ton personnage pour mieux voir ton skin.
-- **Statut** : en bas à gauche, l'état des services utiles (connexion, serveurs, téléchargements Nerysia, skins, Discord).
-- **Français / English** : le launcher est traduit en anglais. Paramètres → Launcher → Langue.
-- **News importantes** : mises en avant en jaune.
+- **Préréglage conseillé pour ton PC** : le launcher regarde ta carte graphique, ta mémoire et ton processeur, et te conseille Faible, Moyen ou Ultra (étoile ★ sur le bouton, onglet Mods et choix du serveur). Les nouveaux joueurs démarrent directement avec le bon préréglage. Ton choix actuel n'est pas modifié.
+- **Launcher discret** : pendant que tu joues, le launcher se range dans la barre des tâches et revient quand tu fermes le jeu. Pour le garder à l'écran : Paramètres → Minecraft.
+- **Fond d'écran** : les images de fond changent maintenant en fondu.
+- **News** : cliquer sur le titre d'une news n'ouvre plus de page dans le navigateur.
 
 **🇬🇧 What's new**
-- **Sign-in fixed**: the launcher no longer asks you to sign in again every day. After this update, sign in one last time if asked.
-- **Faster**: the game starts much faster after clicking Play (file check about 3× faster).
-- **My screenshots**: new camera button on the right. View your screenshots (F2 in game), copy them for Discord or delete them.
-- **Skin poses**: in the skin window, make your character walk, run, wave or sit to see your skin better.
-- **Status**: bottom left, the state of the useful services (sign-in, servers, Nerysia downloads, skins, Discord).
-- **Français / English**: the launcher is now available in English. Settings → Launcher → Language.
-- **Important news**: highlighted in yellow.
+- **Recommended preset for your PC**: the launcher checks your graphics card, memory and processor, and recommends Low, Medium or Ultra (★ star on the button, Mods tab and server selection). New players start with the right preset. Your current choice is not changed.
+- **Discreet launcher**: while you play, the launcher goes to the taskbar and comes back when you close the game. To keep it on screen: Settings → Minecraft.
+- **Background**: background images now change with a fade.
+- **News**: clicking a news title no longer opens a page in your browser.

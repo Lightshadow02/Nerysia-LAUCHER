@@ -1117,11 +1117,38 @@ async function downloadJava(effectiveJavaOptions, launchAfter = true) {
 
 // Keep reference to Minecraft Process
 let proc
-// Is DiscordRPC enabled
-let hasRPC = false
+// Jeu dont le statut Discord est affiche (assets/js/discordwrapper.js), null = pas de statut
+let rpcGameProc = null
 // Joined server regex
 // Change this if your server uses something different.
 const GAME_JOINED_REGEX = /\[.+\]: Sound engine started/
+// "Connecting to play.nerysia.fr, 25565" (entree sur un serveur) / partie solo
+const GAME_CONNECTING_REGEX = /\]: Connecting to ([^,\s]+), ?\d+/
+const GAME_SINGLEPLAYER_REGEX = /\]: Starting integrated minecraft server/
+
+/*
+ * Launcher discret pendant la partie (Parametres > Minecraft, actif par defaut) : il se range
+ * dans la barre des taches quand le menu du jeu s'affiche (il ne dessine plus rien : plus de
+ * memoire et de carte graphique pour Minecraft) et revient quand le dernier jeu se ferme.
+ */
+let minimizedForGame = false
+
+function hideLauncherWhilePlaying(){
+    if(!ConfigManager.getMinimizeWhilePlaying()) return
+    const win = remote.getCurrentWindow()
+    if(win.isMinimized()) return
+    minimizedForGame = true
+    win.minimize()
+}
+
+function restoreLauncherAfterGame(){
+    if(!minimizedForGame || GameInstances.isAnyRunning()) return
+    minimizedForGame = false
+    const win = remote.getCurrentWindow()
+    if(win.isMinimized()){
+        win.restore()
+    }
+}
 const GAME_LAUNCH_REGEX = /^\[.+\]: (?:MinecraftForge .+ Initialized|ModLauncher .+ starting: .+|Loading Minecraft .+ with Fabric Loader .+)$/
 // Etapes du demarrage de Minecraft (lues dans sa sortie) : la barre de chargement reste
 // affichee jusqu'au menu du jeu (avant : cachee 5 s apres le lancement, alors que la
@@ -1343,7 +1370,12 @@ async function dlAsyncInner(login = true) {
                 GameInstances.markRunning(gameProc.pid)
                 showPercent(100)
                 setLaunchDetails(Lang.queryJS('landing.dlAsync.doneEnjoyServer'))
-                setTimeout(() => toggleLaunchArea(false), 2000)
+                setTimeout(() => {
+                    toggleLaunchArea(false)
+                    if(gameProc.exitCode == null){
+                        hideLauncherWhilePlaying()
+                    }
+                }, 2000)
             } else {
                 toggleLaunchArea(false)
             }
@@ -1354,10 +1386,6 @@ async function dlAsyncInner(login = true) {
             const step = GAME_START_STEPS[index]
             showPercent(Math.max(shownPercent, step.percent))
             setLaunchDetails(Lang.queryJS(step.text))
-            if(index === 0 && hasRPC){
-                DiscordWrapper.updateDetails(Lang.queryJS('landing.discord.loading'))
-                gameProc.stdout.on('data', gameStateChange)
-            }
         }
 
         // Attach a temporary listener to the client output.
@@ -1379,13 +1407,23 @@ async function dlAsyncInner(login = true) {
             }
         }
 
-        // Listener for Discord RPC.
+        // Statut Discord : etape de la partie lue dans la sortie du jeu (menu, serveur Nerysia, solo…).
+        // Jamais l'adresse ni le nom de l'instance (l'instance ADMIN est secrete).
+        const nerysiaHost = String(serv.rawServer.address ?? '').split(':')[0].toLowerCase()
         const gameStateChange = function(data){
-            data = data.trim()
-            if(SERVER_JOINED_REGEX.test(data)){
-                DiscordWrapper.updateDetails(Lang.queryJS('landing.discord.joined'))
-            } else if(GAME_JOINED_REGEX.test(data)){
-                DiscordWrapper.updateDetails(Lang.queryJS('landing.discord.joining'))
+            for(const line of data.split('\n')){
+                const connecting = line.match(GAME_CONNECTING_REGEX)
+                if(connecting){
+                    const host = connecting[1].toLowerCase()
+                    const onNerysia = host === nerysiaHost || /(^|\.)nerysia\.fr$/.test(host)
+                    DiscordWrapper.updateDetails(Lang.queryJS(onNerysia ? 'landing.discord.joined' : 'landing.discord.otherServer'))
+                } else if(SERVER_JOINED_REGEX.test(line)){
+                    DiscordWrapper.updateDetails(Lang.queryJS('landing.discord.joined'))
+                } else if(GAME_SINGLEPLAYER_REGEX.test(line)){
+                    DiscordWrapper.updateDetails(Lang.queryJS('landing.discord.singleplayer'))
+                } else if(GAME_JOINED_REGEX.test(line)){
+                    DiscordWrapper.updateDetails(Lang.queryJS('landing.discord.joining'))
+                }
             }
         }
 
@@ -1423,6 +1461,7 @@ async function dlAsyncInner(login = true) {
                 if(proc === gameProc){
                     proc = null
                 }
+                restoreLauncherAfterGame()
                 if(!startFinished){
                     finishStart(false)
                     if(code !== 0){
@@ -1435,14 +1474,17 @@ async function dlAsyncInner(login = true) {
                 }
             })
 
-            // Init Discord Hook
-            if(distro.rawDistribution.discord != null && serv.rawServer.discord != null){
-                DiscordWrapper.initRPC(distro.rawDistribution.discord, serv.rawServer.discord)
-                hasRPC = true
-                gameProc.on('close', (code, signal) => {
-                    loggerLaunchSuite.info('Shutting down Discord Rich Presence..')
-                    DiscordWrapper.shutdownRPC()
-                    hasRPC = false
+            // Statut Discord "Joue a Nerysia" (assets/js/discordwrapper.js)
+            if(ConfigManager.getDiscordPresence() && DiscordWrapper.initRPC(Lang.queryJS('landing.discord.loading'))){
+                rpcGameProc = gameProc
+                gameProc.stdout.on('data', gameStateChange)
+                gameProc.on('close', () => {
+                    // Un autre jeu lance depuis a pris le statut : on n'y touche pas
+                    if(rpcGameProc === gameProc){
+                        loggerLaunchSuite.info('Shutting down Discord Rich Presence..')
+                        DiscordWrapper.shutdownRPC()
+                        rpcGameProc = null
+                    }
                 })
             }
 
@@ -1831,7 +1873,6 @@ function isPriorityNow(article){
 
 function displayArticle(articleObject, index){
     newsArticleTitle.innerHTML = articleObject.title
-    newsArticleTitle.href = articleObject.link
     newsArticleAuthor.innerHTML = articleObject.author ? Lang.queryJS('landing.news.by', { author: articleObject.author }) : ''
     newsArticleAuthor.style.display = articleObject.author ? '' : 'none'
     newsArticleDate.innerHTML = articleObject.date

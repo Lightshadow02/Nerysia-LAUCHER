@@ -234,6 +234,7 @@ function renderServerSelectPreset(){
         else btn.removeAttribute('selected')
     }
     document.getElementById('serverSelectPresetDesc').innerHTML = Lang.queryJS(`settings.presets.${state.level ?? 'custom'}`)
+    showPresetAdvice(document.getElementsByClassName('serverSelectPresetButton'), document.getElementById('serverSelectPresetAdvice'))
     document.getElementById('serverSelectPresetBuilder').style.display = state.hasBuilder ? '' : 'none'
     document.getElementById('serverSelectPresetBuilderBox').checked = state.builder
 }

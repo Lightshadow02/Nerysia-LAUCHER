@@ -13,27 +13,34 @@
             background-size: cover;
             -webkit-user-select: none;
         }
-        /* Fonds d'ecran en diaporama (cf startBackgroundSlideshow dans uibinder.js) */
+        /* Fonds d'ecran en diaporama (cf startBackgroundSlideshow dans uibinder.js).
+           Fondu de 1 s : la nouvelle image (calque [front], au-dessus) apparait sur l'ancienne,
+           qui reste affichee dessous jusqu'a la fin du fondu (pas de flash au milieu). */
         .bgLayer {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            z-index: -1;
+            z-index: -2;
             background-size: cover;
             background-position: center;
             opacity: 0;
-            transition: opacity 2s ease;
             animation: bgZoom 45s ease-in-out infinite alternate;
             pointer-events: none;
         }
         .bgLayer[shown] {
             opacity: 1;
         }
+        .bgLayer[front] {
+            z-index: -1;
+            transition: opacity 1s ease;
+        }
         @keyframes bgZoom {
             from { transform: scale(1); }
             to { transform: scale(1.06); }
         }
+        /* "Effets d'animation" desactives dans Windows (ou macOS) : on coupe le zoom (mouvement),
+           mais on garde le fondu (pas un mouvement), sinon le fond change d'un coup. */
         @media (prefers-reduced-motion: reduce) {
-            .bgLayer { animation: none; transition: none; }
+            .bgLayer { animation: none; }
         }
         #main {
             display: none;

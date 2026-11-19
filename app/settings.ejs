@@ -116,6 +116,30 @@
                     </label>
                 </div>
             </div>
+            <div class="settingsFieldContainer">
+                <div class="settingsFieldLeft">
+                    <span class="settingsFieldTitle"><%- lang('settings.minimizeWhilePlayingTitle') %></span>
+                    <span class="settingsFieldDesc"><%- lang('settings.minimizeWhilePlayingDesc') %></span>
+                </div>
+                <div class="settingsFieldRight">
+                    <label class="toggleSwitch">
+                        <input type="checkbox" cValue="MinimizeWhilePlaying">
+                        <span class="toggleSwitchSlider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="settingsFieldContainer" id="settingsDiscordPresenceContainer">
+                <div class="settingsFieldLeft">
+                    <span class="settingsFieldTitle"><%- lang('settings.discordPresenceTitle') %></span>
+                    <span class="settingsFieldDesc"><%- lang('settings.discordPresenceDesc') %></span>
+                </div>
+                <div class="settingsFieldRight">
+                    <label class="toggleSwitch">
+                        <input type="checkbox" cValue="DiscordPresence">
+                        <span class="toggleSwitchSlider"></span>
+                    </label>
+                </div>
+            </div>
         </div>
         <div id="settingsTabMods" class="settingsTab" style="display: none;">
             <div class="settingsTabHeader">
@@ -142,6 +166,8 @@
                             <button class="settingsPresetButton" preset="ultra"><%- lang('settings.presetUltra') %></button>
                         </div>
                         <div id="settingsPresetDesc"></div>
+                        <!-- Conseil selon le PC (assets/js/hardwareprofile.js, cf showPresetAdvice dans uibinder.js) -->
+                        <div id="settingsPresetAdvice"></div>
                         <div id="settingsPresetBuilderRow">
                             <div class="settingsFieldLeft">
                                 <span class="settingsFieldTitle"><%- lang('settings.presetBuilderTitle') %></span>

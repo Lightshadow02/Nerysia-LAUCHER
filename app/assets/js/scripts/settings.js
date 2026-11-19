@@ -123,6 +123,9 @@ function initSettingsValidators(){
  * Load configuration values onto the UI. This is an automated process.
  */
 async function initSettingsValues(){
+    // Statut Discord pas encore prevu dans cette version (DISCORD_APP_ID vide) : reglage cache
+    document.getElementById('settingsDiscordPresenceContainer').style.display = DiscordWrapper.isConfigured() ? '' : 'none'
+
     const sEls = document.getElementById('settingsContainer').querySelectorAll('[cValue]')
 
     for(const v of sEls) {
@@ -776,6 +779,7 @@ function refreshPresetUI(){
         else btn.removeAttribute('selected')
     }
     document.getElementById('settingsPresetDesc').innerHTML = Lang.queryJS(`settings.presets.${active ?? 'custom'}`)
+    showPresetAdvice(document.querySelectorAll('#settingsPresetButtons .settingsPresetButton'), document.getElementById('settingsPresetAdvice'))
 
     const builderMods = PresetUtil.builderMods(CACHE_PRESET_MODS)
     document.getElementById('settingsPresetBuilderRow').style.display = builderMods.length > 0 ? '' : 'none'

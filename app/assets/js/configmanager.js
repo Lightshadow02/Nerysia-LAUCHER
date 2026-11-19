@@ -88,7 +88,11 @@ const DEFAULT_CONFIG = {
             resHeight: 720,
             fullscreen: false,
             autoConnect: true,
-            launchDetached: true
+            launchDetached: true,
+            // Launcher range dans la barre des taches pendant la partie (landing.js -> hideLauncherWhilePlaying)
+            minimizeWhilePlaying: true,
+            // Statut "Joue a Nerysia" sur Discord pendant la partie (discordwrapper.js)
+            discordPresence: true
         },
         launcher: {
             allowPrerelease: false,
@@ -808,6 +812,29 @@ exports.getLaunchDetached = function(def = false){
  */
 exports.setLaunchDetached = function(launchDetached){
     config.settings.game.launchDetached = launchDetached
+}
+
+/**
+ * Le launcher se range-t-il dans la barre des taches pendant la partie ?
+ * (il revient quand le jeu se ferme, cf landing.js -> hideLauncherWhilePlaying)
+ */
+exports.getMinimizeWhilePlaying = function(def = false){
+    return !def ? config.settings.game.minimizeWhilePlaying !== false : DEFAULT_CONFIG.settings.game.minimizeWhilePlaying
+}
+
+exports.setMinimizeWhilePlaying = function(minimize){
+    config.settings.game.minimizeWhilePlaying = minimize
+}
+
+/**
+ * Afficher "Joue a Nerysia" sur le profil Discord du joueur pendant la partie ? (discordwrapper.js)
+ */
+exports.getDiscordPresence = function(def = false){
+    return !def ? config.settings.game.discordPresence !== false : DEFAULT_CONFIG.settings.game.discordPresence
+}
+
+exports.setDiscordPresence = function(enabled){
+    config.settings.game.discordPresence = enabled
 }
 
 // Launcher Settings

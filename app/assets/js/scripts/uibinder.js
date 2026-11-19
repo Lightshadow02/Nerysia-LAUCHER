@@ -12,6 +12,7 @@ const { DistroAPI } = require('./assets/js/distromanager')
 const AdminAccess   = require('./assets/js/adminaccess')
 const SkinUtil      = require('./assets/js/skinutil')
 const PresetUtil    = require('./assets/js/presetutil')
+const HardwareProfile = require('./assets/js/hardwareprofile')
 
 let rscShouldLoad = false
 let fatalStartupError = false
@@ -149,25 +150,36 @@ function onDistroRefresh(data){
 }
 
 /**
- * Diaporama des fonds d'ecran : fondu entre deux calques (#bgLayerA / #bgLayerB) toutes les
- * BG_INTERVAL ms. Le theme (clair 7h-19h, sombre sinon) est reevalue a chaque image, comme
- * pickBackground() dans index.js qui choisit la premiere.
+ * Diaporama des fonds d'ecran : fondu de BG_FADE ms entre deux calques (#bgLayerA / #bgLayerB)
+ * toutes les BG_INTERVAL ms. La nouvelle image passe au-dessus et apparait sur l'ancienne, qui
+ * n'est cachee qu'apres le fondu (sinon on voit le fond flou de secours a mi-chemin).
+ * Le theme (clair 7h-19h, sombre sinon) est reevalue a chaque image, comme pickBackground()
+ * dans index.js qui choisit la premiere. Duree du fondu aussi dans app.ejs (.bgLayer[front]).
  */
 const BG_INTERVAL = 45000
+const BG_FADE = 1000
 
 function startBackgroundSlideshow(first){
     const fs = require('fs')
     const layers = [document.getElementById('bgLayerA'), document.getElementById('bgLayerB')]
     let current = 0
     let shown = first
+    let hideTimer = null
 
     const show = (bkid) => {
         const img = new Image()
         img.onload = () => {
+            const outgoing = layers[current]
             current = 1 - current
-            layers[current].style.backgroundImage = `url('assets/images/backgrounds/${bkid}')`
-            layers[current].setAttribute('shown', '')
-            layers[1 - current].removeAttribute('shown')
+            const incoming = layers[current]
+            clearTimeout(hideTimer)
+            incoming.style.backgroundImage = `url('assets/images/backgrounds/${bkid}')`
+            outgoing.removeAttribute('front')   // passe dessous, reste visible pendant le fondu
+            incoming.removeAttribute('shown')
+            incoming.setAttribute('front', '')
+            void incoming.offsetWidth           // le fondu part bien de 0
+            incoming.setAttribute('shown', '')
+            hideTimer = setTimeout(() => outgoing.removeAttribute('shown'), BG_FADE + 200)
             shown = bkid
         }
         img.src = `assets/images/backgrounds/${bkid}`
@@ -256,6 +268,7 @@ function scheduleAdminRetry(attempt = 0){
 function syncModConfigurations(data){
 
     const syncedCfgs = []
+    const newServers = [] // jamais configures sur ce PC (1er lancement)
 
     for(let serv of data.servers){
 
@@ -324,12 +337,61 @@ function syncModConfigurations(data){
                 id,
                 mods
             })
+            newServers.push(serv)
 
         }
     }
 
     ConfigManager.setModConfigurations(syncedCfgs)
     ConfigManager.save()
+
+    if(newServers.length > 0){
+        applyRecommendedPreset(newServers)
+    }
+}
+
+/**
+ * 1er lancement d'un serveur : son prereglage devient celui conseille pour ce PC
+ * (assets/js/hardwareprofile.js, d'apres la configuration conseillee du site) au lieu de
+ * Moyen d'office. Un serveur deja configure n'est jamais touche (le choix du joueur reste).
+ */
+async function applyRecommendedPreset(servers){
+    try {
+        const profile = await HardwareProfile.detect()
+        for(const serv of servers){
+            const modConf = ConfigManager.getModConfiguration(serv.rawServer.id)
+            if(modConf == null) continue
+            for(const mod of PresetUtil.presetMods(serv)){
+                const enabled = PresetUtil.enabledFor(mod, profile.level) // null = Builder, pas touche
+                if(enabled != null){
+                    PresetUtil.setInConfig(modConf, mod.id, enabled)
+                }
+            }
+            ConfigManager.setModConfiguration(serv.rawServer.id, modConf)
+        }
+        ConfigManager.save()
+    } catch(err) {
+        console.warn('Prereglage conseille non applique (Moyen garde).', err)
+    }
+}
+
+/**
+ * Etoile sur le bouton du prereglage conseille pour ce PC + ligne "Conseille pour ton PC : …".
+ * Utilise par l'onglet Mods (settings.js) et la fenetre de choix du serveur (overlay.js).
+ *
+ * @param {Iterable<HTMLElement>} buttons Boutons avec un attribut preset="faible|moyen|ultra".
+ * @param {HTMLElement} adviceEl Ou ecrire la ligne de conseil.
+ */
+function showPresetAdvice(buttons, adviceEl){
+    const profile = HardwareProfile.getCached()
+    if(profile == null){
+        HardwareProfile.detect().then(() => showPresetAdvice(buttons, adviceEl)).catch(() => {})
+        return
+    }
+    for(const btn of buttons){
+        btn.toggleAttribute('recommended', btn.getAttribute('preset') === profile.level)
+    }
+    adviceEl.innerHTML = HardwareProfile.adviceText(profile)
 }
 
 /**

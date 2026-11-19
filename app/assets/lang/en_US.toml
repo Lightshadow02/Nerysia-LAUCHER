@@ -78,6 +78,10 @@ launchFullscreenTitle = "Launch in fullscreen."
 autoConnectTitle = "Automatically connect to the server on launch."
 launchDetachedTitle = "Launch game process detached from launcher."
 launchDetachedDesc = "If the game is not detached, closing the launcher will also close the game."
+minimizeWhilePlayingTitle = "Minimize the launcher while you play"
+minimizeWhilePlayingDesc = "It goes to the taskbar when the game opens and comes back when you close it. Minecraft gets more memory."
+discordPresenceTitle = "Show my game on Discord"
+discordPresenceDesc = "Your friends see “Playing Nerysia” on your Discord profile (if Discord is open on this PC)."
 tabModsHeaderText = "Mod Settings"
 tabModsHeaderDesc = "Enable or disable mods."
 switchServerButton = "Switch"
@@ -153,7 +157,10 @@ continueButton = "CONTINUE"
 
 [js.discord]
 waiting = "Waiting for Client…"
-state = "Server: {shortId}"
+state = "Cobblemon server"
+largeText = "Nerysia"
+buttonDiscord = "Join the Discord"
+buttonSite = "Nerysia website"
 
 [js.index]
 microsoftLoginTitle = "Microsoft Login"
@@ -259,8 +266,10 @@ priority = "Important"
 
 [js.landing.discord]
 loading = "Loading game…"
-joining = "Heading to Nerysia!"
+joining = "In the main menu"
 joined = "Exploring Nerysia!"
+otherServer = "In multiplayer"
+singleplayer = "In singleplayer"
 
 [js.landing.modpackUpdate]
 downloading = "&#10227; Updating modpack… {percent}%"
@@ -352,9 +361,13 @@ checkingForUpdatesButton = "Checking for Updates…"
 
 [js.settings.presets]
 faible = "Just the essentials to play: great for low-end PCs."
-moyen = "Essentials + comfort mods (inventory, chat, connected textures…). Recommended."
+moyen = "Essentials + comfort mods (inventory, chat, connected textures…)."
 ultra = "Everything on: shaders, realistic sounds, 3D skins… For powerful PCs."
 custom = "Custom setup: you changed some mods by hand. Click a preset to go back to a standard setup."
+
+[js.settings.presetAdvice]
+line = "★ Recommended for your PC: {level} ({details})"
+memory = "{go} GB of memory"
 
 [js.settings.language]
 restartTitle = "Restart the launcher?"

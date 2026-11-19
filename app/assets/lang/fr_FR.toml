@@ -78,6 +78,10 @@ launchFullscreenTitle = "Lancer en plein écran."
 autoConnectTitle = "Se connecter automatiquement au serveur au lancement."
 launchDetachedTitle = "Lancer le jeu indépendamment du launcher."
 launchDetachedDesc = "Sinon, fermer le launcher fermera aussi le jeu."
+minimizeWhilePlayingTitle = "Réduire le launcher pendant que tu joues"
+minimizeWhilePlayingDesc = "Il se range dans la barre des tâches quand le jeu s'ouvre et revient quand tu le fermes. Minecraft a plus de mémoire pour lui."
+discordPresenceTitle = "Afficher ma partie sur Discord"
+discordPresenceDesc = "Tes amis voient « Joue à Nerysia » sur ton profil Discord (si Discord est ouvert sur ce PC)."
 tabModsHeaderText = "Mods"
 tabModsHeaderDesc = "Active ou désactive des mods."
 switchServerButton = "Changer"
@@ -153,7 +157,10 @@ continueButton = "CONTINUER"
 
 [js.discord]
 waiting = "En attente du client…"
-state = "Serveur : {shortId}"
+state = "Serveur Cobblemon"
+largeText = "Nerysia"
+buttonDiscord = "Rejoindre le Discord"
+buttonSite = "Site de Nerysia"
 
 [js.index]
 microsoftLoginTitle = "Connexion Microsoft"
@@ -259,8 +266,10 @@ priority = "Important"
 
 [js.landing.discord]
 loading = "Chargement du jeu…"
-joining = "En route vers Nerysia !"
+joining = "Dans le menu du jeu"
 joined = "En exploration sur Nerysia !"
+otherServer = "En multijoueur"
+singleplayer = "En solo"
 
 [js.landing.modpackUpdate]
 downloading = "&#10227; Mise à jour du modpack… {percent} %"
@@ -352,9 +361,13 @@ checkingForUpdatesButton = "Recherche de mises à jour…"
 
 [js.settings.presets]
 faible = "Juste l'essentiel pour jouer : idéal pour les petits PC."
-moyen = "Essentiel + mods de confort (inventaire, chat, textures connectées…). Recommandé."
+moyen = "Essentiel + mods de confort (inventaire, chat, textures connectées…)."
 ultra = "Tout activé : shaders, sons réalistes, skins 3D… Pour les PC puissants."
 custom = "Réglage personnalisé : tu as modifié des mods à la main. Clique sur un préréglage pour revenir à une configuration standard."
+
+[js.settings.presetAdvice]
+line = "★ Conseillé pour ton PC : {level} ({details})"
+memory = "{go} Go de mémoire"
 
 [js.settings.language]
 restartTitle = "Redémarrer le launcher ?"
