@@ -3,7 +3,8 @@
  *
  * Le launcher parle au Discord installe sur le PC (en local) : Discord affiche alors sur le
  * profil du joueur "Joue a Nerysia", l'etape (menu, sur le serveur…), le temps de jeu et deux
- * boutons (Discord, site). Discord pas ouvert = rien ne se passe.
+ * boutons pour ses amis : "Rejoindre le serveur" (site de Nerysia) et "Rejoindre le Discord".
+ * Discord pas ouvert = rien ne se passe.
  *
  * Application Discord "Nerysia" (https://discord.com/developers/applications) :
  *   - DISCORD_APP_ID = son "Application ID" (public, ce n'est PAS un secret). Vide = statut eteint.
@@ -20,7 +21,7 @@ const Lang           = require('./langloader')
 
 const logger = LoggerUtil.getLogger('DiscordWrapper')
 
-const DISCORD_APP_ID = ''
+const DISCORD_APP_ID = '1573095080770797791' // application Discord "Nerysia" (Application ID public)
 const LARGE_IMAGE    = 'nerysia'
 
 let client = null
@@ -33,10 +34,11 @@ exports.isConfigured = function(){
 }
 
 function buttons(){
-    // Memes liens que les boutons du launcher (_custom.toml)
+    // Memes liens que les boutons du launcher (_custom.toml : site, Discord).
+    // Discord : 2 boutons maximum, liens web seulement (un bouton ne peut pas lancer le jeu)
     const list = [
-        { label: Lang.queryJS('discord.buttonDiscord'), url: Lang.queryEJS('landing.mediaDiscordURL') },
-        { label: Lang.queryJS('discord.buttonSite'), url: Lang.queryEJS('landing.mediaGitHubURL') }
+        { label: Lang.queryJS('discord.buttonJoin'), url: Lang.queryEJS('landing.mediaGitHubURL') },
+        { label: Lang.queryJS('discord.buttonDiscord'), url: Lang.queryEJS('landing.mediaDiscordURL') }
     ]
     return list.filter(b => /^https:\/\//.test(b.url))
 }

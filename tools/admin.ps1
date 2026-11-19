@@ -113,6 +113,12 @@ switch ($Action) {
             $mcProfile = Invoke-RestMethod "https://api.mojang.com/users/profiles/minecraft/$Pseudo" -TimeoutSec 15
         } catch { $mcProfile = $null }
         if (-not $mcProfile -or -not $mcProfile.id) {
+            # api.mojang.com refuse parfois (429 = trop de demandes) : 2e service officiel de Mojang
+            try {
+                $mcProfile = Invoke-RestMethod "https://api.minecraftservices.com/minecraft/profile/lookup/name/$Pseudo" -TimeoutSec 15
+            } catch { $mcProfile = $null }
+        }
+        if (-not $mcProfile -or -not $mcProfile.id) {
             Write-Host "ERREUR : pseudo '$Pseudo' introuvable chez Mojang (compte Java ?)" -ForegroundColor Red
             exit 1
         }

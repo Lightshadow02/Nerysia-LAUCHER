@@ -55,11 +55,12 @@ const POSES = {
         const b = 3 + Math.sin(t * 1.6) * 1.5
         return { head: { y: -12, x: -4 }, armR: { z: 160 + Math.sin(t * 8) * 14 }, armL: { z: -b }, cape: { x: -6 } }
     },
+    // x positif = vers l'avant (vers l'ecran) : jambes tendues devant, bras un peu en avant
     sit: t => ({
         dy: 6,
         head: { x: Math.sin(t * 0.8) * 3, y: Math.sin(t * 0.5) * 15 },
-        armR: { x: -30, z: 3 }, armL: { x: -30, z: -3 },
-        legR: { x: -88, z: 4 }, legL: { x: -88, z: -4 },
+        armR: { x: 30, z: 3 }, armL: { x: 30, z: -3 },
+        legR: { x: 88, z: 4 }, legL: { x: 88, z: -4 },
         cape: { x: -4 }
     })
 }
