@@ -9,7 +9,35 @@
     <description>Actualités du serveur Nerysia</description>
     <language>fr-FR</language>
 
-    <!-- ================================================================ SEMAINE 8 -->
+    <item>
+      <title>Ouverture officielle du site web de Nerysia !</title>
+      <link>https://apk.nerysia.fr</link>
+      <pubDate>Thu, 19 Nov 2026 17:10:00 +0100</pubDate>
+      <dc:creator>Burri_T</dc:creator>
+      <slash:comments>0</slash:comments>
+      <category>prioritaire</category>
+      <category domain="https://nerysia.fr/rss/prioritaire-jusqu-au">Mon, 30 Nov 2026 18:00:00 +0100</category>
+      <content:encoded><![CDATA[
+        <h2>🎉&nbsp;Le site de Nerysia est enfin en ligne !</h2>
+        <p>Nous sommes ravis de vous accueillir sur la toute nouvelle vitrine officielle de <strong>Nerysia</strong>. Ce site a été pensé pour être le point central de notre communauté et vous permettre de ne rien manquer de l'aventure.</p>
+        <p><strong>Ce que vous pouvez y retrouver dès maintenant :</strong></p>
+        <ul>
+          <li>
+        <p><strong>L'avancement du projet :</strong> Suivez en temps réel le développement, les nouveautés et les prochaines étapes avant l'ouverture.</p></li>
+          <li>
+        <p><strong>Les actualités et annonces :</strong> Retrouvez tous les changelogs, les événements à venir et les informations importantes directement au même endroit (ainsi que sur notre launcher !).</p></li>
+          <li>
+        <p><strong>La présentation de l'univers :</strong> Découvrez plus en détail les fonctionnalités et l'identité de Nerysia.</p></li>
+          <li>
+        <p><strong>L'accès rapide à la communauté :</strong> Retrouvez tous nos liens utiles pour échanger avec l'équipe et les autres joueurs.</p></li>
+        </ul>
+        <p>D'autres fonctionnalités viendront enrichir le site au fil du temps, notamment avec l'arrivée du launcher et l'avancée du serveur. Restez connectés, la suite arrive très vite !</p>
+        <ul>
+        </ul>
+        <p><a href="https://discord.gg/dtvMfS69hU" rel="noopener noreferrer" target="_blank">Rejoins le Discord</a></p>
+      ]]></content:encoded>
+    </item>
+
     <item>
       <title>Semaine de dev #8 : ta carte de joueur, la boîte aux lettres et les Brèches au complet</title>
       <link>https://apk.nerysia.fr</link>
@@ -67,7 +95,6 @@
       ]]></content:encoded>
     </item>
 
-    <!-- ================================================================ SEMAINE 7 -->
     <item>
       <title>Semaine de dev #7 : on a franchi la première Brèche</title>
       <link>https://apk.nerysia.fr</link>
@@ -93,7 +120,6 @@
       ]]></content:encoded>
     </item>
 
-    <!-- ================================================================ SEMAINE 6 -->
     <item>
       <title>Semaine de dev #6 : le modpack fait peau neuve</title>
       <link>https://apk.nerysia.fr</link>
@@ -129,7 +155,6 @@
       ]]></content:encoded>
     </item>
 
-    <!-- ================================================================ SEMAINE 5 -->
     <item>
       <title>Semaine de dev #5 : la carte des quêtes</title>
       <link>https://apk.nerysia.fr</link>
@@ -152,7 +177,6 @@
       ]]></content:encoded>
     </item>
 
-    <!-- ================================================================ SEMAINE 4 -->
     <item>
       <title>Semaine de dev #4 : un écran de lancement à nous, et les factions dans le chat</title>
       <link>https://apk.nerysia.fr</link>
@@ -179,7 +203,6 @@
       ]]></content:encoded>
     </item>
 
-    <!-- ================================================================ SEMAINE 3 -->
     <item>
       <title>Semaine de dev #3 : nouveau menu, PNJ et arène classée</title>
       <link>https://apk.nerysia.fr</link>
@@ -210,7 +233,6 @@
       ]]></content:encoded>
     </item>
 
-    <!-- ================================================================ SEMAINE 2 -->
     <item>
       <title>Semaine de dev #2 : un seul Nerysia, plusieurs serveurs</title>
       <link>https://apk.nerysia.fr</link>
@@ -237,7 +259,6 @@
       ]]></content:encoded>
     </item>
 
-    <!-- ================================================================ SEMAINE 1 -->
     <item>
       <title>Semaine de dev #1 : les fondations</title>
       <link>https://apk.nerysia.fr</link>
