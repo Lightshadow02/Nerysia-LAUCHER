@@ -11,6 +11,7 @@
                     <button class="settingsNavItem" rSc="settingsTabMods"><%- lang('settings.navMods') %></button>
                     <button class="settingsNavItem" rSc="settingsTabJava"><%- lang('settings.navJava') %></button>
                     <button class="settingsNavItem" rSc="settingsTabLauncher"><%- lang('settings.navLauncher') %></button>
+                    <button class="settingsNavItem" rSc="settingsTabSupport"><%- lang('settings.navSupport') %></button>
                     <div class="settingsNavSpacer"></div>
                     <button class="settingsNavItem" rSc="settingsTabAbout"><%- lang('settings.navAbout') %></button>
                     <button class="settingsNavItem" rSc="settingsTabUpdate" id="settingsNavUpdate"><%- lang('settings.navUpdates') %></button>
@@ -119,6 +120,19 @@
                         <span class="toggleSwitchSlider"></span>
                     </label>
                 </div>
+            </div>
+            <!-- Sauvegardes des reglages du joueur (cf assets/js/playerbackup.js, settings.js -> prepareBackupSection) -->
+            <div id="settingsBackupContainer">
+                <div class="settingsFieldLeft">
+                    <span class="settingsFieldTitle"><%- lang('settings.backupTitle') %></span>
+                    <span class="settingsFieldDesc"><%- lang('settings.backupDesc') %></span>
+                </div>
+                <div id="settingsBackupActions">
+                    <button class="settingsBackupButton" id="settingsBackupNow"><%- lang('settings.backupNow') %></button>
+                    <button class="settingsBackupButton" id="settingsBackupOpen"><%- lang('settings.backupOpen') %></button>
+                </div>
+                <div id="settingsBackupStatus"></div>
+                <div id="settingsBackupList"></div>
             </div>
         </div>
         <div id="settingsTabMods" class="settingsTab" style="display: none;">
@@ -343,6 +357,29 @@
                     </div>
                 </div>
                 <div class="settingsFileSelDesc"><%- lang('settings.dataDirectoryDesc') %></div>
+            </div>
+        </div>
+        <!-- Depannage : journaux a copier pour le support (cf assets/js/supportlogs.js, settings.js -> prepareSupportTab) -->
+        <div id="settingsTabSupport" class="settingsTab" style="display: none;">
+            <div class="settingsTabHeader">
+                <span class="settingsTabHeaderText"><%- lang('settings.supportTabHeaderText') %></span>
+                <span class="settingsTabHeaderDesc"><%- lang('settings.supportTabHeaderDesc') %></span>
+            </div>
+            <div id="supportBox">
+                <button id="supportCopyReport"><%- lang('settings.supportCopyReport') %></button>
+                <div id="supportStatus"></div>
+                <div id="supportLogSwitch">
+                    <button class="supportLogTab" kind="launcher" selected><%- lang('settings.supportLogLauncher') %></button>
+                    <button class="supportLogTab" kind="game"><%- lang('settings.supportLogGame') %></button>
+                    <button class="supportLogTab" kind="crash"><%- lang('settings.supportLogCrash') %></button>
+                </div>
+                <div id="supportLogInfo"></div>
+                <pre id="supportLogView"></pre>
+                <div id="supportLogActions">
+                    <button class="supportAction" id="supportCopyLog"><%- lang('settings.supportCopyLog') %></button>
+                    <button class="supportAction" id="supportRefresh"><%- lang('settings.supportRefresh') %></button>
+                    <button class="supportAction" id="supportOpenFolder"><%- lang('settings.supportOpenFolder') %></button>
+                </div>
             </div>
         </div>
         <div id="settingsTabAbout" class="settingsTab" style="display: none;">

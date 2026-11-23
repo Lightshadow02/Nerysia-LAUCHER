@@ -8,6 +8,8 @@
 const $                              = require('jquery')
 const {ipcRenderer, shell, webFrame} = require('electron')
 const remote                         = require('@electron/remote')
+// Journal du launcher enregistre dans un fichier (onglet Depannage), branche avant tout le reste
+require('./assets/js/launcherlog').init(remote.app.getPath('userData'))
 const isDev                          = require('./assets/js/isdev')
 const { LoggerUtil }                 = require('helios-core')
 const Lang                           = require('./assets/js/langloader')

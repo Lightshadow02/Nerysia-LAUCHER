@@ -1,9 +1,9 @@
 **🇫🇷 Nouveautés**
-- **Statut Discord** : pendant que tu joues, tes amis voient « Joue à Nerysia » sur ton profil Discord, avec ce que tu fais (menu, en exploration sur Nerysia…) et ton temps de jeu. Deux boutons leur permettent de rejoindre le serveur (site de Nerysia) et notre Discord. Discord doit être ouvert sur ton PC. Pour le couper : Paramètres → Minecraft.
-- **Pose assise corrigée** : dans la fenêtre skin, le personnage assis a maintenant les jambes devant lui (elles étaient à l'envers).
-- **Connexion Mojang retirée** : les comptes Mojang n'existent plus depuis leur passage chez Microsoft. Le launcher ne propose plus que la connexion Microsoft (ton compte ne change pas).
+- **Dépannage** : nouvel onglet dans les Paramètres. Un problème ? Clique sur « Copier pour le support » et colle le rapport sur le Discord de Nerysia. Tu peux aussi voir les journaux du launcher, du jeu et du dernier plantage. Tes infos de connexion et ton nom de session sont masqués automatiquement.
+- **Sauvegardes de tes réglages** : tes touches, options, configs de mods et points de passage sont sauvegardés avant les mises à jour du modpack. Tu peux revenir à une sauvegarde à tout moment (Paramètres → Minecraft, en bas).
+- **Mes captures** : avec beaucoup de captures, les vignettes ne sont plus écrasées.
 
 **🇬🇧 What's new**
-- **Discord status**: while you play, your friends see "Playing Nerysia" on your Discord profile, with what you are doing (menu, exploring Nerysia…) and your play time. Two buttons let them join the server (Nerysia website) and our Discord. Discord must be open on your PC. To turn it off: Settings → Minecraft.
-- **Sitting pose fixed**: in the skin window, the sitting character now has its legs in front (they were backwards).
-- **Mojang login removed**: Mojang accounts no longer exist since they moved to Microsoft. The launcher now only offers Microsoft login (your account does not change).
+- **Troubleshooting**: new tab in Settings. A problem? Click "Copy for support" and paste the report on the Nerysia Discord. You can also view the launcher, game and last crash logs. Your login details and session name are hidden automatically.
+- **Backups of your settings**: your keys, options, mod configs and waypoints are backed up before modpack updates. You can go back to a backup at any time (Settings → Minecraft, at the bottom).
+- **My screenshots**: with many screenshots, thumbnails are no longer squashed.

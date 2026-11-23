@@ -1751,6 +1751,223 @@ input:checked + .toggleSwitchSlider:before {
     content: " \2605";
     color: #F2C230;
 }
+/* Onglet Depannage (cf assets/js/supportlogs.js) */
+#supportBox {
+    width: 75%;
+    padding: 15px 0px;
+}
+#supportCopyReport {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 3px;
+    color: white;
+    font-family: 'Avenir Medium';
+    font-size: 13px;
+    padding: 7px 16px;
+    cursor: pointer;
+    outline: none;
+    transition: 0.2s ease;
+}
+#supportCopyReport:hover,
+#supportCopyReport:focus {
+    background: rgba(255, 255, 255, 0.24);
+}
+#supportStatus {
+    font-size: 11px;
+    margin-top: 6px;
+    min-height: 14px;
+    color: rgba(255, 255, 255, 0.85);
+}
+#supportStatus[type="error"] {
+    color: #FF8A80;
+}
+#supportStatus[type="success"] {
+    color: #7CFC9A;
+}
+#supportLogSwitch {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+}
+.supportLogTab {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(126, 126, 126, 0.57);
+    border-radius: 3px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 11px;
+    padding: 4px 12px;
+    cursor: pointer;
+    outline: none;
+    transition: 0.2s ease;
+}
+.supportLogTab:hover,
+.supportLogTab:focus {
+    color: white;
+    border-color: rgba(255, 255, 255, 0.85);
+}
+.supportLogTab[selected] {
+    color: white;
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.85);
+}
+#supportLogInfo {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 8px 0px 4px 0px;
+    min-height: 13px;
+}
+#supportLogView {
+    height: 230px;
+    margin: 0px;
+    padding: 8px;
+    box-sizing: border-box;
+    overflow: auto;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(126, 126, 126, 0.57);
+    border-radius: 3px;
+    color: rgba(255, 255, 255, 0.85);
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 10px;
+    line-height: 1.35;
+    white-space: pre-wrap;
+    word-break: break-all;
+    user-select: text;
+}
+#supportLogView::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+#supportLogView::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.35);
+}
+.supportLogError {
+    color: #FF8A80;
+}
+.supportLogWarn {
+    color: #F2C230;
+}
+#supportLogActions {
+    display: flex;
+    gap: 18px;
+    margin-top: 8px;
+}
+.supportAction {
+    background: none;
+    border: none;
+    padding: 2px 0px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    outline: none;
+    transition: 0.25s ease;
+}
+.supportAction:hover,
+.supportAction:focus {
+    text-shadow: 0px 0px 20px white, 0px 0px 20px white;
+}
+
+/* Sauvegardes des reglages du joueur (onglet Minecraft, cf assets/js/playerbackup.js) */
+#settingsBackupContainer {
+    width: 75%;
+    padding: 20px 0px;
+}
+#settingsBackupActions {
+    display: flex;
+    gap: 18px;
+    margin-top: 10px;
+}
+.settingsBackupButton {
+    background: none;
+    border: none;
+    padding: 2px 0px;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    outline: none;
+    transition: 0.25s ease;
+}
+.settingsBackupButton:hover,
+.settingsBackupButton:focus {
+    text-shadow: 0px 0px 20px white, 0px 0px 20px white;
+}
+#settingsBackupStatus {
+    font-size: 11px;
+    margin-top: 6px;
+    min-height: 14px;
+    color: rgba(255, 255, 255, 0.85);
+}
+#settingsBackupStatus[type="error"] {
+    color: #FF8A80;
+}
+#settingsBackupStatus[type="success"] {
+    color: #7CFC9A;
+}
+#settingsBackupList {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+}
+.settingsBackupRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 10px;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(126, 126, 126, 0.57);
+    border-radius: 3px;
+}
+.settingsBackupInfo {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+.settingsBackupDate {
+    font-size: 12px;
+    font-family: 'Avenir Medium';
+    color: white;
+}
+.settingsBackupReason {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.75);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.settingsBackupRestore {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 3px;
+    color: white;
+    font-size: 11px;
+    padding: 3px 10px;
+    cursor: pointer;
+    outline: none;
+    transition: 0.2s ease;
+}
+.settingsBackupRestore:hover,
+.settingsBackupRestore:focus {
+    background: rgba(255, 255, 255, 0.2);
+}
+.settingsBackupDelete {
+    background: none;
+    border: none;
+    padding: 2px 4px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    cursor: pointer;
+    outline: none;
+}
+.settingsBackupDelete:hover,
+.settingsBackupDelete:focus {
+    color: rgb(255, 80, 70);
+}
+.settingsBackupEmpty {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+}
 #settingsPresetAdvice {
     font-size: 11px;
     color: #F2C230;
@@ -4696,6 +4913,9 @@ input:checked + .toggleSwitchSlider:before {
 #screenshotsGrid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    /* Lignes a la taille des vignettes : sans ca, avec beaucoup de captures, les lignes etaient
+       ecrasees pour tenir dans la fenetre (fines bandes) au lieu de faire defiler */
+    grid-auto-rows: max-content;
     gap: 8px;
     align-content: start;
     height: 100%;
@@ -4730,6 +4950,7 @@ input:checked + .toggleSwitchSlider:before {
 }
 .screenshotsThumb {
     width: 100%;
+    flex-shrink: 0;
     aspect-ratio: 16 / 9;
     background-color: rgba(255, 255, 255, 0.06);
     background-position: center;

@@ -284,6 +284,9 @@ function settingsNavItemListener(ele, fade = true){
     ele.setAttribute('selected', '')
     let prevTab = selectedSettingsTab
     selectedSettingsTab = ele.getAttribute('rSc')
+    if(selectedSettingsTab === 'settingsTabSupport'){
+        loadSupportLog() // journaux relus a chaque ouverture de l'onglet
+    }
 
     document.getElementById(prevTab).onscroll = null
     document.getElementById(selectedSettingsTab).onscroll = settingsTabScrollListener
@@ -1689,6 +1692,246 @@ async function prepareSettings(first = false) {
     await prepareJavaTab()
     prepareLanguageButtons()
     prepareAboutTab()
+    prepareBackupSection()
+    prepareSupportTab()
+}
+
+/**
+ * Onglet Depannage : journaux du launcher / du jeu / du dernier plantage, a copier pour le support.
+ * Lecture et masquage des infos sensibles dans assets/js/supportlogs.js.
+ */
+const SupportLogs = require('./assets/js/supportlogs')
+let supportKind = 'launcher'
+let supportCurrent = null // dernier journal affiche ({found, text, folder...})
+
+function setSupportStatus(text, type){
+    const el = document.getElementById('supportStatus')
+    el.textContent = text || ''
+    if(type){
+        el.setAttribute('type', type)
+    } else {
+        el.removeAttribute('type')
+    }
+}
+
+function escapeLogHtml(s){
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+/** Ligne coloree : erreurs en rouge, avertissements en jaune. */
+function logLineHtml(line){
+    const html = escapeLogHtml(line)
+    if(/\b(ERROR|FATAL|SEVERE)\b|\[error\]|Exception|^\s+at |Caused by|---- Minecraft Crash Report/i.test(line)){
+        return `<span class="supportLogError">${html}</span>`
+    }
+    if(/\bWARN(ING)?\b|\[warn\]/i.test(line)){
+        return `<span class="supportLogWarn">${html}</span>`
+    }
+    return html
+}
+
+async function loadSupportLog(){
+    const view = document.getElementById('supportLogView')
+    const info = document.getElementById('supportLogInfo')
+    for(const b of document.querySelectorAll('.supportLogTab')){
+        b.toggleAttribute('selected', b.getAttribute('kind') === supportKind)
+    }
+    info.textContent = Lang.queryJS('settings.support.loading')
+    const kind = supportKind
+    let res
+    try {
+        res = await SupportLogs.read(kind, ConfigManager.getSelectedServer())
+    } catch(err) {
+        res = { found: false, folder: null, error: err.message }
+    }
+    if(kind !== supportKind) return // le joueur a change d'onglet entre-temps
+    supportCurrent = res
+    if(!res.found){
+        info.textContent = res.error
+            ? Lang.queryJS('settings.support.error', { error: res.error })
+            : Lang.queryJS('settings.support.none.' + kind)
+        view.innerHTML = ''
+        return
+    }
+    const date = new Date(res.mtime).toLocaleString(Lang.getLocaleTag(), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+    info.textContent = Lang.queryJS('settings.support.fileInfo', { name: res.name, date })
+    view.innerHTML = res.text.split('\n').map(logLineHtml).join('\n')
+    // journaux : on montre la fin (le plus recent) ; plantage : le debut (la cause)
+    view.scrollTop = kind === 'crash' ? 0 : view.scrollHeight
+}
+
+function prepareSupportTab(){
+    setSupportStatus('')
+    for(const b of document.querySelectorAll('.supportLogTab')){
+        b.onclick = () => {
+            supportKind = b.getAttribute('kind')
+            loadSupportLog()
+        }
+    }
+    document.getElementById('supportRefresh').onclick = () => loadSupportLog()
+    document.getElementById('supportOpenFolder').onclick = () => {
+        if(supportCurrent?.folder != null){
+            shell.openPath(supportCurrent.folder)
+        }
+    }
+    document.getElementById('supportCopyLog').onclick = () => {
+        if(!supportCurrent?.found) return
+        require('electron').clipboard.writeText(supportCurrent.text)
+        setSupportStatus(Lang.queryJS('settings.support.copiedLog'), 'success')
+    }
+    document.getElementById('supportCopyReport').onclick = async () => {
+        setSupportStatus(Lang.queryJS('settings.support.reportWorking'))
+        try {
+            require('electron').clipboard.writeText(await SupportLogs.buildReport(ConfigManager.getSelectedServer()))
+            setSupportStatus(Lang.queryJS('settings.support.copiedReport'), 'success')
+        } catch(err) {
+            setSupportStatus(Lang.queryJS('settings.support.error', { error: err.message }), 'error')
+        }
+    }
+    if(selectedSettingsTab === 'settingsTabSupport'){
+        loadSupportLog()
+    }
+}
+
+/**
+ * Sauvegardes des reglages du joueur (onglet Minecraft), pour le serveur selectionne.
+ * PlayerBackup (assets/js/playerbackup.js) et GameInstances sont charges par landing.js.
+ */
+let backupWorking = false
+
+function backupDate(ms){
+    return new Date(ms).toLocaleString(Lang.getLocaleTag(), { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+}
+
+function backupSize(bytes){
+    const mb = bytes / 1048576
+    if(mb >= 1){
+        return Lang.queryJS('settings.backup.sizeMb', { size: mb.toLocaleString(Lang.getLocaleTag(), { maximumFractionDigits: 1 }) })
+    }
+    return Lang.queryJS('settings.backup.sizeKb', { size: Math.max(1, Math.round(bytes / 1024)) })
+}
+
+function backupReason(b){
+    if(b.reason === 'update'){
+        return b.version ? Lang.queryJS('settings.backup.reasonUpdateVersion', { version: b.version }) : Lang.queryJS('settings.backup.reasonUpdate')
+    }
+    if(b.reason === 'beforeRestore'){
+        return Lang.queryJS('settings.backup.reasonBeforeRestore')
+    }
+    return Lang.queryJS('settings.backup.reasonManual')
+}
+
+function setBackupStatus(text, type){
+    const el = document.getElementById('settingsBackupStatus')
+    el.textContent = text || ''
+    if(type){
+        el.setAttribute('type', type)
+    } else {
+        el.removeAttribute('type')
+    }
+}
+
+async function refreshBackupList(){
+    const serverId = ConfigManager.getSelectedServer()
+    const listEl = document.getElementById('settingsBackupList')
+    if(serverId == null){
+        listEl.innerHTML = ''
+        return
+    }
+    let backups = []
+    try {
+        backups = await PlayerBackup.list(serverId)
+    } catch(err) {
+        // dossier illisible : liste vide
+    }
+    if(backups.length === 0){
+        listEl.innerHTML = `<div class="settingsBackupEmpty">${Lang.queryJS('settings.backup.empty')}</div>`
+        return
+    }
+    listEl.innerHTML = backups.map(b => `<div class="settingsBackupRow" bid="${b.id}">
+        <div class="settingsBackupInfo">
+            <span class="settingsBackupDate">${backupDate(b.date)}</span>
+            <span class="settingsBackupReason">${backupReason(b)} · ${backupSize(b.size)}</span>
+        </div>
+        <button class="settingsBackupRestore">${Lang.queryJS('settings.backup.restore')}</button>
+        <button class="settingsBackupDelete" title="${Lang.queryJS('settings.backup.delete')}">&#10005;</button>
+    </div>`).join('')
+    for(const row of listEl.querySelectorAll('.settingsBackupRow')){
+        const b = backups.find(x => x.id === row.getAttribute('bid'))
+        row.querySelector('.settingsBackupRestore').onclick = () => confirmBackupRestore(serverId, b)
+        row.querySelector('.settingsBackupDelete').onclick = async () => {
+            if(backupWorking) return
+            backupWorking = true
+            try {
+                await PlayerBackup.remove(serverId, b.id)
+                setBackupStatus('')
+            } catch(err) {
+                setBackupStatus(Lang.queryJS('settings.backup.error', { error: err.message }), 'error')
+            }
+            backupWorking = false
+            refreshBackupList()
+        }
+    }
+}
+
+function confirmBackupRestore(serverId, b){
+    if(backupWorking) return
+    if(GameInstances.isAnyRunning() || launchInProgress){
+        setBackupStatus(Lang.queryJS('settings.backup.gameRunning'), 'error')
+        return
+    }
+    setOverlayContent(
+        Lang.queryJS('settings.backup.confirmTitle'),
+        Lang.queryJS('settings.backup.confirmDesc', { date: backupDate(b.date) }),
+        Lang.queryJS('settings.backup.confirmButton'),
+        Lang.queryJS('settings.backup.cancelButton')
+    )
+    setOverlayHandler(async () => {
+        toggleOverlay(false)
+        backupWorking = true
+        setBackupStatus(Lang.queryJS('settings.backup.restoring'))
+        try {
+            await PlayerBackup.restore(serverId, b.id)
+            setBackupStatus(Lang.queryJS('settings.backup.restored'), 'success')
+        } catch(err) {
+            setBackupStatus(Lang.queryJS('settings.backup.error', { error: err.message }), 'error')
+        }
+        backupWorking = false
+        refreshBackupList()
+    })
+    setDismissHandler(() => {
+        toggleOverlay(false)
+    })
+    toggleOverlay(true, true)
+}
+
+function prepareBackupSection(){
+    setBackupStatus('')
+    document.getElementById('settingsBackupNow').onclick = async () => {
+        const serverId = ConfigManager.getSelectedServer()
+        if(backupWorking || serverId == null) return
+        backupWorking = true
+        setBackupStatus(Lang.queryJS('settings.backup.saving'))
+        try {
+            const made = await PlayerBackup.create(serverId)
+            if(made != null){
+                setBackupStatus(Lang.queryJS('settings.backup.saved'), 'success')
+            } else {
+                setBackupStatus(Lang.queryJS('settings.backup.nothing'), 'error')
+            }
+        } catch(err) {
+            setBackupStatus(Lang.queryJS('settings.backup.error', { error: err.message }), 'error')
+        }
+        backupWorking = false
+        refreshBackupList()
+    }
+    document.getElementById('settingsBackupOpen').onclick = async () => {
+        const serverId = ConfigManager.getSelectedServer()
+        if(serverId != null){
+            shell.openPath(await PlayerBackup.folder(serverId))
+        }
+    }
+    refreshBackupList()
 }
 
 // Prepare the settings UI on startup.

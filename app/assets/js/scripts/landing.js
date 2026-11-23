@@ -32,6 +32,7 @@ const DiscordWrapper          = require('./assets/js/discordwrapper')
 const ProcessBuilder          = require('./assets/js/processbuilder')
 const ModpackUpdater          = require('./assets/js/modpackupdater')
 const GameInstances           = require('./assets/js/gameinstances')
+const PlayerBackup            = require('./assets/js/playerbackup')
 const SkinChanger             = require('./assets/js/skinchanger')
 const SkinViewer              = require('./assets/js/skinviewer')
 const SkinHistory             = require('./assets/js/skinhistory')
@@ -1287,6 +1288,9 @@ async function dlAsyncInner(login = true) {
     
 
     if(invalidFileCount > 0) {
+        // Des fichiers vont etre remplaces : sauvegarde des reglages du joueur (cf playerbackup.js)
+        setLaunchDetails(Lang.queryJS('landing.dlAsync.backingUpSettings'))
+        await PlayerBackup.autoBackup(serv)
         loggerLaunchSuite.info('Downloading files.')
         setLaunchDetails(Lang.queryJS('landing.dlAsync.downloadingFiles'))
         setLaunchPercentage(0)

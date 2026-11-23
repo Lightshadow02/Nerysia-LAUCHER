@@ -20,6 +20,7 @@ const { LoggerUtil }    = require('helios-core')
 
 const ConfigManager     = require('./configmanager')
 const { DistroAPI }     = require('./distromanager')
+const PlayerBackup      = require('./playerbackup')
 
 const log = LoggerUtil.getLogger('ModpackUpdater')
 
@@ -107,6 +108,7 @@ async function run(){
         const invalid = await step(repair, () => repair.verifyFiles(() => {}))
         if(invalid > 0){
             log.info(`${invalid} fichier(s) a telecharger.`)
+            await PlayerBackup.autoBackup(server) // reglages du joueur sauvegardes avant le remplacement
             listener({ state: 'downloading', server, percent: 0 })
             await step(repair, () => repair.download(percent => listener({ state: 'downloading', server, percent })))
         }
