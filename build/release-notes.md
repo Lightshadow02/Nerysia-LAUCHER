@@ -1,9 +1,11 @@
 **🇫🇷 Nouveautés**
-- **Dépannage** : nouvel onglet dans les Paramètres. Un problème ? Clique sur « Copier pour le support » et colle le rapport sur le Discord de Nerysia. Tu peux aussi voir les journaux du launcher, du jeu et du dernier plantage. Tes infos de connexion et ton nom de session sont masqués automatiquement.
-- **Sauvegardes de tes réglages** : tes touches, options, configs de mods et points de passage sont sauvegardés avant les mises à jour du modpack. Tu peux revenir à une sauvegarde à tout moment (Paramètres → Minecraft, en bas).
-- **Mes captures** : avec beaucoup de captures, les vignettes ne sont plus écrasées.
+- **Erreur au lancement ?** Un bouton « Voir les détails » ouvre directement l'onglet Dépannage : tu vois ce qui s'est passé et tu peux copier le rapport pour le Discord de Nerysia.
+- **Dépannage** : le journal du launcher note maintenant chaque étape du lancement (fichiers téléchargés, Java, démarrage du jeu) et la cause exacte d'un téléchargement raté. Nouvelle vue « Session d'avant », pour retrouver une erreur même après avoir relancé le launcher.
+- **Installation de Java** : en cas d'échec, un message s'affiche (avant, la barre restait bloquée).
+- Le journal du launcher ne se remplit plus pendant les longues parties.
 
 **🇬🇧 What's new**
-- **Troubleshooting**: new tab in Settings. A problem? Click "Copy for support" and paste the report on the Nerysia Discord. You can also view the launcher, game and last crash logs. Your login details and session name are hidden automatically.
-- **Backups of your settings**: your keys, options, mod configs and waypoints are backed up before modpack updates. You can go back to a backup at any time (Settings → Minecraft, at the bottom).
-- **My screenshots**: with many screenshots, thumbnails are no longer squashed.
+- **Error while launching?** A "See details" button opens the Troubleshooting tab directly: you can see what happened and copy the report for the Nerysia Discord.
+- **Troubleshooting**: the launcher log now records every launch step (downloaded files, Java, game start) and the exact cause of a failed download. New "Previous session" view, to find an error even after restarting the launcher.
+- **Java installation**: if it fails, a message is now shown (before, the bar stayed stuck).
+- The launcher log no longer fills up during long play sessions.

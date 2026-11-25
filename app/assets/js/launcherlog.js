@@ -12,11 +12,19 @@ const path = require('path')
 
 const MAX_BYTES = 5 * 1024 * 1024 // au-dela, on arrete d'ecrire (une session normale fait quelques centaines de Ko)
 const LEVELS = ['log', 'info', 'warn', 'error', 'debug']
+// Sortie du jeu ("[Minecraft] ...") : deja dans logs/latest.log de l'instance (onglet Jeu). On n'en
+// garde que le debut de chaque lancement (erreurs de Java avant que Minecraft ouvre son journal),
+// sinon une longue partie remplirait le journal du launcher et il s'arreterait d'ecrire.
+const GAME_MAX_BYTES = 512 * 1024
+const GAME_LINE = /^\[Minecraft\] /
+// Processus de verification/telechargement (helios-core) : "[_] [date] [niveau] [Nom]: ..."
+const RECEIVER_PREFIX = /^\[_\] (?=\[\d{4}-\d\d-\d\d )/
 
 let file = null
 let previous = null
 let queue = []
 let written = 0
+let gameWritten = 0
 let timer = null
 
 const stripAnsi = s => s.replace(/\u001b\[[0-9;]*m/g, '')
@@ -38,7 +46,14 @@ function stamp(){
 }
 
 function push(level, args){
-    let text = stripAnsi(args.map(toText).join(' '))
+    let text = stripAnsi(args.map(toText).join(' ')).replace(RECEIVER_PREFIX, '')
+    if(GAME_LINE.test(text)){
+        if(gameWritten > GAME_MAX_BYTES) return
+        gameWritten += text.length
+        if(gameWritten > GAME_MAX_BYTES){
+            text = '[Minecraft] (suite de la sortie du jeu : onglet Jeu / see the Game tab)'
+        }
+    }
     // Les loggers helios-core ecrivent deja "[date] [niveau] [Nom]: ..." ; le reste recoit date + niveau
     if(!/^\[\d{4}-\d\d-\d\d /.test(text)){
         text = `[${stamp()}] [${level === 'log' ? 'info' : level}] ${text}`
@@ -51,10 +66,13 @@ function flush(sync = false){
     clearTimeout(timer)
     timer = null
     if(file == null || queue.length === 0) return
-    const text = queue.join('')
+    let text = queue.join('')
     queue = []
     if(written > MAX_BYTES) return
     written += Buffer.byteLength(text)
+    if(written > MAX_BYTES){
+        text += `[${stamp()}] [warn] Journal trop gros (5 Mo) : la suite de cette session n'est pas enregistree.\n`
+    }
     if(sync){
         try { fs.appendFileSync(file, text) } catch(err) { /* tant pis */ }
     } else {
@@ -85,6 +103,11 @@ exports.init = function(launcherDir){
     window.addEventListener('error', e => push('error', [`Erreur non interceptee : ${e.error?.stack || e.message}`]))
     window.addEventListener('unhandledrejection', e => push('error', [`Promesse rejetee non interceptee : ${toText(e.reason)}`]))
     window.addEventListener('beforeunload', () => flush(true))
+}
+
+/** Nouveau lancement du jeu : on garde a nouveau le debut de sa sortie. */
+exports.gameStarting = function(){
+    gameWritten = 0
 }
 
 /** Fichier de la session actuelle (null si le journal n'a pas pu etre cree). */

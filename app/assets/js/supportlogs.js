@@ -24,6 +24,7 @@ const { DistroAPI }     = require('./distromanager')
 const VIEW_LINES = 1500       // lignes affichees dans l'onglet
 const REPORT_LINES = 150      // lignes de chaque journal dans le rapport
 const REPORT_CRASH_LINES = 80 // debut du rapport de plantage (la cause est en haut)
+const REPORT_PREVIOUS_LINES = 100 // session d'avant du launcher
 const READ_BYTES = 768 * 1024 // on ne lit que la fin des gros fichiers
 
 const escapeRe = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -89,10 +90,10 @@ async function newest(files){
     return best
 }
 
-/** Fichier d'un journal : 'launcher', 'game' ou 'crash'. */
+/** Fichier d'un journal : 'launcher', 'previous' (session d'avant du launcher), 'game' ou 'crash'. */
 async function locate(kind, serverId){
-    if(kind === 'launcher'){
-        const f = LauncherLog.file()
+    if(kind === 'launcher' || kind === 'previous'){
+        const f = kind === 'launcher' ? LauncherLog.file() : LauncherLog.previousFile()
         return f && await fs.pathExists(f) ? { file: f, mtime: (await fs.stat(f)).mtimeMs } : null
     }
     if(serverId == null) return null
@@ -120,7 +121,7 @@ async function locate(kind, serverId){
 exports.read = async function(kind, serverId){
     const redact = await makeRedactor()
     const loc = await locate(kind, serverId)
-    const folder = kind === 'launcher'
+    const folder = kind === 'launcher' || kind === 'previous'
         ? path.join(ConfigManager.getLauncherDirectory(), 'logs')
         : (serverId != null ? path.join(ConfigManager.getInstanceDirectory(), serverId, kind === 'game' ? 'logs' : 'crash-reports') : null)
     if(loc == null) return { found: false, folder }
@@ -186,6 +187,8 @@ exports.buildReport = async function(serverId){
     await section('Last crash', 'crash', REPORT_CRASH_LINES)
     await section(`Game log (last ${REPORT_LINES} lines)`, 'game', REPORT_LINES)
     await section(`Launcher log (last ${REPORT_LINES} lines)`, 'launcher', REPORT_LINES)
+    // Le joueur relance souvent le launcher apres un probleme : l'erreur est alors dans la session d'avant
+    await section(`Previous launcher session (last ${REPORT_PREVIOUS_LINES} lines)`, 'previous', REPORT_PREVIOUS_LINES)
 
     return '```\n' + redact(out.join('\n')).replace(/```/g, '\'\'\'') + '\n```'
 }

@@ -70,6 +70,7 @@ supportCopyReport = "Copy for support"
 supportLogLauncher = "Launcher"
 supportLogGame = "Game"
 supportLogCrash = "Last crash"
+supportLogPrevious = "Previous session"
 supportCopyLog = "Copy this log"
 supportRefresh = "Refresh"
 supportOpenFolder = "Open folder"
@@ -179,13 +180,14 @@ tryAgain = "Try Again"
 
 [js.login.error.unknown]
 title = "Unknown Error During Login"
-desc = "An unknown error has occurred. Please see the console for details."
+desc = "An unknown error has occurred. Details are in Settings → Troubleshooting."
 
 [js.landing.launch]
 pleaseWait = "Please wait…"
 failureTitle = "Error During Launch"
-failureText = "See console (CTRL + Shift + i) for more details."
+failureText = "Details are in Settings → Troubleshooting."
 okay = "Okay"
+openSupport = "See details"
 
 [js.landing.selectedAccount]
 noAccountSelected = "No Account Selected"
@@ -215,7 +217,7 @@ installJava = "Install Java"
 installJavaManually = "Install Manually"
 javaDownloadPrepare = "Preparing Java Download…"
 javaDownloadFailureTitle = "Error During Java Download"
-javaDownloadFailureText = "See console (CTRL + Shift + i) for more details."
+javaDownloadFailureText = "Check your Internet connection, then try again. Details are in Settings → Troubleshooting."
 javaRequired = "Java is Required<br>to Launch"
 javaRequiredMessage = 'A valid x64 installation of Java {major} is required to launch.<br><br>Please refer to the <a href="https://github.com/dscalzi/HeliosLauncher/wiki/Java-Management#manually-installing-a-valid-version-of-java">Java Management Guide</a> for instructions on how to manually install Java.'
 javaRequiredDismiss = "I Understand"
@@ -230,11 +232,11 @@ javaInstalled = "Java Installed!"
 [js.landing.dlAsync]
 loadingServerInfo = "Loading server information…"
 fatalError = "Fatal Error"
-unableToLoadDistributionIndex = "Could not load a copy of the distribution index. See the console (CTRL + Shift + i) for more details."
+unableToLoadDistributionIndex = "Could not load the list of modpack files. Check your Internet connection. Details are in Settings → Troubleshooting."
 pleaseWait = "Please wait…"
 errorDuringLaunchTitle = "Error During Launch"
-errorDuringLaunchText = "An error occurred while preparing the game. See the console (CTRL + Shift + i) for more details."
-seeConsoleForDetails = "See console (CTRL + Shift + i) for more details."
+errorDuringLaunchText = "An error occurred while preparing the game. Details are in Settings → Troubleshooting."
+seeConsoleForDetails = "Details are in Settings → Troubleshooting."
 validatingFileIntegrity = "Validating file integrity…"
 errorDuringFileVerificationTitle = "Error During File Verification"
 downloadingFiles = "Downloading files…"
@@ -244,7 +246,7 @@ preparingToLaunch = "Preparing to launch…"
 launchingGame = "Launching game…"
 launchWrapperNotDownloaded = "The main file, LaunchWrapper, failed to download properly. As a result, the game cannot launch.<br><br>To fix this issue, temporarily turn off your antivirus software and launch the game again.<br><br>If it keeps happening, let the staff know on Discord and tell them which antivirus software you use."
 doneEnjoyServer = "Done. Have fun on Nerysia!"
-checkConsoleForDetails = "Please check the console (CTRL + Shift + i) for more details."
+checkConsoleForDetails = "Details are in Settings → Troubleshooting."
 
 [js.landing.news]
 checking = "Loading news"
@@ -271,7 +273,7 @@ loadingMods = "Loading mods…"
 initMods = "Starting mods…"
 openingWindow = "Opening the game…"
 crashedTitle = "Minecraft closed"
-crashedText = "Minecraft stopped while starting (code {code}).<br><br>Try again. If it keeps happening, send the game's <b>logs/latest.log</b> file to the staff."
+crashedText = "Minecraft stopped while starting (code {code}).<br><br>Try again. If it keeps happening, click “See details”, then “Copy for support”, and paste the report on the Nerysia Discord."
 
 [js.landing.alreadyRunning]
 launchingTitle = "Minecraft is already starting"
@@ -366,6 +368,7 @@ error = "Failed: {error}"
 launcher = "No launcher log yet."
 game = "No game log: launch the game at least once on this server."
 crash = "No crash recorded for this server."
+previous = "No previous session: this is the first time the launcher has been opened."
 
 [js.settings.backup]
 empty = "No backup yet. The first one will be made at the next modpack update."
@@ -428,7 +431,7 @@ xblBannedDesc = "Your Microsoft account is from a country where Xbox Live is not
 under18Title = "Error During Login:<br>Parental Approval Required"
 under18Desc = "Accounts for users under the age of 18 must be added to a Family by an adult."
 unknownTitle = "Unknown Error During Login"
-unknownDesc = "An unknown error has occurred. Please see the console for details."
+unknownDesc = "An unknown error has occurred. Details are in Settings → Troubleshooting."
 
 [js.skin]
 title = "Change skin"

@@ -70,6 +70,7 @@ supportCopyReport = "Copier pour le support"
 supportLogLauncher = "Launcher"
 supportLogGame = "Jeu"
 supportLogCrash = "Dernier plantage"
+supportLogPrevious = "Session d'avant"
 supportCopyLog = "Copier ce journal"
 supportRefresh = "Actualiser"
 supportOpenFolder = "Ouvrir le dossier"
@@ -179,13 +180,14 @@ tryAgain = "Réessayer"
 
 [js.login.error.unknown]
 title = "Erreur inconnue pendant la connexion"
-desc = "Une erreur inconnue s'est produite. Les détails sont dans la console."
+desc = "Une erreur inconnue s'est produite. Les détails sont dans Paramètres → Dépannage."
 
 [js.landing.launch]
 pleaseWait = "Un instant…"
 failureTitle = "Erreur au lancement"
-failureText = "Plus de détails dans la console (Ctrl + Maj + I)."
+failureText = "Les détails sont dans Paramètres → Dépannage."
 okay = "OK"
+openSupport = "Voir les détails"
 
 [js.landing.selectedAccount]
 noAccountSelected = "Aucun compte sélectionné"
@@ -215,7 +217,7 @@ installJava = "Installer Java"
 installJavaManually = "Installer moi-même"
 javaDownloadPrepare = "Préparation du téléchargement de Java…"
 javaDownloadFailureTitle = "Erreur pendant le téléchargement de Java"
-javaDownloadFailureText = "Plus de détails dans la console (Ctrl + Maj + I)."
+javaDownloadFailureText = "Vérifie ta connexion à Internet, puis réessaie. Les détails sont dans Paramètres → Dépannage."
 javaRequired = "Java est nécessaire<br>pour jouer"
 javaRequiredMessage = "Il faut une installation valide de Java {major} (x64) pour lancer le jeu.<br><br>Le <a href=\"https://github.com/dscalzi/HeliosLauncher/wiki/Java-Management#manually-installing-a-valid-version-of-java\">guide de gestion de Java</a> (en anglais) explique comment l'installer à la main."
 javaRequiredDismiss = "J'ai compris"
@@ -230,11 +232,11 @@ javaInstalled = "Java installé !"
 [js.landing.dlAsync]
 loadingServerInfo = "Chargement des infos du serveur…"
 fatalError = "Erreur fatale"
-unableToLoadDistributionIndex = "Impossible de charger la liste des fichiers du modpack. Plus de détails dans la console (Ctrl + Maj + I)."
+unableToLoadDistributionIndex = "Impossible de charger la liste des fichiers du modpack. Vérifie ta connexion à Internet. Les détails sont dans Paramètres → Dépannage."
 pleaseWait = "Un instant…"
 errorDuringLaunchTitle = "Erreur au lancement"
-errorDuringLaunchText = "Une erreur s'est produite pendant la préparation du jeu. Plus de détails dans la console (Ctrl + Maj + I)."
-seeConsoleForDetails = "Plus de détails dans la console (Ctrl + Maj + I)."
+errorDuringLaunchText = "Une erreur s'est produite pendant la préparation du jeu. Les détails sont dans Paramètres → Dépannage."
+seeConsoleForDetails = "Les détails sont dans Paramètres → Dépannage."
 validatingFileIntegrity = "Vérification des fichiers…"
 errorDuringFileVerificationTitle = "Erreur pendant la vérification des fichiers"
 downloadingFiles = "Téléchargement des fichiers…"
@@ -244,7 +246,7 @@ preparingToLaunch = "Préparation du lancement…"
 launchingGame = "Lancement du jeu…"
 launchWrapperNotDownloaded = "Le fichier principal du jeu (LaunchWrapper) n'a pas été téléchargé correctement : le jeu ne peut pas démarrer.<br><br>Pour régler le problème, désactive temporairement ton antivirus, puis relance le jeu.<br><br>Si ça continue, préviens le staff sur Discord en indiquant quel antivirus tu utilises."
 doneEnjoyServer = "C'est parti, bon jeu sur Nerysia !"
-checkConsoleForDetails = "Plus de détails dans la console (Ctrl + Maj + I)."
+checkConsoleForDetails = "Les détails sont dans Paramètres → Dépannage."
 
 [js.landing.news]
 checking = "Chargement des actualités"
@@ -271,7 +273,7 @@ loadingMods = "Chargement des mods…"
 initMods = "Démarrage des mods…"
 openingWindow = "Ouverture du jeu…"
 crashedTitle = "Minecraft s'est fermé"
-crashedText = "Minecraft s'est arrêté pendant son démarrage (code {code}).<br><br>Réessaie. Si ça recommence, envoie au staff le fichier <b>logs/latest.log</b> du jeu."
+crashedText = "Minecraft s'est arrêté pendant son démarrage (code {code}).<br><br>Réessaie. Si ça recommence, clique sur « Voir les détails », puis sur « Copier pour le support », et colle le rapport sur le Discord de Nerysia."
 
 [js.landing.alreadyRunning]
 launchingTitle = "Minecraft est déjà en train de se lancer"
@@ -366,6 +368,7 @@ error = "Échec : {error}"
 launcher = "Aucun journal du launcher pour l'instant."
 game = "Aucun journal du jeu : lance le jeu au moins une fois sur ce serveur."
 crash = "Aucun plantage enregistré pour ce serveur."
+previous = "Pas de session d'avant : c'est la première fois que le launcher est ouvert."
 
 [js.settings.backup]
 empty = "Aucune sauvegarde pour l'instant. La première sera faite à la prochaine mise à jour du modpack."
@@ -428,7 +431,7 @@ xblBannedDesc = "Ton compte Microsoft vient d'un pays où Xbox Live n'est pas di
 under18Title = "Erreur de connexion :<br>accord parental requis"
 under18Desc = "Les comptes des moins de 18 ans doivent être ajoutés à une famille Microsoft par un adulte."
 unknownTitle = "Erreur inconnue pendant la connexion"
-unknownDesc = "Une erreur inconnue s'est produite. Les détails sont dans la console."
+unknownDesc = "Une erreur inconnue s'est produite. Les détails sont dans Paramètres → Dépannage."
 
 [js.skin]
 title = "Changer de skin"

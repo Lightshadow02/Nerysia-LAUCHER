@@ -33,6 +33,7 @@ const ProcessBuilder          = require('./assets/js/processbuilder')
 const ModpackUpdater          = require('./assets/js/modpackupdater')
 const GameInstances           = require('./assets/js/gameinstances')
 const PlayerBackup            = require('./assets/js/playerbackup')
+const LauncherLog             = require('./assets/js/launcherlog')
 const SkinChanger             = require('./assets/js/skinchanger')
 const SkinViewer              = require('./assets/js/skinviewer')
 const SkinHistory             = require('./assets/js/skinhistory')
@@ -960,16 +961,40 @@ let serverStatusListener = setInterval(() => refreshServerStatus(true), 300000)
  * 
  * @param {string} title The overlay title.
  * @param {string} desc The overlay description.
+ * @param {string} logKind Journal ouvert par "Voir les details" (onglet Depannage) : 'launcher' ou 'game'.
  */
-function showLaunchFailure(title, desc){
+function showLaunchFailure(title, desc, logKind = 'launcher'){
+    LoggerUtil.getLogger('LaunchSuite').error(`Fenetre d'erreur affichee : ${title} | ${String(desc).replace(/<[^>]+>/g, ' ')}`)
     setOverlayContent(
         title,
         desc,
-        Lang.queryJS('landing.launch.okay')
+        Lang.queryJS('landing.launch.okay'),
+        Lang.queryJS('landing.launch.openSupport')
     )
     setOverlayHandler(null)
-    toggleOverlay(true)
+    setDismissHandler(() => {
+        toggleOverlay(false)
+        openSupportTab(logKind)
+    })
+    toggleOverlay(true, true)
     toggleLaunchArea(false)
+}
+
+/** Ouvre Parametres > Depannage sur un journal (apres une erreur, pour copier le rapport). */
+async function openSupportTab(logKind = 'launcher'){
+    supportKind = logKind // journal affiche par l'onglet (settings.js)
+    await prepareSettings() // relit le journal si l'onglet Depannage etait deja ouvert
+    const tab = document.querySelector('.settingsNavItem[rSc=settingsTabSupport]')
+    const show = () => {
+        if(!tab.hasAttribute('selected')){
+            settingsNavItemListener(tab, false) // charge le journal
+        }
+    }
+    if(getCurrentView() === VIEWS.settings){
+        show()
+    } else {
+        switchView(getCurrentView(), VIEWS.settings, 500, 500, show)
+    }
 }
 
 /* System (Java) Scan */
@@ -1002,13 +1027,14 @@ async function asyncSystemScan(effectiveJavaOptions, launchAfter = true){
         setOverlayHandler(() => {
             setLaunchDetails(Lang.queryJS('landing.systemScan.javaDownloadPrepare'))
             toggleOverlay(false)
-            
-            try {
-                downloadJava(effectiveJavaOptions, launchAfter)
-            } catch(err) {
-                loggerLanding.error('Unhandled error in Java Download', err)
+
+            // downloadJava est asynchrone : un try/catch autour ne voyait pas ses erreurs
+            // (la barre restait bloquee sans message)
+            downloadJava(effectiveJavaOptions, launchAfter).catch(err => {
+                loggerLanding.error('Erreur pendant l\'installation de Java :', err)
+                remote.getCurrentWindow().setProgressBar(-1)
                 showLaunchFailure(Lang.queryJS('landing.systemScan.javaDownloadFailureTitle'), Lang.queryJS('landing.systemScan.javaDownloadFailureText'))
-            }
+            })
         })
         setDismissHandler(() => {
             $('#overlayContent').fadeOut(250, () => {
@@ -1035,6 +1061,7 @@ async function asyncSystemScan(effectiveJavaOptions, launchAfter = true){
     } else {
         // Java installation found, use this to launch the game.
         const javaExec = javaExecFromRoot(jvmDetails.path)
+        loggerLanding.info(`Java trouve : ${javaExec} (version ${jvmDetails.semverStr ?? '?'})`)
         ConfigManager.setJavaExecutable(ConfigManager.getSelectedServer(), javaExec)
         ConfigManager.save()
 
@@ -1064,6 +1091,7 @@ async function downloadJava(effectiveJavaOptions, launchAfter = true) {
     if(asset == null) {
         throw new Error(Lang.queryJS('landing.downloadJava.findJdkFailure'))
     }
+    loggerLanding.info(`Java ${effectiveJavaOptions.suggestedMajor} : telechargement de ${asset.url} (${asset.size} octets)`)
 
     let received = 0
     await downloadFile(asset.url, asset.path, ({ transferred }) => {
@@ -1075,7 +1103,7 @@ async function downloadJava(effectiveJavaOptions, launchAfter = true) {
     if(received != asset.size) {
         loggerLanding.warn(`Java Download: Expected ${asset.size} bytes but received ${received}`)
         if(!await validateLocalFile(asset.path, asset.algo, asset.hash)) {
-            log.error(`Hashes do not match, ${asset.id} may be corrupted.`)
+            loggerLanding.error(`Hashes do not match, ${asset.id} may be corrupted.`)
             // Don't know how this could happen, but report it.
             throw new Error(Lang.queryJS('landing.downloadJava.javaDownloadCorruptedError'))
         }
@@ -1098,16 +1126,20 @@ async function downloadJava(effectiveJavaOptions, launchAfter = true) {
         setLaunchDetails(eLStr + dotStr)
     }, 750)
 
-    const newJavaExec = await extractJdk(asset.path)
-
-    // Extraction complete, remove the loading from the OS progress bar.
-    remote.getCurrentWindow().setProgressBar(-1)
+    let newJavaExec
+    try {
+        newJavaExec = await extractJdk(asset.path)
+    } finally {
+        clearInterval(extractListener)
+        // Extraction complete, remove the loading from the OS progress bar.
+        remote.getCurrentWindow().setProgressBar(-1)
+    }
+    loggerLanding.info(`Java installe : ${newJavaExec}`)
 
     // Extraction completed successfully.
     ConfigManager.setJavaExecutable(ConfigManager.getSelectedServer(), newJavaExec)
     ConfigManager.save()
 
-    clearInterval(extractListener)
     setLaunchDetails(Lang.queryJS('landing.downloadJava.javaInstalled'))
 
     // TODO Callback hell
@@ -1267,6 +1299,8 @@ async function dlAsyncInner(login = true) {
     }
 
     const serv = distro.getServerById(ConfigManager.getSelectedServer())
+    // Repere dans le journal (onglet Depannage) : debut d'un lancement
+    loggerLaunchSuite.info(`===== Lancement : ${serv.rawServer.id} - modpack ${serv.rawServer.version} - Minecraft ${serv.rawServer.minecraftVersion} =====`)
 
     setLaunchDetails(Lang.queryJS('landing.dlAsync.pleaseWait'))
     toggleLaunchArea(true)
@@ -1280,8 +1314,10 @@ async function dlAsyncInner(login = true) {
             setLaunchPercentage(percent)
         })
         setLaunchPercentage(100)
+        loggerLaunchSuite.info(`Verification terminee : ${invalidFileCount} fichier(s) a telecharger.`)
     } catch (err) {
-        loggerLaunchSuite.error('Error during file validation.')
+        // Le detail (fichier, cause) est ecrit juste au-dessus par le processus de verification
+        loggerLaunchSuite.error('Erreur pendant la verification des fichiers :', err?.displayable ?? 'voir les lignes au-dessus')
         showLaunchFailure(Lang.queryJS('landing.dlAsync.errorDuringFileVerificationTitle'), err.displayable || Lang.queryJS('landing.dlAsync.seeConsoleForDetails'))
         return
     }
@@ -1299,8 +1335,10 @@ async function dlAsyncInner(login = true) {
                 setDownloadPercentage(percent)
             })
             setDownloadPercentage(100)
+            loggerLaunchSuite.info('Telechargement termine.')
         } catch(err) {
-            loggerLaunchSuite.error('Error during file download.')
+            // Le detail (adresse du fichier, cause) est ecrit juste au-dessus par le processus de telechargement
+            loggerLaunchSuite.error('Erreur pendant le telechargement des fichiers :', err?.displayable ?? 'voir les lignes au-dessus')
             showLaunchFailure(Lang.queryJS('landing.dlAsync.errorDuringFileDownloadTitle'), err.displayable || Lang.queryJS('landing.dlAsync.seeConsoleForDetails'))
             return
         }
@@ -1399,6 +1437,7 @@ async function dlAsyncInner(login = true) {
                 const line = raw.trim()
                 if(GAME_JOINED_REGEX.test(line)){
                     // "Sound engine started" : fin du chargement, le menu du jeu s'affiche
+                    loggerLaunchSuite.info('Minecraft a demarre (menu du jeu affiche).')
                     finishStart(true)
                     return
                 }
@@ -1441,6 +1480,7 @@ async function dlAsyncInner(login = true) {
 
         try {
             // Build Minecraft process.
+            LauncherLog.gameStarting()
             proc = pb.build()
             gameProc = proc
             GameInstances.register(gameProc, serv)
@@ -1472,9 +1512,12 @@ async function dlAsyncInner(login = true) {
                         loggerLaunchSuite.error(`Minecraft closed during startup (code ${code}).`)
                         showLaunchFailure(
                             Lang.queryJS('landing.gameStart.crashedTitle'),
-                            Lang.queryJS('landing.gameStart.crashedText', { code })
+                            Lang.queryJS('landing.gameStart.crashedText', { code }),
+                            'game'
                         )
                     }
+                } else {
+                    loggerLaunchSuite.info(`Minecraft ferme (code ${code}).`)
                 }
             })
 
